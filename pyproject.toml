@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thesis"
+version = "0.0.1"
+description = "My thesis on Graph Interpretations of Latent Features of Transformer Language Models"
+authors = [
+  { name = "albertsgarde", email = "your@email.com" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.11"
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.setuptools]
+packages = ["thesis"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = {file = ['requirements_dev.txt']}
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "thesis"
+]
+
+
+[tool.ruff]
+line-length = 120
+select = ["I", "E", "F", "W", "N", "B"]
+ignore = ["D203", "D213"]
+lint.isort.known-first-party = ["device", "models", "data"]
