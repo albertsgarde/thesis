@@ -9,6 +9,8 @@ from jaxtyping import Float, Int
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
 
+from thesis.mas.sample_loader import SampleDataset
+
 from ..device import get_device
 from . import html
 
@@ -43,14 +45,11 @@ def main(config: MASConfig):
     context_size = model.cfg.n_ctx
     print(f"Model context size: {context_size}")
 
-    for i, datapoint in enumerate(dataset.iter(batch_size=1)):
-        text = datapoint["text"]
-        tokens = model.to_tokens(datapoint["text"], truncate=False)
-        print(tokens.shape)
+    sample_dataset = SampleDataset(context_size, context_size // 4, model, dataset)
 
-        tokens = tokens[0, :context_size]
-        model.run_with_hooks(tokens, fwd_hooks=[("blocks.0.mlp.hook_mid", create_hook(tokens))])
-        if i == 0:
+    for i, sample in enumerate(sample_dataset):
+        model.run_with_hooks(sample.tokens, fwd_hooks=[("blocks.0.mlp.hook_mid", create_hook(sample.tokens))])
+        if i == 10:
             break
 
     with open("outputs/output.html", "w") as f:

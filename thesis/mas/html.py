@@ -17,7 +17,12 @@ def token_color(activation: float, max_abs_activation: float) -> str:
 
 def token_html(token: str, activation: float, max_abs_activation: float) -> str:
     token = token.replace("\n", "\\n").replace("\t", "\\t")
-    return f"<span style='background-color: {token_color(activation, max_abs_activation)}'>{html.escape(token)}</span>"
+    tooltip = f"Activation: {activation:.4f}"
+    return f"""\
+<span style='background-color: {token_color(activation, max_abs_activation)}' title='{tooltip}'>
+    {html.escape(token)}
+</span>\
+"""
 
 
 def sample_html(
