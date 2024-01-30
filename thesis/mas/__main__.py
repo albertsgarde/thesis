@@ -1,4 +1,3 @@
-import html
 from dataclasses import dataclass
 from typing import Any, Callable, Tuple
 
@@ -10,44 +9,13 @@ from jaxtyping import Float, Int
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
 
-from .device import get_device
+from ..device import get_device
+from . import html
 
 
 @dataclass
 class MASConfig:
     model_name: str = "solu-1l"
-
-
-def token_color(activation: float, max_abs_activation: float) -> str:
-    activation = activation / max_abs_activation
-    if activation >= 0:
-        return f"rgba({255*(1-activation)}, {255*(1-activation)}, 255, {activation})"
-    else:
-        return f"rgba(255, {255*(1+activation)}, {255*(1+activation)}, {-activation})"
-
-
-def token_html(token: str, activation: float, max_abs_activation: float) -> str:
-    return f"<span style='background-color: {token_color(activation, max_abs_activation)}'>{html.escape(token)}</span>"
-
-
-def sample_html(
-    model: HookedTransformer,
-    tokens: Int[Tensor, " context"],
-    activations: Float[Tensor, " context"],
-) -> str:
-    max_abs_activation = activations.abs().max()
-    token_strings: list[str] = model.to_str_tokens(tokens)
-    text: str = "".join(
-        token_html(token, activation, max_abs_activation) for token, activation in zip(token_strings, activations)
-    )
-    return f"<p>{text}</p>"
-
-
-def generate_html(
-    model: HookedTransformer,
-    samples: list[Tuple[Int[Tensor, " context"], Float[Tensor, " context"]]],
-) -> str:
-    return "".join(sample_html(model, tokens, activations) for tokens, activations in samples)
 
 
 def main(config: MASConfig):
@@ -59,12 +27,6 @@ def main(config: MASConfig):
     dataset = dataset.take(1000)  # type: ignore[reportUnknownMemberType]
 
     model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
-
-    for i, datapoint in enumerate(dataset.iter(batch_size=1)):
-        text = datapoint["text"][0]
-        print(model.to_tokens(text, truncate=False).shape)
-        if i == 10:
-            break
 
     neuron_index = 0
 
@@ -79,7 +41,7 @@ def main(config: MASConfig):
         return hook
 
     context_size = model.cfg.n_ctx
-    print(f"Context size: {context_size}")
+    print(f"Model context size: {context_size}")
 
     for i, datapoint in enumerate(dataset.iter(batch_size=1)):
         text = datapoint["text"]
@@ -92,7 +54,7 @@ def main(config: MASConfig):
             break
 
     with open("outputs/output.html", "w") as f:
-        f.write(generate_html(model, samples))
+        f.write(html.generate_html(model, samples))
 
 
 cs = ConfigStore.instance()
