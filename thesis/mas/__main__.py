@@ -2,14 +2,14 @@ import itertools
 import os
 import time
 from dataclasses import dataclass
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
 import hydra
 import torch
 from datasets import IterableDataset  # type: ignore[missingTypeStubs]
 from hydra.core.config_store import ConfigStore
-from jaxtyping import Float, Int
+from jaxtyping import Float
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
 
@@ -34,6 +34,12 @@ def main(config: MASConfig):
         dataset = dataset.take(1000)  # type: ignore[reportUnknownMemberType]
 
         model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
+        if model.tokenizer is None:
+            raise ValueError("Model must have tokenizer.")
+        if model.tokenizer.pad_token_id is None:
+            raise ValueError("Model tokenizer must have pad token.")
+        if model.cfg is None:
+            raise ValueError("Model must have config.")
 
         neuron_index = 0
 
@@ -42,7 +48,7 @@ def main(config: MASConfig):
 
         sample_dataset = SampleDataset(context_size, 256, model, dataset)
 
-        mas_store = MASStore(20, 2048, context_size, device)
+        mas_store = MASStore(32, 2048, context_size, 192, 64, model.tokenizer.pad_token_id, device)
 
         def create_hook(
             sample: Sample, mas_store: MASStore

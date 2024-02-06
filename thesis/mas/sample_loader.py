@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Generator, Optional
 
-import torch.nn.functional as F
-from datasets import IterableDataset
+import torch.nn.functional as f
+from datasets import IterableDataset  # type: ignore[missingTypeStubs, import-untyped]
 from jaxtyping import Int
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
@@ -56,9 +56,11 @@ class SampleIterator:
         else:
             self.cur_sample_index += self.context_size - self.overlap_size
         sample = self.cur_sample[self.cur_sample_index : self.cur_sample_index + self.context_size]
-        sample = F.pad(
+        if self.model.tokenizer is None:
+            raise ValueError("Model must have tokenizer.")
+        sample = f.pad(
             sample, (0, self.context_size - sample.shape[-1]), mode="constant", value=self.model.tokenizer.pad_token_id
         )
-        assert sample.shape[-1] == self.context_size, f"""Sample must be padded to context length. 
-        Sample length: {sample.shape[-1]}, context size: {self.context_size}"""
+        assert sample.shape[-1] == self.context_size, f"""Sample must be padded to context length.
+         Sample length: {sample.shape[-1]}, context size: {self.context_size}"""
         return Sample(sample, 0 if self.cur_sample_index == 0 else self.overlap_size)
