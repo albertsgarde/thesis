@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Generator, Optional
 
+import torch.nn.functional as F
 from datasets import IterableDataset
 from jaxtyping import Int
 from torch import Tensor
@@ -24,7 +25,7 @@ class SampleDataset:
 @dataclass
 class Sample:
     tokens: Int[Tensor, " context"]
-    start_of_context: bool
+    overlap: int
 
 
 class SampleIterator:
@@ -55,4 +56,9 @@ class SampleIterator:
         else:
             self.cur_sample_index += self.context_size - self.overlap_size
         sample = self.cur_sample[self.cur_sample_index : self.cur_sample_index + self.context_size]
-        return Sample(sample, self.cur_sample_index == 0)
+        sample = F.pad(
+            sample, (0, self.context_size - sample.shape[-1]), mode="constant", value=self.model.tokenizer.pad_token_id
+        )
+        assert sample.shape[-1] == self.context_size, f"""Sample must be padded to context length. 
+        Sample length: {sample.shape[-1]}, context size: {self.context_size}"""
+        return Sample(sample, 0 if self.cur_sample_index == 0 else self.overlap_size)

@@ -2,6 +2,7 @@ import html
 import json
 from typing import Tuple
 
+import torch
 from jaxtyping import Float, Int
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
@@ -30,25 +31,38 @@ def sample_html(
     tokens: Int[Tensor, " context"],
     activations: Float[Tensor, " context"],
 ) -> str:
+    assert tokens.shape == activations.shape, "Tokens and activations must have the same shape"
+    first_pad: Int[Tensor, "0:1"] = (tokens == model.tokenizer.pad_token_id).nonzero(as_tuple=True)[0]
+    if first_pad.numel() == 0:
+        first_pad = tokens.shape[-1]
+    else:
+        first_pad = first_pad[0]
+    token_strings: list[str] = model.to_str_tokens(tokens[:first_pad])
+    activations = activations[:first_pad]
     max_abs_activation = activations.abs().max()
-    token_strings: list[str] = model.to_str_tokens(tokens)
     text: str = "".join(
-        token_html(token, activation, max_abs_activation) for token, activation in zip(token_strings, activations)
+        token_html(token, activation, max_abs_activation)
+        for token, activation in zip(token_strings, activations, strict=True)
     )
     return f"<p>{text}</p>"
 
 
 def generate_html(
     model: HookedTransformer,
-    samples: list[Tuple[Int[Tensor, " context"], Float[Tensor, " context"]]],
+    samples: Int[Tensor, "num_samples context"],
+    activations: Float[Tensor, "num_samples context"],
 ) -> str:
-    samples = "<hr>".join(sample_html(model, tokens, activations) for tokens, activations in samples)
+    assert not torch.isinf(activations).any(), "Infinite activations found"
+    assert not torch.isnan(activations).any(), "NaN activations found"
+    samples_html: str = "<hr>".join(
+        sample_html(model, tokens, activations) for tokens, activations in zip(samples, activations, strict=True)
+    )
     return f"""
 <head>
 	<meta charset="utf-8" />
     <title>Sample activations</title>
 </head>
 <body>
-    {samples}
+    {samples_html}
 </body>
 """

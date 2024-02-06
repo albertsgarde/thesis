@@ -1,18 +1,22 @@
+import itertools
+import os
+import time
 from dataclasses import dataclass
 from typing import Any, Callable, Tuple
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
 import hydra
+import torch
 from datasets import IterableDataset  # type: ignore[missingTypeStubs]
 from hydra.core.config_store import ConfigStore
 from jaxtyping import Float, Int
 from torch import Tensor
 from transformer_lens.HookedTransformer import HookedTransformer
 
-from thesis.mas.sample_loader import SampleDataset
-
 from ..device import get_device
 from . import html
+from .mas_store import MASStore
+from .sample_loader import Sample, SampleDataset
 
 
 @dataclass
@@ -21,39 +25,53 @@ class MASConfig:
 
 
 def main(config: MASConfig):
-    device = get_device()
+    with torch.no_grad():
+        device = get_device()
 
-    dataset: IterableDataset = datasets.load_dataset(  # type: ignore[reportUnknownMemberType]
-        "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
-    )
-    dataset = dataset.take(1000)  # type: ignore[reportUnknownMemberType]
+        dataset: IterableDataset = datasets.load_dataset(  # type: ignore[reportUnknownMemberType]
+            "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
+        )
+        dataset = dataset.take(1000)  # type: ignore[reportUnknownMemberType]
 
-    model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
+        model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
 
-    neuron_index = 0
+        neuron_index = 0
 
-    samples: list[Tuple[Int[Tensor, " context"], Float[Tensor, " context"]]] = []
+        context_size = model.cfg.n_ctx
+        print(f"Model context size: {context_size}")
 
-    def create_hook(
-        tokens: Int[Tensor, " context"],
-    ) -> Callable[[Float[Tensor, "batch context neurons_per_layer"], Any], None]:
-        def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: Any) -> None:
-            samples.append((tokens, activation[0, :, neuron_index]))
+        sample_dataset = SampleDataset(context_size, 256, model, dataset)
 
-        return hook
+        mas_store = MASStore(20, 2048, context_size, device)
 
-    context_size = model.cfg.n_ctx
-    print(f"Model context size: {context_size}")
+        def create_hook(
+            sample: Sample, mas_store: MASStore
+        ) -> Callable[[Float[Tensor, "batch context neurons_per_layer"], Any], None]:
+            def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: Any) -> None:
+                mas_store.add_sample(sample, activation[0, :, :])
 
-    sample_dataset = SampleDataset(context_size, context_size // 4, model, dataset)
+            return hook
 
-    for i, sample in enumerate(sample_dataset):
-        model.run_with_hooks(sample.tokens, fwd_hooks=[("blocks.0.mlp.hook_mid", create_hook(sample.tokens))])
-        if i == 10:
-            break
+        num_samples = 40
+        start_time = time.time()
+        for i, sample in itertools.islice(enumerate(sample_dataset), num_samples):
+            model.run_with_hooks(sample.tokens, fwd_hooks=[("blocks.0.mlp.hook_mid", create_hook(sample, mas_store))])
+            assert mas_store.num_samples_added() == i + 1
+        end_time = time.time()
+        print(f"Time taken: {end_time - start_time:.2f}s")
+        print(f"Time taken per sample: {(end_time - start_time) / (num_samples):.2f}s")
 
-    with open("outputs/output.html", "w") as f:
-        f.write(html.generate_html(model, samples))
+        os.makedirs("outputs/html", exist_ok=True)
+
+        print("Generating and saving HTML")
+
+        feature_samples = mas_store.feature_samples()
+        feature_activations = mas_store.feature_activations()
+
+        for neuron_index in range(40):
+            with open(f"outputs/html/{neuron_index}.html", "w", encoding="utf-8") as f:
+                html_str = html.generate_html(model, feature_samples[neuron_index], feature_activations[neuron_index])
+                f.write(html_str)
 
 
 cs = ConfigStore.instance()
