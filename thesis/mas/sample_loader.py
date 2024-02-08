@@ -5,7 +5,7 @@ import torch.nn.functional as f
 from datasets import IterableDataset  # type: ignore[missingTypeStubs, import-untyped]
 from jaxtyping import Int
 from torch import Tensor
-from transformer_lens.HookedTransformer import HookedTransformer
+from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
 
 @dataclass
@@ -55,6 +55,7 @@ class SampleIterator:
             self.cur_sample_index = 0
         else:
             self.cur_sample_index += self.context_size - self.overlap_size
+        assert self.cur_sample is not None, "Sample should have been loaded by the preceding code."
         sample = self.cur_sample[self.cur_sample_index : self.cur_sample_index + self.context_size]
         if self.model.tokenizer is None:
             raise ValueError("Model must have tokenizer.")

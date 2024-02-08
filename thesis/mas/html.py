@@ -7,7 +7,7 @@ from beartype import beartype
 from jaxtyping import Float, Int
 from numpy import ndarray
 from torch import Tensor
-from transformer_lens.HookedTransformer import HookedTransformer
+from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
 
 @beartype

@@ -7,6 +7,6 @@ algorithm.run(
         num_max_samples=32,
         sample_length_pre=192,
         sample_length_post=64,
-        samples_to_check=128,
+        samples_to_check=256,
     )
 )

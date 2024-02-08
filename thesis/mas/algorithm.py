@@ -9,8 +9,8 @@ import torch
 from datasets import IterableDataset  # type: ignore[missingTypeStubs]
 from jaxtyping import Float
 from torch import Tensor
-from transformer_lens.hook_points import HookPoint
-from transformer_lens.HookedTransformer import HookedTransformer
+from transformer_lens.hook_points import HookPoint  # type: ignore[import]
+from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
 from ..device import get_device
 from . import html
@@ -43,6 +43,7 @@ class MASConfig:
 def run(config: MASConfig):
     with torch.no_grad():
         device = get_device()
+        print(f"Using device: {device.torch()}")
 
         dataset: IterableDataset = datasets.load_dataset(  # type: ignore[reportUnknownMemberType]
             "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
@@ -87,16 +88,25 @@ def run(config: MASConfig):
 
             return [(f"blocks.{layer}.mlp.hook_mid", hook) for layer in range(num_layers)]
 
-        activation_scratch = torch.zeros((context_size, num_model_neurons))
+        activation_scratch = torch.zeros((context_size, num_model_neurons), device=device.torch())
 
+        model_time = 0.0
+        mas_time = 0.0
         start_time = time.time()
         for i, sample in itertools.islice(enumerate(sample_dataset), config.samples_to_check):
+            model_start_time = time.time()
             model.run_with_hooks(sample.tokens, fwd_hooks=create_hooks(activation_scratch))
+            model_time += time.time() - model_start_time
+            mas_start_time = time.time()
             mas_store.add_sample(sample, activation_scratch)
+            mas_time += time.time() - mas_start_time
             assert mas_store.num_samples_added() == i + 1
         end_time = time.time()
         print(f"Time taken: {end_time - start_time:.2f}s")
         print(f"Time taken per sample: {(end_time - start_time) / (config.samples_to_check):.2f}s")
+
+        print(f"Model time: {model_time:.2f}s")
+        print(f"MAS time: {mas_time:.2f}s")
 
         os.makedirs("outputs/html", exist_ok=True)
 
