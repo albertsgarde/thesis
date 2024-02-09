@@ -187,3 +187,8 @@ lightning_logs
 wandb/
 
 *.lprof
+
+*.aux
+*.out
+*.synctex.gz
+report/*.pdf
