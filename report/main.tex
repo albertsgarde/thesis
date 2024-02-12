@@ -22,12 +22,19 @@
 \usepackage{symbols}
 \usepackage{subfiles} % Should be loaded last in the preamble apparently
 
+
 \title{Thesis}
 \author{Albert Ramus Sidenius Garde (s183969)}
 \date{\today}
 \begin{document}
 \maketitle
+\tableofcontents
+
+\def\isMain{true}
 
 \subfile{sections}
+
+\bibliographystyle{plainnat}
+\bibliography{main}
 
 \end{document}

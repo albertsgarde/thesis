@@ -1,0 +1,94 @@
+
+@misc{foote_neuron_2023,
+  title      = {Neuron to {Graph}: {Interpreting} {Language} {Model} {Neurons} at {Scale}},
+  shorttitle = {Neuron to {Graph}},
+  url        = {http://arxiv.org/abs/2305.19911},
+  doi        = {10.48550/arXiv.2305.19911},
+  abstract   = {Advances in Large Language Models (LLMs) have led to remarkable capabilities, yet their inner mechanisms remain largely unknown. To understand these models, we need to unravel the functions of individual neurons and their contribution to the network. This paper introduces a novel automated approach designed to scale interpretability techniques across a vast array of neurons within LLMs, to make them more interpretable and ultimately safe. Conventional methods require examination of examples with strong neuron activation and manual identification of patterns to decipher the concepts a neuron responds to. We propose Neuron to Graph (N2G), an innovative tool that automatically extracts a neuron's behaviour from the dataset it was trained on and translates it into an interpretable graph. N2G uses truncation and saliency methods to emphasise only the most pertinent tokens to a neuron while enriching dataset examples with diverse samples to better encompass the full spectrum of neuron behaviour. These graphs can be visualised to aid researchers' manual interpretation, and can generate token activations on text for automatic validation by comparison with the neuron's ground truth activations, which we use to show that the model is better at predicting neuron activation than two baseline methods. We also demonstrate how the generated graph representations can be flexibly used to facilitate further automation of interpretability research, by searching for neurons with particular properties, or programmatically comparing neurons to each other to identify similar neurons. Our method easily scales to build graph representations for all neurons in a 6-layer Transformer model using a single Tesla T4 GPU, allowing for wide usability. We release the code and instructions for use at https://github.com/alexjfoote/Neuron2Graph.},
+  urldate    = {2024-02-09},
+  publisher  = {arXiv},
+  author     = {Foote, Alex and Nanda, Neel and Kran, Esben and Konstas, Ioannis and Cohen, Shay and Barez, Fazl},
+  month      = may,
+  year       = {2023},
+  note       = {arXiv:2305.19911 [cs]},
+  keywords   = {Computer Science - Computation and Language, Computer Science - Machine Learning},
+  file       = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\EHVYIWBD\\Foote et al. - 2023 - Neuron to Graph Interpreting Language Model Neuro.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\XLRS23N4\\2305.html:text/html}
+}
+
+@misc{garde_deepdecipher_2023,
+  title      = {{DeepDecipher}: {Accessing} and {Investigating} {Neuron} {Activation} in {Large} {Language} {Models}},
+  copyright  = {Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International Licence (CC-BY-NC-ND)},
+  shorttitle = {{DeepDecipher}},
+  url        = {http://arxiv.org/abs/2310.01870},
+  doi        = {10.48550/arXiv.2310.01870},
+  abstract   = {As large language models (LLMs) become more capable, there is an urgent need for interpretable and transparent tools. Current methods are difficult to implement, and accessible tools to analyze model internals are lacking. To bridge this gap, we present DeepDecipher - an API and interface for probing neurons in transformer models' MLP layers. DeepDecipher makes the outputs of advanced interpretability techniques for LLMs readily available. The easy-to-use interface also makes inspecting these complex models more intuitive. This paper outlines DeepDecipher's design and capabilities. We demonstrate how to analyze neurons, compare models, and gain insights into model behavior. For example, we contrast DeepDecipher's functionality with similar tools like Neuroscope and OpenAI's Neuron Explainer. DeepDecipher enables efficient, scalable analysis of LLMs. By granting access to state-of-the-art interpretability methods, DeepDecipher makes LLMs more transparent, trustworthy, and safe. Researchers, engineers, and developers can quickly diagnose issues, audit systems, and advance the field.},
+  urldate    = {2024-02-09},
+  publisher  = {arXiv},
+  author     = {Garde, Albert and Kran, Esben and Barez, Fazl},
+  month      = nov,
+  year       = {2023},
+  note       = {arXiv:2310.01870 [cs]},
+  keywords   = {Computer Science - Machine Learning, 68T50 (Primary) 68T05 (Secondary), I.2.7},
+  annote     = {Comment: 5 pages (9 total), 1 figure, submitted to NeurIPS 2023 Workshop XAIA},
+  file       = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\3RIPKI9H\\Garde et al. - 2023 - DeepDecipher Accessing and Investigating Neuron A.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\HPGFUTED\\2310.html:text/html}
+}
+
+@misc{bloom_open_2024,
+  title    = {Open {Source} {Sparse} {Autoencoders} for all {Residual} {Stream} {Layers} of {GPT2}-{Small}},
+  url      = {https://www.lesswrong.com/posts/f9EgfLSurAiqRJySD/open-source-sparse-autoencoders-for-all-residual-stream},
+  language = {en},
+  urldate  = {2024-02-09},
+  author   = {Bloom, Joseph},
+  month    = feb,
+  year     = {2024},
+  file     = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\7CSP42FU\\open-source-sparse-autoencoders-for-all-residual-stream.html:text/html}
+}
+
+@misc{cunningham_sparse_2023,
+  title     = {Sparse {Autoencoders} {Find} {Highly} {Interpretable} {Features} in {Language} {Models}},
+  url       = {http://arxiv.org/abs/2309.08600},
+  doi       = {10.48550/arXiv.2309.08600},
+  abstract  = {One of the roadblocks to a better understanding of neural networks' internals is {\textbackslash}textit\{polysemanticity\}, where neurons appear to activate in multiple, semantically distinct contexts. Polysemanticity prevents us from identifying concise, human-understandable explanations for what neural networks are doing internally. One hypothesised cause of polysemanticity is {\textbackslash}textit\{superposition\}, where neural networks represent more features than they have neurons by assigning features to an overcomplete set of directions in activation space, rather than to individual neurons. Here, we attempt to identify those directions, using sparse autoencoders to reconstruct the internal activations of a language model. These autoencoders learn sets of sparsely activating features that are more interpretable and monosemantic than directions identified by alternative approaches, where interpretability is measured by automated methods. Moreover, we show that with our learned set of features, we can pinpoint the features that are causally responsible for counterfactual behaviour on the indirect object identification task {\textbackslash}citep\{wang2022interpretability\} to a finer degree than previous decompositions. This work indicates that it is possible to resolve superposition in language models using a scalable, unsupervised method. Our method may serve as a foundation for future mechanistic interpretability work, which we hope will enable greater model transparency and steerability.},
+  urldate   = {2024-02-09},
+  publisher = {arXiv},
+  author    = {Cunningham, Hoagy and Ewart, Aidan and Riggs, Logan and Huben, Robert and Sharkey, Lee},
+  month     = oct,
+  year      = {2023},
+  note      = {arXiv:2309.08600 [cs]},
+  keywords  = {Computer Science - Computation and Language, Computer Science - Machine Learning},
+  annote    = {Comment: 20 pages, 18 figures, 2 tables},
+  file      = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\GGYGXFZ5\\Cunningham et al. - 2023 - Sparse Autoencoders Find Highly Interpretable Feat.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\MPIW2KKM\\2309.html:text/html}
+}
+
+@misc{rogers_primer_2020,
+  title      = {A {Primer} in {BERTology}: {What} we know about how {BERT} works},
+  shorttitle = {A {Primer} in {BERTology}},
+  url        = {http://arxiv.org/abs/2002.12327},
+  doi        = {10.48550/arXiv.2002.12327},
+  abstract   = {Transformer-based models have pushed state of the art in many areas of NLP, but our understanding of what is behind their success is still limited. This paper is the first survey of over 150 studies of the popular BERT model. We review the current state of knowledge about how BERT works, what kind of information it learns and how it is represented, common modifications to its training objectives and architecture, the overparameterization issue and approaches to compression. We then outline directions for future research.},
+  urldate    = {2024-02-09},
+  publisher  = {arXiv},
+  author     = {Rogers, Anna and Kovaleva, Olga and Rumshisky, Anna},
+  month      = nov,
+  year       = {2020},
+  note       = {arXiv:2002.12327 [cs]},
+  keywords   = {Computer Science - Computation and Language},
+  annote     = {Comment: Accepted to TACL. Please note that the multilingual BERT section is only available in version 1},
+  file       = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\9H3J65NM\\Rogers et al. - 2020 - A Primer in BERTology What we know about how BERT.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\44E2CYUZ\\2002.html:text/html}
+}
+
+@article{elhage_toy_2022,
+  title   = {Toy {Models} of {Superposition}},
+  journal = {Transformer Circuits Thread},
+  author  = {Elhage, Nelson and Hume, Tristan and Olsson, Catherine and Schiefer, Nicholas and Henighan, Tom and Kravec, Shauna and Hatfield-Dodds, Zac and Lasenby, Robert and Drain, Dawn and Chen, Carol and Grosse, Roger and McCandlish, Sam and Kaplan, Jared and Amodei, Dario and Wattenberg, Martin and Olah, Christopher},
+  year    = {2022},
+  annote  = {https://transformer-circuits.pub/2022/toy\_model/index.html}
+}
+
+@article{bricken_towards_2023,
+  title   = {Towards {Monosemanticity}: {Decomposing} {Language} {Models} {With} {Dictionary} {Learning}},
+  journal = {Transformer Circuits Thread},
+  author  = {Bricken, Trenton and Templeton, Adly and Batson, Joshua and Chen, Brian and Jermyn, Adam and Conerly, Tom and Turner, Nick and Anil, Cem and Denison, Carson and Askell, Amanda and Lasenby, Robert and Wu, Yifan and Kravec, Shauna and Schiefer, Nicholas and Maxwell, Tim and Joseph, Nicholas and Hatfield-Dodds, Zac and Tamkin, Alex and Nguyen, Karina and McLean, Brayden and Burke, Josiah E and Hume, Tristan and Carter, Shan and Henighan, Tom and Olah, Christopher},
+  year    = {2023},
+  annote  = {https://transformer-circuits.pub/2023/monosemantic-features/index.html}
+}
