@@ -1,9 +1,9 @@
-name: LaTeX
+name: Check LaTeX
 
 on: pull_request
 
 jobs:
-  build_latex:
+  check_latex:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
