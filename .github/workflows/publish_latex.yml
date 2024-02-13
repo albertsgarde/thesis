@@ -3,10 +3,11 @@ name: Publish LaTeX
 on:
   push:
     branches:
-      - 5-check-latex-and-generate-report-in-ci
+      - main
 
 jobs:
   build_latex:
+    if: contains(github.event.head_commit.modified, 'report/')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -20,11 +21,12 @@ jobs:
 
       - name: Move PDF to root directory
         run: |
-          mv report/main.pdf main.pdf
+          mkdir -p github_pages
+          mv report/main.pdf github_pages/main.pdf
 
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.PAGES_TOKEN }}
-          publish_dir: ./
+          publish_dir: ./github_pages
           publish_branch: github-pages
