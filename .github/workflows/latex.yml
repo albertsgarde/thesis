@@ -5,14 +5,11 @@ on: pull_request
 jobs:
   build_latex:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: report/
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Compile Latex
         uses: xu-cheng/latex-action@v2
         with:
-          root_file: main.tex
+          root_file: report/main.tex
  
