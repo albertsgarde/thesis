@@ -8,8 +8,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - working-directory: report/
       - name: Compile Latex
+        working-directory: report/
         uses: xu-cheng/latex-action@v2
         with:
           root_file: main.tex
