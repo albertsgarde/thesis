@@ -9,9 +9,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Compile Latex
-        uses: xu-cheng/latex-action@v2
-        with:
-          work_in_root_file_dir: true
-          root_file: |
-            ./report/main.tex
-            ./report/meeting_documents/meeting_*/main.tex
+        uses: docker://xucheng/texlive-full:latest
+        run: |
+          latexmk -pdf -cd -interaction=nonstopmode -Werror -halt-on-error ./report/main.tex
+          find . -wholename "report/meeting_documents/meeting_*/main.tex" -exec latexmk -cd -interaction=nonstopmode -Werror -halt-on-error {} \;
+          
