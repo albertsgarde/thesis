@@ -6,12 +6,14 @@
 \begin{itemize}
     \item Motivation
     \begin{itemize}
-        \item Large Language Models (LLMs) have shown exceptional performance across a range of tasks, yet their complexity renders their inner workings opaque.
+        \item Large Language Models (LLMs) based on the transformer architecture \citep{vaswani_attention_2023} have shown exceptional performance across a range of tasks, yet their complexity renders their inner workings opaque.
         This opacity challenges our ability to understand, trust, and safely deploy these models in real-world applications.
         To rectify this, the overlapping fields of Explainable AI (XAI) and Mechanistic Interpretability (MI) have emerged.
         The former focuses on developing methods to explain the predictions of LLMs, while the latter focuses on understanding the inner workings of LLMs.
-        Much of the focus in MI has been on understanding the behaviour of individual neurons, but as demonstrated in \citet{elhage_toy_2022}, the behaviour of individual neurons often doesn't map onto human understandable concepts.
-        \citet{bricken_towards_2023} shows a possible way forward by providing the features of SAEs (Sparse Autoencoders) as alternative units of interpretability. 
+        Transformer models contain both attention and MLP (multi-layer perceptron) layers, and the latter is the focus of this thesis.
+        Most attempts at interpreting MLP neurons have focused on understanding the behaviour of individual neurons, but as demonstrated in \citet{elhage_toy_2022}, the behaviour of individual neurons often doesn't map onto human understandable concepts.
+        \citet{bricken_towards_2023} shows a possible way forward by suggesting the features of SAEs (Sparse Autoencoders) as alternative units of interpretability.
+        This thesis aims to apply the N2G \citep{foote_neuron_2023} method to the features of SAEs, with the goal of understanding the behaviour of these features and the potential for using this understanding to interpret the behaviour of LLMs.
     \end{itemize}
     \item SotA
     \begin{itemize}
