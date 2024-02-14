@@ -1,0 +1,35 @@
+%!LW recipe=pdflatex
+
+\RequirePackage{import}
+\makeatletter
+\def\@sub@import#1#2#3{%
+  \begingroup
+  \protected@edef\@tempa{\endgroup
+    \let\noexpand\IfFileExists\noexpand#2%
+    \noexpand\@import  \noexpand#1%  param 1
+      {\@ifundefined{input@path}{}{\input@path}}% 2
+      {\@ifundefined{Ginput@path}{}{\Ginput@path}}% 3
+      {\import@path#3}{\import@path}% 4,5
+      {\ifx\IfFileExists\im@@IfFileExists \noexpand\im@@IfFileExistjs
+       \else \noexpand\IfFileExists \fi}}% 6
+  \if\relax#3\relax% need expansion, for eg \filename@area
+    \endgroup\expandafter#1%
+  \else
+    \expandafter\@tempa
+  \fi}
+\makeatother
+
+\documentclass[10pt,a4paper]{report}
+\usepackage{../../pre}
+\usepackage{../../symbols}
+\usepackage{subfiles} % Should be loaded last in the preamble apparently
+
+
+\title{Thesis meeting DATE}
+\author{Albert Ramus Sidenius Garde (s183969)}
+\begin{document}
+\maketitle
+
+\subfile{meeting}
+
+\end{document}
