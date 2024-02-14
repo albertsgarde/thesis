@@ -3,14 +3,15 @@ name: Check LaTeX
 on: pull_request
 
 jobs:
-  check_latex:
+  container-test-job:
     runs-on: ubuntu-latest
+    container:
+      image: xucheng/texlive-full:latest
+      volumes:
+        - ./report:/report
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
       - name: Compile Latex
-        uses: docker://xucheng/texlive-full:latest
         run: |
           latexmk -pdf -cd -interaction=nonstopmode -Werror -halt-on-error ./report/main.tex
           find . -wholename "report/meeting_documents/meeting_*/main.tex" -exec latexmk -cd -interaction=nonstopmode -Werror -halt-on-error {} \;
-          
+
