@@ -5,3 +5,6 @@
 *.bbl
 *.blg
 *.toc
+*.dvi
+*.fdv_latexmk
+*.fls
