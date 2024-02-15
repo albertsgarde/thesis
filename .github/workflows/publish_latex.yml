@@ -23,8 +23,10 @@ jobs:
 
       - name: Move PDF to root directory
         run: |
-          mkdir -p github_pages
-          mv report/main.pdf github_pages/report.pdf
+          mkdir -p github_pages/${BRANCH_NAME}
+          mv report/main.pdf github_pages/${BRANCH_NAME}/report.pdf
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
 
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
