@@ -9,7 +9,7 @@ on:
       - 'report/**'
 
 jobs:
-  build_latex:
+  publish_latex:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
