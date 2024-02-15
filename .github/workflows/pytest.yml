@@ -22,5 +22,5 @@ jobs:
           coverage run -m pytest -v
       - name: Generate Coverage Report
         run: |
-          coverage report -m
+          coverage report --include "thesis/*" -m
       
