@@ -185,3 +185,6 @@ cython_debug/
 lightning_logs
 
 wandb/
+
+*.lprof
+
