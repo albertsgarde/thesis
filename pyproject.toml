@@ -22,6 +22,7 @@ dependencies = { file = ["requirements.txt"] }
 dev = { file = ['requirements_dev.txt'] }
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
 pythonpath = ["thesis"]
 
 

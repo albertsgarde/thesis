@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - ci-test
+    paths:
+      - 'report/**'
 
 jobs:
   build_latex:
-    if: contains(github.event.head_commit.modified, 'report/')
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
