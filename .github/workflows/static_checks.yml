@@ -10,7 +10,7 @@ jobs:
       - name: Use action to check for CRLF endings
         uses: erclu/check-crlf@v1
 
-      - -name: Ruff
+      - name: Ruff
         uses: chartboost/ruff-action@v1
         with:
           src: "thesis"
