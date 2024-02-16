@@ -7,4 +7,5 @@
 *.toc
 *.dvi
 *.fdv_latexmk
+*.fdb_latexmk
 *.fls
