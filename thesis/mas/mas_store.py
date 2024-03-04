@@ -107,23 +107,9 @@ class MASStore:
         assert not torch.isinf(activations).any(), "Infinite activations found"
         assert not torch.isnan(activations).any(), "NaN activations found"
 
-        first_pad_tensor: Int[Tensor, " num_pad"] = torch.where(tokens == self._pad_token_id)[0]
-        first_pad: int
-        if first_pad_tensor.numel() == 0:
-            first_pad = tokens.shape[0]
-        else:
-            first_pad = int(first_pad_tensor[0].item())
-
-        assert (
-            first_pad >= overlap
-        ), "The overlap should not contain any pad tokens, as then there would be no point in this sample."
-        assert (
-            first_pad >= overlap + 1
-        ), "The first token after overlap should not be a pad token, since that effectively means this sample is empty."
-
         max_activations: Float[Tensor, " num_features"]
         max_activating_indices: Int[Tensor, " num_features"]
-        max_activations, max_activating_indices = activations[overlap:first_pad, :].max(dim=-2)
+        max_activations, max_activating_indices = activations[overlap : sample.length, :].max(dim=-2)
         max_activating_indices += overlap
 
         sample_starts: Int[Tensor, " num_features"] = torch.maximum(
