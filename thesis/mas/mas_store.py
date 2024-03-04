@@ -1,3 +1,7 @@
+import pickle
+from io import BytesIO
+from zipfile import ZipFile
+
 import torch
 from jaxtyping import Bool, Float, Int
 from line_profiler import profile
@@ -10,7 +14,7 @@ from .sample_loader import Sample
 class MASStore:
     _feature_samples: Int[Tensor, "num_features num_samples sample_length"]
     _feature_activations: Float[Tensor, "num_features num_samples sample_length"]
-    _feature_max_activations: Float[Tensor, " num_features num_samples"]
+    _feature_max_activations: Float[Tensor, "num_features num_samples"]
 
     _num_samples_added: int
 
@@ -63,6 +67,56 @@ class MASStore:
         self._pad_token_id = pad_token_id
 
         self._device = device
+
+    def save(self, file_name: str) -> None:
+        values_dict = {
+            "num_samples_added": self._num_samples_added,
+            "sample_length_pre": self._sample_length_pre,
+            "sample_length_post": self._sample_length_post,
+            "pad_token_id": self._pad_token_id,
+        }
+        ints_serialized = pickle.dumps(values_dict)
+
+        tensors_dict: dict[str, Tensor] = {
+            "feature_samples": self._feature_samples.int(),
+            "feature_activations": self._feature_activations,
+            "feature_max_activations": self._feature_max_activations,
+        }
+
+        tensors_serialized: dict[str, BytesIO] = {key: BytesIO() for key in tensors_dict.keys()}
+
+        for key, value in tensors_dict.items():
+            torch.save(value, tensors_serialized[key])
+
+        with ZipFile(file_name, "w") as zip_file:
+            zip_file.writestr("ints", ints_serialized)
+            for key, value in tensors_serialized.items():  # type: ignore
+                zip_file.writestr(key, value.getvalue())  # type: ignore
+
+    @staticmethod
+    def load(file_name: str, device: Device) -> "MASStore":
+        with ZipFile(file_name, "r") as zip_file:
+            ints_serialized = zip_file.read("ints")
+            values_dict = pickle.loads(ints_serialized)
+
+            tensors_serialized = {name: zip_file.read(name) for name in zip_file.namelist() if name != "ints"}
+            tensors_dict = {
+                name: torch.load(BytesIO(tensors_serialized[name]), map_location=device.torch())
+                for name in tensors_serialized
+            }
+
+        mas_store = MASStore.__new__(MASStore)
+        mas_store._feature_samples = tensors_dict["feature_samples"].long()
+        mas_store._feature_activations = tensors_dict["feature_activations"]
+        mas_store._feature_max_activations = tensors_dict["feature_max_activations"]
+
+        mas_store._num_samples_added = values_dict["num_samples_added"]
+        mas_store._sample_length_pre = values_dict["sample_length_pre"]
+        mas_store._sample_length_post = values_dict["sample_length_post"]
+        mas_store._pad_token_id = values_dict["pad_token_id"]
+        mas_store._device = device
+
+        return mas_store
 
     def num_features(self) -> int:
         return self._feature_samples.shape[0]

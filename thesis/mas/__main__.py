@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
@@ -8,7 +7,6 @@ from hydra.core.config_store import ConfigStore
 from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
 from thesis.device import get_device  # type: ignore[import]
-from thesis.mas import html
 
 from . import algorithm
 from .algorithm import MASParams
@@ -37,17 +35,7 @@ def hydra_main(config: MASScriptConfig):
 
     mas_store = algorithm.run(model, dataset, config.params, device)
 
-    os.makedirs("outputs/html", exist_ok=True)
-
-    print("Generating and saving HTML")
-
-    feature_samples = mas_store.feature_samples()
-    feature_activations = mas_store.feature_activations()
-
-    for neuron_index in range(40):
-        with open(f"outputs/html/{neuron_index}.html", "w", encoding="utf-8") as f:
-            html_str = html.generate_html(model, feature_samples[neuron_index], feature_activations[neuron_index])
-            f.write(html_str)
+    mas_store.save("outputs/mas_store.zip")
 
 
 if __name__ == "__main__":
