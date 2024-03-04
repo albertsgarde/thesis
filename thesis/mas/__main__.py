@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
@@ -34,6 +35,8 @@ def hydra_main(config: MASScriptConfig):
     )
 
     mas_store = algorithm.run(model, dataset, config.params, device)
+
+    os.makedirs("outputs", exist_ok=True)
 
     mas_store.save("outputs/mas_store.zip")
 
