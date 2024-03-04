@@ -7,6 +7,10 @@ class Device(Enum):
     CPU = 0
     GPU = 1
 
+    @staticmethod
+    def get() -> "Device":
+        return get_device()
+
     def __str__(self) -> str:
         match self:
             case Device.CPU:
