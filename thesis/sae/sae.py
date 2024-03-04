@@ -6,6 +6,8 @@ from torch import Tensor
 from transformer_lens import HookedTransformer  # type: ignore[import]
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
 
+from thesis.device import Device  # type: ignore[import]
+
 
 class SparseAutoencoder:
     _w_enc: Float[Tensor, "layer_dim num_features"]
@@ -21,7 +23,7 @@ class SparseAutoencoder:
         w_dec: Float[Tensor, " num_features layer_dim"],
         b_dec: Float[Tensor, " layer_dim"],
         hook_point: str,
-        device: str,
+        device: Device,
     ) -> None:
         num_features = w_enc.shape[1]
         assert b_enc.shape[0] == num_features, (
@@ -41,14 +43,14 @@ class SparseAutoencoder:
             "The layer_dim must match between the encoder and decoder. "
             f"w_enc neurons: {layer_dim}, w_dec neurons: {w_dec.shape[1]}"
         )
-        self._w_enc = w_enc.to(device)
-        self._b_enc = b_enc.to(device)
-        self._w_dec = w_dec.to(device)
-        self._b_dec = b_dec.to(device)
+        self._w_enc = w_enc.to(device.torch())
+        self._b_enc = b_enc.to(device.torch())
+        self._w_dec = w_dec.to(device.torch())
+        self._b_dec = b_dec.to(device.torch())
         self._hook_point = hook_point
 
     @staticmethod
-    def from_data(data: dict[str, torch.Tensor], hook_point: str, device: str) -> "SparseAutoencoder":
+    def from_data(data: dict[str, torch.Tensor], hook_point: str, device: Device) -> "SparseAutoencoder":
         return SparseAutoencoder(data["W_enc"], data["b_enc"], data["W_dec"], data["b_dec"], hook_point, device)
 
     @property
