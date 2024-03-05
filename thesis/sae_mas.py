@@ -1,5 +1,6 @@
 import itertools
 import os
+import sys
 import time
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
@@ -16,6 +17,13 @@ from .mas.sample_loader import SampleDataset  # type: ignore[import]
 
 
 def main() -> None:
+    # Get number of samples to check from first commandline argument, or default to 32 if there is none
+
+    if len(sys.argv) > 1:
+        samples_to_check = int(sys.argv[1])
+    else:
+        samples_to_check = 32
+
     with torch.no_grad():
         device = Device.get()
 
@@ -27,8 +35,6 @@ def main() -> None:
             "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
         )
         sample_dataset = SampleDataset(context_size, 256, model, dataset)
-
-        samples_to_check = 32
 
         point = "resid_pre"
         layer_index = 3
@@ -69,7 +75,7 @@ def main() -> None:
             mas_time += time.time() - mas_start_time
         end_time = time.time()
         print(f"Time taken: {end_time - start_time:.2f}s")
-        print(f"Time taken per sample: {(end_time - start_time) / (samples_to_check)*1000:.2f}s")
+        print(f"Time taken per sample: {(end_time - start_time) / (samples_to_check)*1000:.2f}ms")
 
         print(f"Model time: {model_time:.2f}s ({model_time/(end_time - start_time)*100:.2f}%)")
         print(f"MAS time: {mas_time:.2f}s ({mas_time/(end_time - start_time)*100:.2f}%)")
