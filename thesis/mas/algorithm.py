@@ -93,9 +93,9 @@ def run(model: HookedTransformer, dataset: IterableDataset, params: MASParams, d
             assert mas_store.num_samples_added() == i + 1
         end_time = time.time()
         print(f"Time taken: {end_time - start_time:.2f}s")
-        print(f"Time taken per sample: {(end_time - start_time) / (params.samples_to_check):.2f}s")
+        print(f"Time taken per sample: {(end_time - start_time) / (params.samples_to_check)*1000:.2f}s")
 
-        print(f"Model time: {model_time:.2f}s")
-        print(f"MAS time: {mas_time:.2f}s")
+        print(f"Model time: {model_time:.2f}s ({model_time/(end_time - start_time)*100:.2f}%)")
+        print(f"MAS time: {mas_time:.2f}s ({mas_time/(end_time - start_time)*100:.2f}%)")
 
         return mas_store
