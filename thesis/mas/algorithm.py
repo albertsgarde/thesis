@@ -1,4 +1,5 @@
 import itertools
+import math
 import time
 from dataclasses import dataclass
 from typing import Any, Callable, Tuple
@@ -115,6 +116,8 @@ def run(
         slices = [slice(start, end) for start, end in zip(indices[:-1], indices[1:], strict=True)]
         hooks = [create_hook(layer, slice) for layer, slice in zip(layers, slices, strict=True)]
 
+        last_percentage = -1
+
         model_time = 0.0
         mas_time = 0.0
         start_time = time.time()
@@ -126,9 +129,14 @@ def run(
             mas_store.add_sample(sample, activation_scratch)
             mas_time += time.time() - mas_start_time
             assert mas_store.num_samples_added() == i + 1
+
+            cur_percentage = int(math.floor(i / params.samples_to_check * 100))
+            if cur_percentage > last_percentage:
+                print(f"{cur_percentage}%")
+                last_percentage = cur_percentage
         end_time = time.time()
         print(f"Time taken: {end_time - start_time:.2f}s")
-        print(f"Time taken per sample: {(end_time - start_time) / (params.samples_to_check)*1000:.2f}s")
+        print(f"Time taken per sample: {(end_time - start_time) / (params.samples_to_check)*1000:.2f}ms")
 
         print(f"Model time: {model_time:.2f}s ({model_time/(end_time - start_time)*100:.2f}%)")
         print(f"MAS time: {mas_time:.2f}s ({mas_time/(end_time - start_time)*100:.2f}%)")
