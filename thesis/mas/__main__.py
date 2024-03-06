@@ -7,15 +7,15 @@ from datasets import IterableDataset  # type: ignore[missingTypeStubs]
 from hydra.core.config_store import ConfigStore
 from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
-from thesis.device import get_device  # type: ignore[import]
+from thesis.device import get_device
+from thesis.sae.sae import SparseAutoencoder  # type: ignore[import]
 
 from . import algorithm
-from .algorithm import MASParams
+from .algorithm import MASLayer, MASParams
 
 
 @dataclass
 class MASScriptConfig:
-    model_name: str
     params: MASParams
 
 
@@ -28,13 +28,20 @@ cs.store(name="mas", node=MASScriptConfig)
 def hydra_main(config: MASScriptConfig):
     device = get_device()
 
-    model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
+    model: HookedTransformer = HookedTransformer.from_pretrained("gelu-1l", device=device.torch())  # type: ignore[reportUnknownVariableType]
 
     dataset: IterableDataset = datasets.load_dataset(  # type: ignore[reportUnknownMemberType]
-        "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
+        "NeelNanda/c4-code-20k", streaming=True, split="train", trust_remote_code=True
     )
 
-    mas_store = algorithm.run(model, dataset, config.params, device)
+    mas_layers = [
+        MASLayer.from_hook_id("blocks.0.mlp.hooks_post", 2048),
+        MASLayer.from_sae(
+            SparseAutoencoder.from_hf("NeelNanda/sparse_autoencoder", "25.pt", "blocks.0.mlp.hooks_post", device)
+        ),
+    ]
+
+    mas_store = algorithm.run(model, dataset, mas_layers, config.params, device)
 
     os.makedirs("outputs", exist_ok=True)
 

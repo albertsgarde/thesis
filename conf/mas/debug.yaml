@@ -2,7 +2,6 @@ defaults:
   - mas
   - _self_
 
-model_name: solu-1l
 params:
   sample_overlap: 256
   num_max_samples: 32

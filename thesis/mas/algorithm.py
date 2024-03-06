@@ -3,12 +3,15 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable, Tuple
 
+import numpy as np
 import torch
 from datasets import IterableDataset  # type: ignore[import]
 from jaxtyping import Float
 from torch import Tensor
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
 from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
+
+from thesis.sae.sae import SparseAutoencoder  # type: ignore[import]
 
 from ..device import Device, get_device
 from .mas_store import MASStore
@@ -36,7 +39,37 @@ class MASParams:
             raise ValueError("Samples to check must be greater than 0.")
 
 
-def run(model: HookedTransformer, dataset: IterableDataset, params: MASParams, device: Device) -> MASStore:
+@dataclass
+class MASLayer:
+    """
+    A description of a layer to include in the MAS algorithm and how to handle it.
+
+    Attributes:
+        hook_id: The transformer_lens to get activations for this layer from.
+        num_features: The number of features to store for this layer.
+        activation_map: A function that takes the activations from the given hook and returns activations for the
+                features of the layer.
+                The last dimension of the output must always match the `num_features` attribute.
+    """
+
+    hook_id: str
+    num_features: int
+    activation_map: Callable[
+        [Float[Tensor, "batch context neurons_in_hook"]], Float[Tensor, "batch context _num_features"]
+    ]
+
+    @staticmethod
+    def from_hook_id(hook_id: str, num_features: int) -> "MASLayer":
+        return MASLayer(hook_id, num_features, lambda x: x)
+
+    @staticmethod
+    def from_sae(sae: SparseAutoencoder) -> "MASLayer":
+        return MASLayer(sae.hook_point, sae.num_features, sae.encode)
+
+
+def run(
+    model: HookedTransformer, dataset: IterableDataset, layers: list[MASLayer], params: MASParams, device: Device
+) -> MASStore:
     with torch.no_grad():
         device = get_device()
         print(f"Using device: {device.torch()}")
@@ -57,10 +90,11 @@ def run(model: HookedTransformer, dataset: IterableDataset, params: MASParams, d
 
         num_layers = model.cfg.n_layers
         neurons_per_layer = model.cfg.d_mlp
+        num_total_features = sum([layer.num_features for layer in layers])
         num_model_neurons = num_layers * neurons_per_layer
         mas_store = MASStore(
             params.num_max_samples,
-            num_model_neurons,
+            num_total_features,
             context_size,
             params.sample_length_pre,
             params.sample_length_post,
@@ -68,24 +102,28 @@ def run(model: HookedTransformer, dataset: IterableDataset, params: MASParams, d
             device,
         )
 
-        def create_hooks(
-            activation_scratch: Float[Tensor, "context num_features"],
-        ) -> list[Tuple[str, Callable[[Float[Tensor, "batch context neurons_per_layer"], Any], None]]]:
-            def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: HookPoint) -> None:
-                activation_scratch[
-                    :, neurons_per_layer * hook.layer() : neurons_per_layer * (hook.layer() + 1)
-                ] = activation
-
-            return [(f"blocks.{layer}.mlp.hook_mid", hook) for layer in range(num_layers)]
-
         activation_scratch = torch.zeros((context_size, num_model_neurons), device=device.torch())
+
+        def create_hook(
+            layer: MASLayer, slice: slice
+        ) -> Tuple[str, Callable[[Float[Tensor, "batch context neurons_per_layer"], Any], None]]:
+            assert layer.num_features == slice.stop - slice.start
+
+            def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: HookPoint) -> None:
+                activation_scratch[slice] = layer.activation_map(activation)
+
+            return (layer.hook_id, hook)
+
+        indices = np.cumsum([0] + [layer.num_features for layer in layers])
+        slices = [slice(start, end) for start, end in zip(indices[:-1], indices[1:], strict=True)]
+        hooks = [create_hook(layer, slice) for layer, slice in zip(layers, slices, strict=True)]
 
         model_time = 0.0
         mas_time = 0.0
         start_time = time.time()
         for i, sample in itertools.islice(enumerate(sample_dataset), params.samples_to_check):
             model_start_time = time.time()
-            model.run_with_hooks(sample.tokens, fwd_hooks=create_hooks(activation_scratch))
+            model.run_with_hooks(sample.tokens, fwd_hooks=hooks)
             model_time += time.time() - model_start_time
             mas_start_time = time.time()
             mas_store.add_sample(sample, activation_scratch)

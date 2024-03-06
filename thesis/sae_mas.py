@@ -5,7 +5,6 @@ import time
 
 import datasets  # type: ignore[missingTypeStubs, import-untyped]
 import torch
-import transformer_lens  # type: ignore
 from datasets import IterableDataset  # type: ignore[missingTypeStubs]
 from transformer_lens import HookedTransformer  # type: ignore[import]
 
@@ -41,12 +40,9 @@ def main() -> None:
         layer_id = f"blocks.{layer_index}.hook_resid_pre"
         # layer_id = f"blocks.{layer_index}.mlp.hook_post"
 
-        sae_data = transformer_lens.utils.download_file_from_hf(
-            "jacobcd52/gpt2-small-sparse-autoencoders",
-            f"gpt2-small_6144_{point}_{layer_index}.pt",
-            force_is_torch=True,
+        sae = SparseAutoencoder.from_hf(
+            "jacobcd52/gpt2-small-sparse-autoencoders", f"gpt2-small_6144_{point}_{layer_index}.pt", layer_id, device
         )
-        sae = SparseAutoencoder.from_data(sae_data, layer_id, device)
 
         num_sae_features = sae.num_features
 

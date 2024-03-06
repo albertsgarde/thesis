@@ -1,6 +1,7 @@
 from typing import Callable, Tuple
 
 import torch
+import transformer_lens  # type: ignore[import]
 from jaxtyping import Float
 from torch import Tensor
 from transformer_lens import HookedTransformer  # type: ignore[import]
@@ -53,6 +54,15 @@ class SparseAutoencoder:
     def from_data(data: dict[str, torch.Tensor], hook_point: str, device: Device) -> "SparseAutoencoder":
         return SparseAutoencoder(data["W_enc"], data["b_enc"], data["W_dec"], data["b_dec"], hook_point, device)
 
+    @staticmethod
+    def from_hf(repo: str, file: str, hook_point: str, device: Device) -> "SparseAutoencoder":
+        data = transformer_lens.utils.download_file_from_hf(
+            repo,
+            file,
+            force_is_torch=True,
+        )
+        return SparseAutoencoder.from_data(data, hook_point, device)
+
     @property
     def num_features(self) -> int:
         return self._w_enc.shape[1]
@@ -60,6 +70,10 @@ class SparseAutoencoder:
     @property
     def layer_dim(self) -> int:
         return self._w_enc.shape[0]
+
+    @property
+    def hook_point(self) -> str:
+        return self._hook_point
 
     def encode(self, x: Float[Tensor, "*batch layer_dim"]) -> Float[Tensor, "*batch num_sae_features"]:
         return torch.relu(x @ self._w_enc + self._b_enc)
