@@ -88,10 +88,7 @@ def run(
 
         sample_dataset = SampleDataset(context_size, params.sample_overlap, model, dataset)
 
-        num_layers = model.cfg.n_layers
-        neurons_per_layer = model.cfg.d_mlp
         num_total_features = sum([layer.num_features for layer in layers])
-        num_model_neurons = num_layers * neurons_per_layer
         mas_store = MASStore(
             params.num_max_samples,
             num_total_features,
@@ -102,7 +99,7 @@ def run(
             device,
         )
 
-        activation_scratch = torch.zeros((context_size, num_model_neurons), device=device.torch())
+        activation_scratch = torch.zeros((context_size, num_total_features), device=device.torch())
 
         def create_hook(
             layer: MASLayer, slice: slice
@@ -110,7 +107,7 @@ def run(
             assert layer.num_features == slice.stop - slice.start
 
             def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: HookPoint) -> None:
-                activation_scratch[slice] = layer.activation_map(activation)
+                activation_scratch[:, slice] = layer.activation_map(activation)[0, :, :]
 
             return (layer.hook_id, hook)
 

@@ -1,5 +1,6 @@
 import pickle
 from io import BytesIO
+from pathlib import Path
 from zipfile import ZipFile
 
 import torch
@@ -68,7 +69,7 @@ class MASStore:
 
         self._device = device
 
-    def save(self, file_name: str) -> None:
+    def save(self, file_name: Path) -> None:
         values_dict = {
             "num_samples_added": self._num_samples_added,
             "sample_length_pre": self._sample_length_pre,
@@ -94,7 +95,7 @@ class MASStore:
                 zip_file.writestr(key, value.getvalue())  # type: ignore
 
     @staticmethod
-    def load(file_name: str, device: Device) -> "MASStore":
+    def load(file_name: Path, device: Device) -> "MASStore":
         with ZipFile(file_name, "r") as zip_file:
             ints_serialized = zip_file.read("ints")
             values_dict = pickle.loads(ints_serialized)
