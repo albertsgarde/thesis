@@ -76,7 +76,7 @@ def main() -> None:
         else:
             raise ValueError(f"Feature index must be less than {NUM_FEATURES + NUM_FEATURES}. {feature_index=}")
 
-    with (Path(__file__) / ".." / "word_to_casings.json").open("r", encoding="utf-8") as f:
+    with (Path(__file__).parent / "word_to_casings.json").open("r", encoding="utf-8") as f:
         word_to_casings = json.load(f)
 
     train_config = n2g.TrainConfig()
