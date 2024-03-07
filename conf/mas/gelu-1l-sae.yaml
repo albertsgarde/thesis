@@ -8,7 +8,7 @@ params:
   sample_length_pre: 192
   sample_length_post: 64
   samples_to_check: 32
-dataset_name: 'monology/pile-uncopyrighted'
+dataset_name: 'NeelNanda/c4-code-20k'
 model_name: 'gelu-1l'
 layers:
   - hook_id: blocks.0.mlp.hook_post
