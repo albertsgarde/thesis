@@ -76,7 +76,8 @@ class SparseAutoencoder:
         return self._hook_point
 
     def encode(self, x: Float[Tensor, "*batch layer_dim"]) -> Float[Tensor, "*batch num_sae_features"]:
-        return torch.relu(x @ self._w_enc + self._b_enc)
+        result = torch.relu(x @ self._w_enc + self._b_enc)
+        return result + (result == 0).float() * 1e-7
 
     def hook(
         self, destination: Float[Tensor, "*batch sample_length num_sae_features"]
@@ -93,6 +94,26 @@ class SparseAutoencoder:
 
         with torch.no_grad():
             model.run_with_hooks(sample_tokens, fwd_hooks=[self.hook(result)])
+            assert not torch.isnan(result).any(), "Result should not contain NaNs"
+
+        return result
+
+    def feature_hook(
+        self, destination: Float[Tensor, "*batch sample_length"], feature_index: int
+    ) -> Tuple[str, Callable[[Float[Tensor, "*batch sample_length layer_dim"], HookPoint], None]]:
+        def hook(activation: Float[Tensor, "*batch sample_length layer_dim"], hook: HookPoint) -> None:
+            destination[:] = torch.relu(activation @ self._w_enc[:, feature_index] + self._b_enc[feature_index])
+            destination[:] += (destination == 0).float() * 1e-7
+
+        return self._hook_point, hook
+
+    def feature_activations(
+        self, model: HookedTransformer, sample_tokens: Float[Tensor, "*batch sample_length"], feature_index: int
+    ) -> Float[Tensor, "*batch sample_length"]:
+        result = torch.full(sample_tokens.shape, torch.nan)
+
+        with torch.no_grad():
+            model.run_with_hooks(sample_tokens, fwd_hooks=[self.feature_hook(result, feature_index)])
             assert not torch.isnan(result).any(), "Result should not contain NaNs"
 
         return result
