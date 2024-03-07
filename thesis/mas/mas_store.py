@@ -132,6 +132,9 @@ class MASStore:
         return self._num_samples_added
 
     def feature_samples(self) -> Int[Tensor, "num_features num_samples_added sample_length"]:
+        """
+        Sorts all data by max activations and returns the samples.
+        """
         self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
 
         expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
@@ -141,6 +144,9 @@ class MASStore:
         return self._feature_samples[:, : self.num_samples_added(), :]
 
     def feature_activations(self) -> Float[Tensor, "num_features num_samples_added sample_length"]:
+        """
+        Sorts all data by max activations and returns the activations.
+        """
         self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
 
         expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
@@ -148,6 +154,18 @@ class MASStore:
         self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
 
         return self._feature_activations[:, : self.num_samples_added(), :]
+
+    def feature_max_activations(self) -> Float[Tensor, "num_features num_samples_added"]:
+        """
+        Sorts all data by max activations and returns the max activations.
+        """
+        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
+
+        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
+        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
+        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+
+        return self._feature_max_activations[:, : self.num_samples_added()]
 
     @profile
     def add_sample(
