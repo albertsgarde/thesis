@@ -1,3 +1,8 @@
+import pickle
+from io import BytesIO
+from pathlib import Path
+from zipfile import ZipFile
+
 import torch
 from jaxtyping import Bool, Float, Int
 from line_profiler import profile
@@ -10,7 +15,7 @@ from .sample_loader import Sample
 class MASStore:
     _feature_samples: Int[Tensor, "num_features num_samples sample_length"]
     _feature_activations: Float[Tensor, "num_features num_samples sample_length"]
-    _feature_max_activations: Float[Tensor, " num_features num_samples"]
+    _feature_max_activations: Float[Tensor, "num_features num_samples"]
 
     _num_samples_added: int
 
@@ -64,6 +69,56 @@ class MASStore:
 
         self._device = device
 
+    def save(self, file_name: Path) -> None:
+        values_dict = {
+            "num_samples_added": self._num_samples_added,
+            "sample_length_pre": self._sample_length_pre,
+            "sample_length_post": self._sample_length_post,
+            "pad_token_id": self._pad_token_id,
+        }
+        ints_serialized = pickle.dumps(values_dict)
+
+        tensors_dict: dict[str, Tensor] = {
+            "feature_samples": self._feature_samples.int(),
+            "feature_activations": self._feature_activations,
+            "feature_max_activations": self._feature_max_activations,
+        }
+
+        tensors_serialized: dict[str, BytesIO] = {key: BytesIO() for key in tensors_dict.keys()}
+
+        for key, value in tensors_dict.items():
+            torch.save(value, tensors_serialized[key])
+
+        with ZipFile(file_name, "w") as zip_file:
+            zip_file.writestr("ints", ints_serialized)
+            for key, value in tensors_serialized.items():  # type: ignore
+                zip_file.writestr(key, value.getvalue())  # type: ignore
+
+    @staticmethod
+    def load(file_name: Path, device: Device) -> "MASStore":
+        with ZipFile(file_name, "r") as zip_file:
+            ints_serialized = zip_file.read("ints")
+            values_dict = pickle.loads(ints_serialized)
+
+            tensors_serialized = {name: zip_file.read(name) for name in zip_file.namelist() if name != "ints"}
+            tensors_dict = {
+                name: torch.load(BytesIO(tensors_serialized[name]), map_location=device.torch())
+                for name in tensors_serialized
+            }
+
+        mas_store = MASStore.__new__(MASStore)
+        mas_store._feature_samples = tensors_dict["feature_samples"].long()
+        mas_store._feature_activations = tensors_dict["feature_activations"]
+        mas_store._feature_max_activations = tensors_dict["feature_max_activations"]
+
+        mas_store._num_samples_added = values_dict["num_samples_added"]
+        mas_store._sample_length_pre = values_dict["sample_length_pre"]
+        mas_store._sample_length_post = values_dict["sample_length_post"]
+        mas_store._pad_token_id = values_dict["pad_token_id"]
+        mas_store._device = device
+
+        return mas_store
+
     def num_features(self) -> int:
         return self._feature_samples.shape[0]
 
@@ -77,6 +132,9 @@ class MASStore:
         return self._num_samples_added
 
     def feature_samples(self) -> Int[Tensor, "num_features num_samples_added sample_length"]:
+        """
+        Sorts all data by max activations and returns the samples.
+        """
         self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
 
         expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
@@ -86,6 +144,9 @@ class MASStore:
         return self._feature_samples[:, : self.num_samples_added(), :]
 
     def feature_activations(self) -> Float[Tensor, "num_features num_samples_added sample_length"]:
+        """
+        Sorts all data by max activations and returns the activations.
+        """
         self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
 
         expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
@@ -93,6 +154,18 @@ class MASStore:
         self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
 
         return self._feature_activations[:, : self.num_samples_added(), :]
+
+    def feature_max_activations(self) -> Float[Tensor, "num_features num_samples_added"]:
+        """
+        Sorts all data by max activations and returns the max activations.
+        """
+        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
+
+        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
+        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
+        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+
+        return self._feature_max_activations[:, : self.num_samples_added()]
 
     @profile
     def add_sample(
@@ -107,23 +180,9 @@ class MASStore:
         assert not torch.isinf(activations).any(), "Infinite activations found"
         assert not torch.isnan(activations).any(), "NaN activations found"
 
-        first_pad_tensor: Int[Tensor, " num_pad"] = torch.where(tokens == self._pad_token_id)[0]
-        first_pad: int
-        if first_pad_tensor.numel() == 0:
-            first_pad = tokens.shape[0]
-        else:
-            first_pad = int(first_pad_tensor[0].item())
-
-        assert (
-            first_pad >= overlap
-        ), "The overlap should not contain any pad tokens, as then there would be no point in this sample."
-        assert (
-            first_pad >= overlap + 1
-        ), "The first token after overlap should not be a pad token, since that effectively means this sample is empty."
-
         max_activations: Float[Tensor, " num_features"]
         max_activating_indices: Int[Tensor, " num_features"]
-        max_activations, max_activating_indices = activations[overlap:first_pad, :].max(dim=-2)
+        max_activations, max_activating_indices = activations[overlap : sample.length, :].max(dim=-2)
         max_activating_indices += overlap
 
         sample_starts: Int[Tensor, " num_features"] = torch.maximum(
