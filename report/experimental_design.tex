@@ -1,0 +1,69 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+
+\section{Experimental design}
+\subsection{Setting}
+We have two sets of N2G models of individual neurons or SAE features, 
+and a set of text samples for each N2G model.
+We also decide on a firing threshold that determines 
+whether a neuron or feature is considered active for a given token.
+\subsection{Goal}
+There are two main goals of this experiment:
+\begin{enumerate}
+    \item To measure the performance of individual N2G models 
+    quantatively with uncertainty estimates.
+    This is useful in order to know 
+    whether the N2G model is reliable for each specific neuron/feature.
+    \item To compare the overall performance of the two sets of N2G models.
+    This allows us to compare different ways of creating N2G models 
+    and to compare the performance of N2G models of individual neurons 
+    to those of SAE features.
+\end{enumerate}
+\subsection{Procedure}
+The procedure for each goal is as follows:
+\begin{enumerate}
+    \item For each N2G model, 
+    we obtain predicted activations for all tokens in the text samples 
+    and obtain the ground truth by running the original language model 
+    on the same text samples.
+    We now have a set of binary predictions and ground truths 
+    for a number of tokens.
+    From this we can calculate the precision, recall, and F1 score.
+    \item I am more uncertain about how to achieve this goal.
+    Currently I just take the average statistics over all N2G models 
+    in each set.
+    We could also see each set as a single model for predicting 
+    the activations of all neurons/features 
+    and calculate a single set of statistics for each set.
+\end{enumerate}
+We currently use \verb|sklearn.metrics| to calculate the statistics 
+and this does not give us uncertainty estimates.
+\subsection{Discussion}
+\begin{itemize}
+    \item Currently, we use 16 text samples for training N2G model 
+    and 16 for testing.
+    This is not many for either purpose.
+    The issue is that the samples we use are max activating samples 
+    and acquiring these is expensive, especially in disk usage.
+    We could probably scale up to 64 samples or so, 
+    at least for small models.
+    Therefore it would be beneficial to reduce our reliance on these.
+    An idea for doing this is to use some other samples for either 
+    training or testing.
+    How do we test whether this works?
+    \item As described above, we use a fixed firing threshold 
+    to turn continuous activations into binary predictions.
+    Since both the predictions and the ground truth 
+    are originally continuous, 
+    we could instead compare these values directly.
+    This would remove an arbitrary parameter (the firing threshold) 
+    as long with allowing more fine grained comparisons.
+    The issue is that it is not clear that there is any useful information 
+    in the exact prediction values from the N2G models.
+\end{itemize}
+
+
+\nocite{foote_neuron_2023}
+\subbib{main}
+\end{document}
