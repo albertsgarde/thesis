@@ -1,0 +1,63 @@
+\documentclass[../main.tex]{subfiles}
+
+
+\begin{document}
+
+\section{Preliminaries}
+Before we can dive into the specifics of the methods used in this thesis, 
+we need to establish some basic concepts and terminology.
+Firstly, throughout this section, we assume there is some fixed 
+transformer language model \citep{vaswani_attention_2023} 
+which we want to interpret.
+We will refer to this as the \emph{original language model}.
+We will also assume that we have a set of text samples 
+which we use to train and test the methods.
+We will refer to these as the \emph{dataset}.
+
+Next we introduce the unit of interpretability, namely \emph{features}. 
+In the most general form, a feature is any function of the activations 
+of a model, but in the context of this thesis we will focus on two 
+specific types.
+These are individual neurons or activations which can be read directly 
+from the model, and neurons in the hidden layer of 
+a sparse autoencoder \citep{conmy_towards_2023}.
+We will generally refer to these as \emph{neurons} and 
+\emph{features} or \emph{features of an SAE} respectively.
+
+Since we interpret features based on their value on various inputs, 
+it is useful to have notation for this.
+Taking inspiration from \citet{foote_neuron_2023} 
+but diverging significantly, we use the function
+\begin{align*}
+    a\in\mathcal{F}\times\mathcal{S}\times\N\to\R
+\end{align*} 
+where $\mathcal{F}$ is the set of possible features and
+$\mathcal{S}$ is the set of possible token strings.
+$a$ then takes a feature, a token string, and an index, and returns 
+the value of the feature on the token string at the given index.
+For example, if $f$ is the 423rd neuron in the second MLP layer of 
+the \verb|gpt2-small| model, $s$ is the token string 
+\verb="<|BOS|>","The"," quick"," brown"," fox"=
+then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
+"brown" when \verb|gpt2-small| processes the string "The quick brown fox".
+
+\section{MAS}
+The first method we will use is that of \emph{maximum activating samples}.
+It consists of finding the samples which maximally activate a given feature.
+The hope is that these samples will give us some insight 
+into what the feature is doing.
+Mathematically this can be written as
+\begin{align*}
+    \argmax_{\substack{s\in\mathcal{D}\\ \text{top }k}}\left(\max_{i\leq|s|}\left(a(f,s,i)\right)\right)
+\end{align*}
+for some feature $f\in\mathcal{F}$ and dataset $\mathcal{D}\subseteq\mathcal{S}$.
+This method has faced criticism \citep{bolukbasi_interpretability_2021} 
+and should probably not be used in isolation, but it can be a useful
+starting point for understanding the behaviour of a feature.
+
+Calculation of the maximum activating samples is rather simple.
+Simply iterate over the dataset and for each feature of interest 
+keep track of the $k$ samples which maximally activate the feature.
+
+\subbib{../main}
+\end{document}
