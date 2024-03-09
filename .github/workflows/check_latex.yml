@@ -20,6 +20,7 @@ jobs:
 
   check_latex:
     runs-on: ubuntu-latest
+    steps:
       - name: Check for report changes
         uses: dorny/paths-filter@v3
         id: filter
