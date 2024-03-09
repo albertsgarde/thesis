@@ -25,11 +25,11 @@ jobs:
           echo "ls ./report"
           ls ./report
           echo ""
-          echo "ls /home/runner/work/_temp/_github_workflow/report"
-          ls /home/runner/work/_temp/_github_workflow/report
+          echo "ls /home/runner/work/thesis/thesis/report"
+          ls /home/runner/work/thesis/thesis/report
           echo ""
-          echo "cat /home/runner/work/_temp/_github_workflow/report/sections.tex"
-          cat /home/runner/work/_temp/_github_workflow/report/sections.tex
+          echo "cat /home/runner/work/thesis/thesis/report/sections.tex"
+          cat /home/runner/work/thesis/thesis/report/sections.tex
 
       - name: Compile LaTeX
         uses: xu-cheng/latex-action@v2
