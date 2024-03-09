@@ -70,6 +70,9 @@ The second method of interest is the \emph{Neuron2Graph}
 as described in \citet{foote_neuron_2023}.
 It attempts to build a graph model of the behaviours of a feature 
 by finding a set of patterns which activate the feature.
+Each pattern consists of a string of tokens (an $n$-gram) 
+with the possibility of a special ignore token 
+which signal that the token at that position does not matter.
 
 \subbib{../main}
 \end{document}
