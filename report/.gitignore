@@ -1,7 +1,7 @@
 *.aux
 *.out
 *.synctex.gz
-*.synctex.(busy)
+*.synctex(busy)
 *.pdf
 *.bbl
 *.blg
