@@ -21,6 +21,15 @@ jobs:
           ls report/sections
           cat report/sections.tex
           echo "GITHUB_REF: $GITHUB_REF"
+          echo ""
+          echo "ls ./report"
+          ls ./report
+          echo ""
+          echo "ls /github/workspace/report"
+          ls /github/workspace/report
+          echo ""
+          echo "cat /github/workspace/report/sections.tex"
+          cat /github/workspace/report/sections.tex
 
       - name: Compile LaTeX
         uses: xu-cheng/latex-action@v2
