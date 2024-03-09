@@ -56,8 +56,14 @@ and should probably not be used in isolation, but it can be a useful
 starting point for understanding the behaviour of a feature.
 
 Calculation of the maximum activating samples is rather simple.
-Simply iterate over the dataset and for each feature of interest 
+Simply iterate over the dataset 
+and for each of the $n$ features of interest 
 keep track of the $k$ samples which maximally activate the feature.
+Here "keep track" means storing the token that causes the activation and 
+surrounding $c$ tokens of context along with the activations on that context.
+This can be done for the entire model with a single pass over the dataset.
+The more of the dataset is used, the "better" the found samples will be, 
+but the computational cost will of course increase linearly.
 
 \subbib{../main}
 \end{document}
