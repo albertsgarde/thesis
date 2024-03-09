@@ -19,12 +19,19 @@ jobs:
               - 'report/**'
 
   check_latex:
-    needs: check_report
-    if: ${{ needs.check_report.outputs.report == 'true' }}
     runs-on: ubuntu-latest
+      - name: Check for report changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            report:
+              - 'report/**'
       - name: Check out repository
+        if: steps.filter.outputs.report == 'true'
         uses: actions/checkout@v4
       - name: Compile Latex
+        if: steps.filter.outputs.report == 'true'
         uses: xu-cheng/latex-action@v2
         with:
           work_in_root_file_dir: true
