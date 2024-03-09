@@ -3,9 +3,25 @@ name: Check LaTeX
 on: pull_request
 
 jobs:
-  check_latex:
+  check_report:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      report: ${{ steps.filter.outputs.report }}
     steps:
+      - name: Check for report changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            report:
+              - 'report/**'
+
+  check_latex:
+    needs: check_report
+    if: ${{ needs.check_report.outputs.report == 'true' }}
+    runs-on: ubuntu-latest
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Compile Latex
