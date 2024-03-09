@@ -2,10 +2,17 @@ defaults:
   - mas
   - _self_
 
-model_name: solu-1l
 params:
   sample_overlap: 256
   num_max_samples: 32
   sample_length_pre: 192
   sample_length_post: 64
   samples_to_check: 32
+dataset_name: 'monology/pile-uncopyrighted'
+model_name: 'gelu-2l'
+layers:
+  - hook_id: blocks.0.mlp.hook_post
+    num_features: 2048
+  - hook_id: blocks.1.mlp.hook_post
+    num_features: 2048
+out_path: mas_store

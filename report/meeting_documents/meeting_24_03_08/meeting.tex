@@ -1,0 +1,32 @@
+%!LW recipe=pdflatex
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+GitHub: \url{https://github.com/albertsgarde/thesis}
+
+Newest version of report: \url{https://albertsgarde.github.io/thesis/main/report.pdf}
+
+
+\section*{Progress since last meeting}
+\begin{itemize}
+    \item Finished basic and probably buggy script for running N2G on SAE features. Hope I can get some results before the meeting. Otherwise I'll have them next week.
+    \begin{itemize}
+        \item This uses Neel Nanda's SAE for his \verb|gelu-1l| model. Found as \verb|25.pt| at \url{https://huggingface.co/NeelNanda/sparse_autoencoder}
+    \end{itemize}
+    \item Gained a far deeper understanding of N2G.
+\end{itemize}
+\section*{Plan for the next weeks}
+\begin{itemize}
+    \item Actually write report this time (theory on MAS and N2G) :))
+    \item Polish script.
+\end{itemize}
+\section*{Topics for meeting}
+\begin{itemize}
+    \item After reading the N2G paper and looking a lot more at the code, I've found quite a few places where I think I can simplify the code a lot. It may also make it run significantly faster.
+    \begin{itemize}
+        \item One of the main advantages would be that some of the current code I find very difficult to understand the purpose of. If I wrote my own version of that part, I could make it more readable and immediately write documentation
+        \item Since these changes will change the output, I need better tests than simply comparing the outputs byte by byte. My thought is that the predictive power would be a good metric.
+    \end{itemize}
+\end{itemize}
+
+\end{document}

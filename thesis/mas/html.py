@@ -12,7 +12,7 @@ from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore
 
 @beartype
 def token_color(activation: float, max_abs_activation: float) -> str:
-    activation = activation / max_abs_activation
+    activation = activation / max_abs_activation if max_abs_activation > 0 else 0
     if activation >= 0:
         return f"rgba({int(255*(1-activation))}, {int(255*(1-activation))}, 255, {int(activation*256)/256})"
     else:
@@ -39,11 +39,8 @@ def sample_html(
     assert len(tokens) == activations.shape[0], "Tokens and activations must have the same shape"
     if model.tokenizer is None:
         raise ValueError("Model must have tokenizer.")
-    first_pad: int = next(
-        (i for i, token in enumerate(tokens) if token == typing.cast(str, model.tokenizer.pad_token)), len(tokens)
-    )
-    token_strings: list[str] = tokens[:first_pad]
-    activations = activations[:first_pad]
+    token_strings: list[str] = tokens
+    activations = activations
     max_abs_activation = np.abs(activations).max()
     text: str = "".join(
         token_html(token, float(activation), float(max_abs_activation))

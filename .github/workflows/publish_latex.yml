@@ -20,6 +20,12 @@ jobs:
         with:
           work_in_root_file_dir: true
           root_file: ./report/main.tex
+      
+      - name: Create artifact1
+        uses: actions/upload-artifact@v4
+        with:
+          name: report1
+          path: ./report/main.pdf
 
       - name: Move PDF to root directory
         run: |
@@ -27,6 +33,12 @@ jobs:
           mv report/main.pdf github_pages/${BRANCH_NAME}/report.pdf
         env:
           BRANCH_NAME: ${{ github.ref_name }}
+      
+      - name: Create artifact2
+        uses: actions/upload-artifact@v4
+        with:
+          name: report2
+          path: github_pages/${BRANCH_NAME}/report.pdf
 
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

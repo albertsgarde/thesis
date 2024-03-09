@@ -1,10 +1,12 @@
 *.aux
 *.out
 *.synctex.gz
+*.synctex(busy)
 *.pdf
 *.bbl
 *.blg
 *.toc
 *.dvi
 *.fdv_latexmk
+*.fdb_latexmk
 *.fls

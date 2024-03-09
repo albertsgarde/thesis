@@ -4,7 +4,7 @@ from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore
 
 from thesis.device import get_device  # type: ignore[import]
 from thesis.mas import algorithm
-from thesis.mas.algorithm import MASParams
+from thesis.mas.algorithm import MASLayer, MASParams
 
 
 def test_mas() -> None:
@@ -14,13 +14,15 @@ def test_mas() -> None:
 
     device = get_device()
 
-    model: HookedTransformer = HookedTransformer.from_pretrained("solu-1l", device=device.torch())  # type: ignore[reportUnknownVariableType]
+    model: HookedTransformer = HookedTransformer.from_pretrained("gelu-1l", device=device.torch())  # type: ignore[reportUnknownVariableType]
 
     dataset: IterableDataset = datasets.load_dataset(  # type: ignore[reportUnknownMemberType]
         "monology/pile-uncopyrighted", streaming=True, split="train", trust_remote_code=True
     )
 
-    mas_store = algorithm.run(model, dataset, params, device)
+    layers = [MASLayer.from_hook_id("blocks.0.mlp.hook_post", 2048)]
+
+    mas_store = algorithm.run(model, dataset, layers, params, device)
 
     samples = mas_store.feature_samples()
     activations = mas_store.feature_activations()

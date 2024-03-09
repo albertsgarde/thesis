@@ -28,6 +28,8 @@ pythonpath = ["thesis"]
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
 select = ["I", "E", "F", "W", "N", "B"]
 ignore = ["D203", "D213", "F722"]
-lint.isort.known-first-party = ["device", "models", "data"]
+isort.known-first-party = ["device", "models", "data"]
