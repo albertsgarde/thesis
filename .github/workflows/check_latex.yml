@@ -3,21 +3,6 @@ name: Check LaTeX
 on: pull_request
 
 jobs:
-  check_report:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-    outputs:
-      report: ${{ steps.filter.outputs.report }}
-    steps:
-      - name: Check for report changes
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            report:
-              - 'report/**'
-
   check_latex:
     runs-on: ubuntu-latest
     steps:
