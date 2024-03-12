@@ -1,0 +1,51 @@
+%!LW recipe=pdflatex
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+GitHub: \url{https://github.com/albertsgarde/thesis}
+
+Newest version of report: \url{https://albertsgarde.github.io/thesis/main/report.pdf}
+
+
+\section*{Progress since last meeting}
+\begin{itemize}
+    \item Created rough experimental design document.
+    \item Wrote first draft theory sections for MAS and N2G.
+    See link to report above.
+    \item Continued work on the N2G code.
+\end{itemize}
+\section*{Plan for the next weeks}
+\begin{itemize}
+    \item Polish the script written last time.
+    \item Fix issue in N2G code where a division by zero error 
+    makes it impossible to create graphs for some features.
+    \begin{itemize}
+        \item This could be temporarily be hacked around, 
+        as was done in the original script, 
+        but it needs to be fixed at some point.
+        \item It is especially important for SAE features, 
+        since the ReLU activation causes far more $0$ activations.
+    \end{itemize}
+    \item Quantatively compare the performance of SAE feature graphs 
+    with MLP neuron graphs.
+\end{itemize}
+\section*{Topics for meeting}
+\begin{itemize}
+    \item How best to quantify the performance of the feature graphs? 
+    Both for comparing MLP and SAE features 
+    and for regression testing changes to the N2G code.
+    \begin{itemize}
+        \item See the set of feature models as a single model 
+        combine their predictions into a single set of statistics.
+        \begin{itemize}
+            \item This might work fine for comparing the two types of features, 
+            but for regression testing, 
+            I kinda want to know (and avoid) if a single feature model 
+            performs far worse.
+        \end{itemize}
+        \item Use statistics like mean, mininum, median on 
+        recall/precision/etc. of individual models.
+    \end{itemize}
+\end{itemize}
+
+\end{document}
