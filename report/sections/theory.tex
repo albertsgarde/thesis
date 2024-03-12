@@ -29,17 +29,18 @@ it is useful to have notation for this.
 Taking inspiration from \citet{foote_neuron_2023} 
 but diverging significantly, we use the function
 \begin{align*}
-    a\in\mathcal{F}\times\mathcal{S}\times\N\to\R
+    a\in\mathcal{F}\times\mathcal{T}\times\N\to\R
 \end{align*} 
 where $\mathcal{F}$ is the set of possible features and
-$\mathcal{S}$ is the set of possible token strings.
+$\mathcal{T}$ is the set of possible token strings.
 $a$ then takes a feature, a token string, and an index, and returns 
 the value of the feature on the token string at the given index.
 For example, if $f$ is the 423rd neuron in the second MLP layer of 
 the \verb|gpt2-small| model, $s$ is the token string 
 \verb="<|BOS|>","The"," quick"," brown"," fox"=
 then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
-"brown" when \verb|gpt2-small| processes the string "The quick brown fox".
+"\verb| brown|" when \verb|gpt2-small| processes 
+the string "\verb|The quick brown fox|".
 
 \section{MAS}
 The first method we will use is that of \emph{maximum activating samples}.
@@ -50,7 +51,8 @@ Mathematically this can be written as
 \begin{align*}
     \argmax_{\substack{s\in\mathcal{D}\\ \text{top }k}}\left(\max_{i\leq|s|}\left(a(f,s,i)\right)\right)
 \end{align*}
-for some feature $f\in\mathcal{F}$ and dataset $\mathcal{D}\subseteq\mathcal{S}$.
+for some feature $f\in\mathcal{F}$ 
+and dataset $\mathcal{D}\subseteq\mathcal{T}$.
 This method has faced criticism \citep{bolukbasi_interpretability_2021} 
 and should probably not be used in isolation, but it can be a useful
 starting point for understanding the behaviour of a feature.
@@ -73,6 +75,80 @@ by finding a set of patterns which activate the feature.
 Each pattern consists of a string of tokens (an $n$-gram) 
 with the possibility of a special ignore token 
 which signal that the token at that position does not matter.
+It does this on the basis of maximum activating samples,
+\todo{though it doesn't have to}s 
+so it is dependent on that method and 
+can be argued to share some of its weaknesses.
+
+To run this method for a particular feature $f\in\mathcal{F}$, 
+we need a set of highly activating samples $\mathcal S\subseteq \mathcal T$.
+For sample $s\in\mathcal S$, we identify a \emph{pivot token} $e$, 
+which is the most activating token in the sample, 
+and perform 3 steps: pruning, saliencey detection, and augmentation.
+
+\subsection{Pruning}
+For a token string $s\in\mathcal S$, and pivot token $e$, 
+pruning consists of finding the smallest substring of $s$ that ends in $e$ 
+and still sufficiently activates $f$.
+What "sufficiently activates" means is a parameter of the method, 
+but in the original paper it is defined as causing an activation at least
+half of original activation.
+This removes context that is irrelevant to the activation of $f$.
+We call the pruned string $s'$
+
+\subsection{Saliency detection}
+Here we find the most important tokens in the pruned string $s'$.
+This is done by replacing each token in the pruned string 
+with a padding token and finding the change in activation.
+If the change is large, the token is important.
+How large the change needs to be is another parameter of the model.
+Once this step is done, we have a set $B$ of important tokens in $s'$.
+
+\subsection{Augmentation}
+Given a pruned string $s'$ and a set of important tokens $B$ in that string, 
+augmentation is the process of finding nearby nearby strings 
+that activate $f$ similarly to $s'$.
+To do this, we replace each $b\in B$ with other "similar" tokens and 
+see whether the resulting string activates $f$ sufficiently.
+What counts as sufficient is yet another parameter, 
+while "similar" tokens are found using a helper model 
+(\verb|distilbert-base-uncased| in the original paper) 
+that is asked to predict replacements for $b$ 
+given the rest of $s'$ as context.
+All alternative strings that activates $f$ sufficiently are stored.
+
+\subsection{Graph building}
+After performing the $3$ previous steps on all strings in $\mathcal S$, 
+We have a set $\mathcal S'\subseteq\mathcal T$ 
+of pruned and augmented strings that all activate $f$ highly.
+In order to make predictions we must build a model from these strings.
+This is done by creating a trie $T$ 
+by working backwards through each string.
+The first nodes after the root of $T$ are the activating tokens 
+in the strings of $S'$.
+The rest of the nodes are the tokens in the strings of $S'$, 
+so that each path from the root to a leaf represents a string in $S'$.
+At the end of each of these paths through $T$, 
+we add an end node storing the activation of $f$ on the represented string.
+To predict the activation of $f$ on the last token of a new string $s$, 
+we start from the root of $T$ and the last token of $s$.
+We then traverse the trie, going backwards through $s$ 
+following any node that matches the current token of $s$, 
+with the special ignore tokens matching any token.
+If we reach an end node, we return the activation stored there.
+If at some point no node matches the current token of $s$, 
+we return $0$.
+
+This gives us a quantative measure of how good a model of the feature 
+the graph is.
+It also allows us to create a visual representation 
+of the feature behaviour.
+To do this, we create a new graph from $T$ 
+where all ignore nodes are removed, 
+and nodes representing the same token on the same layer are collapsed.
+We refer to both this representation and the original trie $T$ 
+as the \emph{feature graph}.
+
 
 \subbib{../main}
 \end{document}
