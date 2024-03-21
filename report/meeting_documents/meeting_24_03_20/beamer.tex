@@ -41,6 +41,24 @@
     \end{itemize}
 }
 \frame{
+    \frametitle{Recall distribution}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.6\textwidth]{figures/recall_all.png}
+        \caption{Distribution of recall scores for the MLP and SAE models.}
+        \label{fig:recall_dist}
+    \end{figure}
+}
+\frame{
+    \frametitle{Non NaN distributions}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1\textwidth]{figures/all_notnull.png}
+        \caption{Distribution of non NaN scores.}
+        \label{fig:all_dist_notnull}
+    \end{figure}
+}
+\frame{
     \frametitle{Results}
     \begin{table}[h]
         \centering
@@ -58,24 +76,6 @@
         \bottomrule
         \end{tabular}
     \end{table}
-}
-\frame{
-    \frametitle{Recall distribution}
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.6\textwidth]{figures/recall_all.png}
-        \caption{Distribution of recall scores for the MLP and SAE models.}
-        \label{fig:recall_dist}
-    \end{figure}
-}
-\frame{
-    \frametitle{Non NaN distributions}
-    \begin{figure}
-        \centering
-        \includegraphics[width=1\textwidth]{figures/all_notnull.png}
-        \caption{Distribution of non NaN scores.}
-        \label{fig:all_dist_notnull}
-    \end{figure}
 }
 
 \end{document}
