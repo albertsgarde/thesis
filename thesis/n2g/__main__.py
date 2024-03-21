@@ -6,7 +6,7 @@ import n2g
 import torch
 import transformer_lens  # type: ignore[import]
 from jaxtyping import Float, Int
-from n2g import NeuronModel, NeuronStats, Tokenizer
+from n2g import NeuronStats, Tokenizer
 from torch import Tensor
 from transformer_lens import HookedTransformer
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
@@ -31,12 +31,11 @@ def main() -> None:
     def feature_samples(feature_index: int) -> Tuple[list[str], float]:
         if feature_index < 0:
             raise ValueError(f"Feature index must be non-negative. {feature_index=}")
+
         elif feature_index < NUM_FEATURES:
-            store_index = feature_index
-        elif feature_index < NUM_FEATURES + NUM_FEATURES:
-            store_index = feature_index - NUM_FEATURES + 2048
+            store_index = feature_index + 2048
         else:
-            raise ValueError(f"Feature index must be less than {NUM_FEATURES + NUM_FEATURES}. {feature_index=}")
+            raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
 
         samples = mas_store.feature_samples()[store_index, :, :]
         max_activation = mas_store.feature_max_activations()[store_index, :].max().item()
@@ -70,61 +69,24 @@ def main() -> None:
         if feature_index < 0:
             raise ValueError(f"Feature index must be non-negative. {feature_index=}")
         elif feature_index < NUM_FEATURES:
-            return model_feature_activation(model, "blocks.0.mlp.hook_post", feature_index)
-        elif feature_index < NUM_FEATURES + NUM_FEATURES:
-            return lambda samples: sae.feature_activations(model, samples, feature_index - NUM_FEATURES)
+            return lambda samples: sae.feature_activations(model, samples, feature_index)
         else:
-            raise ValueError(f"Feature index must be less than {NUM_FEATURES + NUM_FEATURES}. {feature_index=}")
+            raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
 
     with (Path(__file__).parent / "word_to_casings.json").open("r", encoding="utf-8") as f:
         word_to_casings = json.load(f)
 
     train_config = n2g.TrainConfig()
 
-    models: list[NeuronModel]
     stats: list[NeuronStats]
-    models, stats = n2g.run_layer(
-        NUM_FEATURES * 2, feature_activation, feature_samples, tokenizer, word_to_casings, device.torch(), train_config
+    _, stats = n2g.run_layer(
+        NUM_FEATURES, feature_activation, feature_samples, tokenizer, word_to_casings, device.torch(), train_config
     )
 
-    neuron_stats = stats[:NUM_FEATURES]
-    sae_stats = stats[NUM_FEATURES:]
-
-    avg_neuron_precision = sum(neuron_stats.firing.precision for neuron_stats in neuron_stats) / NUM_FEATURES
-    avg_neuron_recall = sum(neuron_stats.firing.recall for neuron_stats in neuron_stats) / NUM_FEATURES
-    avg_neuron_f1 = sum(neuron_stats.firing.f1_score for neuron_stats in neuron_stats) / NUM_FEATURES
-
-    avg_sae_precision = sum(sae_stats.firing.precision for sae_stats in sae_stats) / NUM_FEATURES
-    avg_sae_recall = sum(sae_stats.firing.recall for sae_stats in sae_stats) / NUM_FEATURES
-    avg_sae_f1 = sum(sae_stats.firing.f1_score for sae_stats in sae_stats) / NUM_FEATURES
-
-    print(f"Neuron precision: {avg_neuron_precision:.2f}")
-    print(f"Neuron recall: {avg_neuron_recall:.2f}")
-    print(f"Neuron f1: {avg_neuron_f1:.2f}")
-
-    print(f"Sae precision: {avg_sae_precision:.2f}")
-    print(f"Sae recall: {avg_sae_recall:.2f}")
-    print(f"Sae f1: {avg_sae_f1:.2f}")
-
-    outputs_path = Path("outputs") / "n2g"
-    outputs_path.mkdir(parents=True, exist_ok=True)
-
-    stats_path = outputs_path / "stats.json"
+    stats_path = Path("outputs") / "stats.json"
     with stats_path.open("w") as f:
-        json.dump(
-            {
-                "neurons": {index: stats.model_dump() for index, stats in enumerate(stats[:NUM_FEATURES])},
-                "sae": {index: stats.model_dump() for index, stats in enumerate(stats[NUM_FEATURES:])},
-            },
-            f,
-        )
-
-    for i, model in enumerate(
-        models,
-    ):
-        graph_path = outputs_path / (f"neuron_{i}" if i < NUM_FEATURES else f"sae_{i-NUM_FEATURES}")
-        with graph_path.open("w") as f:
-            f.write(model.graphviz().source)
+        json_object = [neuron_stats.model_dump() for neuron_stats in stats]
+        json.dump(json_object, f)
 
 
 if __name__ == "__main__":
