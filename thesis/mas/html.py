@@ -4,6 +4,7 @@ import typing
 import numpy as np
 import torch
 from beartype import beartype
+from graphviz import Source  # type: ignore[import]
 from jaxtyping import Float, Int
 from numpy import ndarray
 from torch import Tensor
@@ -50,10 +51,16 @@ def sample_html(
 
 
 @beartype
+def n2g_svg(n2g_source: Source) -> str:
+    return n2g_source.pipe(format="svg", encoding="utf-8")
+
+
+@beartype
 def generate_html(
     model: HookedTransformer,
     samples: Int[Tensor, "num_samples sample_length"],
     activations: Float[Tensor, "num_samples sample_length"],
+    n2g_source: Source | None = None,
 ) -> str:
     assert not torch.isinf(activations).any(), "Infinite activations found"
     assert not torch.isnan(activations).any(), "NaN activations found"
@@ -65,12 +72,14 @@ def generate_html(
             strict=True,
         )
     )
+    n2g_str = f"{n2g_svg(n2g_source)}<hr>" if n2g_source is not None else ""
     return f"""
 <head>
 	<meta charset="utf-8" />
     <title>Sample activations</title>
 </head>
 <body>
+    {n2g_str}
     {samples_html}
 </body>
 """
