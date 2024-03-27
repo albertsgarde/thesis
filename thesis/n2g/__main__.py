@@ -15,7 +15,7 @@ from thesis.device import Device
 from thesis.mas.mas_store import MASStore
 from thesis.sae.sae import SparseAutoencoder
 
-NUM_FEATURES = 2
+NUM_FEATURES = 16384
 
 
 def main() -> None:
@@ -79,7 +79,7 @@ def main() -> None:
     train_config = n2g.TrainConfig()
 
     stats: list[NeuronStats]
-    _, stats = n2g.run_layer(
+    models, stats = n2g.run_layer(
         NUM_FEATURES, feature_activation, feature_samples, tokenizer, word_to_casings, device.torch(), train_config
     )
 
@@ -88,6 +88,11 @@ def main() -> None:
         json_object = [neuron_stats.model_dump() for neuron_stats in stats]
         json.dump(json_object, f)
 
+    models_path = Path("outputs") / "models"
+    models_path.mkdir(exist_ok=True, parents=True)
+    for i, model in enumerate(models):
+        with (models_path / f"{i}").open("w", encoding="utf-8") as f:
+            f.write(model.graphviz().source)    
 
 if __name__ == "__main__":
     main()
