@@ -6,3 +6,4 @@ line-profiler >= 4.1.2
 zstandard >= 0.22.0
 jaxtyping ~= 0.2.20
 datasets ~= 2.16.1
+graphviz ~= 0.20.1
