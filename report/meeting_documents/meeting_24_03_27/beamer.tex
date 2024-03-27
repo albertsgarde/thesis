@@ -1,0 +1,50 @@
+\documentclass[aspectratio=169]{beamer}
+%\setbeameroption{show notes}
+
+\usepackage{beamer_pre}
+
+
+\title{Thesis meeting 2024/03/27}
+\author{Albert R. S. Garde}
+\date{\today}
+	
+
+\begin{document}
+
+\frame{
+	\maketitle
+}
+
+\begin{frame}[fragile=singleslide]
+	\frametitle{Progress since last meeting}
+    \begin{itemize}
+        \item Found critical issues with the results from last week when looking at MAS samples.
+        \item Created Rust implementation of the feature model in N2G.
+        \item Tried to get my new \verb|prune| implementation to work.
+        \item Looked at some other interpretability measures.
+    \end{itemize}
+\end{frame}
+\begin{frame}[fragile=singleslide]
+    \frametitle{Plan for the next weeks}
+    \begin{itemize}
+        \item Fix the critical issue.
+        \item Redo the statistical analysis 
+        (maybe with the bootstrap CI test instead of the Chebyshev inequality) 
+        and again take a look at the individual feature models and MAS samples.
+        \item Integrate the Rust implementation of the feature model in N2G.
+    \end{itemize}
+\end{frame}
+\begin{frame}[fragile=singleslide]
+    \frametitle{Topics for meeting}
+    \begin{itemize}
+        \item Show examples of issues with previous results.
+        \item Other interpretability measures.
+        \begin{itemize}
+            \item Open AI automated interpretability method and variations.
+            \item Manual \url{https://transformer-circuits.pub/2023/monosemantic-features#appendix-rubric}.
+            \item Feature sparsity.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\end{document}
