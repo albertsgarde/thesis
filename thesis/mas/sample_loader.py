@@ -24,6 +24,15 @@ class SampleDataset:
 
 @dataclass
 class Sample:
+    """
+    A sample from the dataset with a fixed size and possible overlap.
+
+    Attributes:
+        tokens (Int[Tensor, " context"]): The tokens of the sample.
+        overlap (int): The number of tokens that overlap with the previous sample.
+        length (int): The number of tokens in the sample before padding.
+    """
+
     tokens: Int[Tensor, " context"]
     overlap: int
     length: int
