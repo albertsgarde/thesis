@@ -131,15 +131,23 @@ class MASStore:
     def num_samples_added(self) -> int:
         return self._num_samples_added
 
+    def _sort_samples(self) -> None:
+        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
+
+        prev_samples_sum = self._feature_samples.sum(dim=1)
+
+        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
+        assert (expanded_indices == expanded_indices[:, :, 0][:, :, None]).all()
+        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
+        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+
+        assert (prev_samples_sum == self._feature_samples.sum(dim=1)).all(), "Activations should not change"
+
     def feature_samples(self) -> Int[Tensor, "num_features num_samples_added sample_length"]:
         """
         Sorts all data by max activations and returns the samples.
         """
-        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
-
-        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
-        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
-        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+        self._sort_samples()
 
         return self._feature_samples[:, : self.num_samples_added(), :]
 
@@ -147,11 +155,7 @@ class MASStore:
         """
         Sorts all data by max activations and returns the activations.
         """
-        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
-
-        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
-        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
-        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+        self._sort_samples()
 
         return self._feature_activations[:, : self.num_samples_added(), :]
 
@@ -159,11 +163,7 @@ class MASStore:
         """
         Sorts all data by max activations and returns the max activations.
         """
-        self._feature_max_activations, sorted_indices = self._feature_max_activations.sort(dim=1, descending=True)
-
-        expanded_indices = sorted_indices.unsqueeze(-1).expand(-1, -1, self._feature_samples.size(-1))
-        self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
-        self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
+        self._sort_samples()
 
         return self._feature_max_activations[:, : self.num_samples_added()]
 
@@ -175,16 +175,23 @@ class MASStore:
     ) -> None:
         # Inputs must be padded to context length
         overlap = sample.overlap
-        tokens = sample.tokens
+        tokens: Int[Tensor, " context"] = sample.tokens
 
         assert not torch.isinf(activations).any(), "Infinite activations found"
         assert not torch.isnan(activations).any(), "NaN activations found"
 
+        # Find max activating sample for each feature, ignoring the overlap region,
+        # since that will have been handled better in another sample.
         max_activations: Float[Tensor, " num_features"]
         max_activating_indices: Int[Tensor, " num_features"]
         max_activations, max_activating_indices = activations[overlap : sample.length, :].max(dim=-2)
         max_activating_indices += overlap
 
+        # Find the starting index for the MAS sample for each feature.
+        # The sample should start at the maximum activating index minus the pre sample length.
+        # However, this is sometimes not possible, either because the index would be negative or
+        # because there would not be room after the index for the an entire sample.
+        # In that case, we clamp to the closest valid index.
         sample_starts: Int[Tensor, " num_features"] = torch.maximum(
             torch.tensor([0], device=self._device.torch()),
             torch.minimum(
@@ -196,30 +203,44 @@ class MASStore:
         assert (
             sample_starts + self.sample_length() <= tokens.shape[0]
         ).all(), "Sample starts should be within the token length"
+        assert (sample_starts >= 0).all(), "Sample starts should be non-negative"
 
+        # Unfold creates a view of the tokens tensor where each possible sample is a row.
+        # The correct sample for each feature is selected by indexing with the sample starts.
         sample_tokens: Int[Tensor, "num_features sample_length"] = tokens.unfold(0, self.sample_length(), 1)[
             sample_starts
         ]
-        sample_activations: Float[Tensor, "num_features sample_length"] = activations.transpose(1, 0)[
+        assert sample_tokens.shape == (self.num_features(), self.sample_length())
+
+        # Because activations are already a 2D tensor with a column for each feature, we cannot use the same approach.
+        # Instead, we index with two tensors.
+        sample_activations: Float[Tensor, "num_features sample_length"] = activations[
+            sample_starts[:, None] + torch.arange(self.sample_length(), device=self._device.torch())[None, :],
             torch.arange(self.num_features(), device=self._device.torch())[:, None].expand(
                 self.num_features(), self.sample_length()
             ),
-            sample_starts[:, None] + torch.arange(self.sample_length(), device=self._device.torch())[None, :],
         ]
+        assert sample_activations.shape == (self.num_features(), self.sample_length())
 
-        min_cur_activations: Float[Tensor, " num_features"]
-        min_cur_activation_indices: Int[Tensor, " num_features"]
-        min_cur_activations, min_cur_activation_indices = self._feature_max_activations.min(dim=-1)
+        # Get minimum maximum activations of all currently stored samples for each feature.
+        min_cur_max_activations: Float[Tensor, " num_features"]
+        min_cur_max_activation_indices: Int[Tensor, " num_features"]
+        min_cur_max_activations, min_cur_max_activation_indices = self._feature_max_activations.min(dim=-1)
+        assert min_cur_max_activations.shape == (self.num_features(),)
+        assert min_cur_max_activation_indices.shape == (self.num_features(),)
 
-        replace_mask: Bool[Tensor, " num_features"] = max_activations > min_cur_activations
+        # True for each feature where the new sample has a higher max activation
+        # than the lowest currently stored sample.
+        replace_mask: Bool[Tensor, " num_features"] = max_activations > min_cur_max_activations
 
-        self._feature_samples[replace_mask, min_cur_activation_indices[replace_mask], :] = sample_tokens[
+        # Replace the lowest currently stored samples with the new sample.
+        self._feature_samples[replace_mask, min_cur_max_activation_indices[replace_mask], :] = sample_tokens[
             replace_mask, :
         ]
-        self._feature_activations[replace_mask, min_cur_activation_indices[replace_mask], :] = sample_activations[
+        self._feature_activations[replace_mask, min_cur_max_activation_indices[replace_mask], :] = sample_activations[
             replace_mask, :
         ]
-        self._feature_max_activations[replace_mask, min_cur_activation_indices[replace_mask]] = max_activations[
+        self._feature_max_activations[replace_mask, min_cur_max_activation_indices[replace_mask]] = max_activations[
             replace_mask
         ]
 

@@ -141,4 +141,5 @@ def run(
         print(f"Model time: {model_time:.2f}s ({model_time/(end_time - start_time)*100:.2f}%)")
         print(f"MAS time: {mas_time:.2f}s ({mas_time/(end_time - start_time)*100:.2f}%)")
 
+        mas_store._sort_samples()
         return mas_store
