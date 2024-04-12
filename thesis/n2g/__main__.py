@@ -1,4 +1,5 @@
 import json
+import pickle
 from pathlib import Path
 from typing import Callable, Tuple
 
@@ -91,8 +92,11 @@ def main() -> None:
     models_path = Path("outputs") / "models"
     models_path.mkdir(exist_ok=True, parents=True)
     for i, model in enumerate(models):
-        with (models_path / f"{i}").open("w", encoding="utf-8") as f:
-            f.write(model.graphviz().source)    
+        with (models_path / f"{i}.pkl").open("wb") as bin_file:
+            pickle.dump(model, bin_file)
+        with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
+            f.write(model.graphviz().source)
+
 
 if __name__ == "__main__":
     main()
