@@ -77,7 +77,12 @@ def main() -> None:
     with (Path(__file__).parent / "word_to_casings.json").open("r", encoding="utf-8") as f:
         word_to_casings = json.load(f)
 
-    train_config = n2g.TrainConfig()
+    fit_config = n2g.FitConfig(
+        prune_config=n2g.PruneConfig(prepend_bos=False),
+        importance_config=n2g.ImportanceConfig(prepend_bos=False),
+        augmentation_config=n2g.AugmentationConfig(prepend_bos=False),
+    )
+    train_config = n2g.TrainConfig(fit_config=fit_config)
 
     stats: list[NeuronStats]
     models, stats = n2g.run_layer(
