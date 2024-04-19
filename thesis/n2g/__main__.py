@@ -16,7 +16,9 @@ from thesis.device import Device
 from thesis.mas.mas_store import MASStore
 from thesis.sae.sae import SparseAutoencoder
 
-NUM_FEATURES = 16384
+NUM_NEURONS = 2048
+NUM_SAE_FEATURES = 16384
+NUM_FEATURES = NUM_NEURONS + NUM_SAE_FEATURES
 
 
 def main() -> None:
@@ -32,9 +34,10 @@ def main() -> None:
     def feature_samples(feature_index: int) -> Tuple[list[str], float]:
         if feature_index < 0:
             raise ValueError(f"Feature index must be non-negative. {feature_index=}")
-
+        elif feature_index < NUM_NEURONS:
+            store_index = feature_index
         elif feature_index < NUM_FEATURES:
-            store_index = feature_index + 2048
+            store_index = feature_index
         else:
             raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
 
@@ -69,8 +72,10 @@ def main() -> None:
     ) -> Callable[[Int[Tensor, "num_samples sample_length"]], Float[Tensor, "num_samples sample_length"]]:
         if feature_index < 0:
             raise ValueError(f"Feature index must be non-negative. {feature_index=}")
+        elif feature_index < NUM_NEURONS:
+            return model_feature_activation(model, "blocks.0.mlp.hook_post", feature_index)
         elif feature_index < NUM_FEATURES:
-            return lambda samples: sae.feature_activations(model, samples, feature_index)
+            return lambda samples: sae.feature_activations(model, samples, feature_index - NUM_NEURONS)
         else:
             raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
 
