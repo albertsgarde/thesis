@@ -87,25 +87,29 @@ def main() -> None:
         importance_config=n2g.ImportanceConfig(prepend_bos=False),
         augmentation_config=n2g.AugmentationConfig(prepend_bos=False),
     )
-    train_config = n2g.TrainConfig(fit_config=fit_config)
+    train_config = n2g.TrainConfig(fit_config=fit_config, stop_on_error=False)
 
     stats: list[NeuronStats]
     models, stats = n2g.run_layer(
         NUM_FEATURES, feature_activation, feature_samples, tokenizer, word_to_casings, device.torch(), train_config
     )
 
+    none_models = sum(model is None for model in models)
+    print(f"Errors: {none_models}/{len(models)}")
+
     stats_path = Path("outputs") / "stats.json"
     with stats_path.open("w") as f:
-        json_object = [neuron_stats.model_dump() for neuron_stats in stats]
+        json_object = [neuron_stats.model_dump() if neuron_stats is not None else {} for neuron_stats in stats]
         json.dump(json_object, f)
 
     models_path = Path("outputs") / "models"
     models_path.mkdir(exist_ok=True, parents=True)
     for i, model in enumerate(models):
-        with (models_path / f"{i}.pkl").open("wb") as bin_file:
-            pickle.dump(model, bin_file)
-        with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
-            f.write(model.graphviz().source)
+        if model is not None:
+            with (models_path / f"{i}.pkl").open("wb") as bin_file:
+                pickle.dump(model, bin_file)
+            with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
+                f.write(model.graphviz().source)
 
 
 if __name__ == "__main__":
