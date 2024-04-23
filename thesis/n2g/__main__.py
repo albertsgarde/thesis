@@ -22,9 +22,12 @@ NUM_FEATURES = NUM_NEURONS + NUM_SAE_FEATURES
 
 
 def main() -> None:
+    torch.set_grad_enabled(False)
+
     device = Device.get()
 
     mas_store = MASStore.load(Path("outputs/gelu-1l-sae_store.zip"), device)
+    assert mas_store.feature_activations().shape[0] == NUM_FEATURES, "Feature activations should have the correct shape"
 
     model = transformer_lens.HookedTransformer.from_pretrained("gelu-1l", device.torch())
     sae = SparseAutoencoder.from_hf("NeelNanda/sparse_autoencoder", "25.pt", "blocks.0.mlp.hook_post", device)
@@ -91,7 +94,13 @@ def main() -> None:
 
     stats: list[NeuronStats]
     models, stats = n2g.run_layer(
-        NUM_FEATURES, feature_activation, feature_samples, tokenizer, word_to_casings, device.torch(), train_config
+        range(NUM_FEATURES),
+        feature_activation,
+        feature_samples,
+        tokenizer,
+        word_to_casings,
+        device.torch(),
+        train_config,
     )
 
     none_models = sum(model is None for model in models)
