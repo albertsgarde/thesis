@@ -1,5 +1,6 @@
 import itertools
 import math
+import random
 import time
 from dataclasses import dataclass
 from typing import Any, Callable, Tuple
@@ -15,8 +16,8 @@ from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore
 from thesis.sae.sae import SparseAutoencoder  # type: ignore[import]
 
 from ..device import Device, get_device
-from .mas_store import MASStore
 from .sample_loader import SampleDataset
+from .weighted_samples_store import WeightedSamplesStore
 
 
 @dataclass
@@ -26,6 +27,8 @@ class MASParams:
     sample_length_pre: int
     sample_length_post: int
     samples_to_check: int
+    seed: int
+    activation_bins: list[float]
 
     def __post_init__(self):
         if self.sample_overlap < 0:
@@ -70,7 +73,7 @@ class MASLayer:
 
 def run(
     model: HookedTransformer, dataset: IterableDataset, layers: list[MASLayer], params: MASParams, device: Device
-) -> MASStore:
+) -> WeightedSamplesStore:
     with torch.no_grad():
         device = get_device()
         print(f"Using device: {device.torch()}")
@@ -90,13 +93,17 @@ def run(
         sample_dataset = SampleDataset(context_size, params.sample_overlap, model, dataset)
 
         num_total_features = sum([layer.num_features for layer in layers])
-        mas_store = MASStore(
+        rng = random.Random(params.seed)
+        activation_bins = np.arange(0, 3, 0.1)
+        mas_store = WeightedSamplesStore(
+            list(activation_bins),
             params.num_max_samples,
             num_total_features,
             context_size,
             params.sample_length_pre,
             params.sample_length_post,
             model.tokenizer.pad_token_id,
+            rng,
             device,
         )
 
