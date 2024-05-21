@@ -9,7 +9,7 @@ we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
 transformer language model \citep{vaswani_attention_2023} 
 which we want to interpret.
-We will refer to this as the \emph{original language model}.
+We will refer to this as the \emph{language model}.
 We will also assume that we have a set of text samples 
 which we use to train and test the methods.
 We will refer to these as the \emph{dataset}.
@@ -41,6 +41,8 @@ the \verb|gpt2-small| model, $s$ is the token string
 then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
 "\verb| brown|" when \verb|gpt2-small| processes 
 the string "\verb|The quick brown fox|".
+
+\section{Sparse autoencoders}
 
 \section{MAS}
 The first method we will use is that of \emph{maximum activating samples}.
