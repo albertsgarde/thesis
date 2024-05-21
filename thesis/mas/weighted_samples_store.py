@@ -179,7 +179,7 @@ class WeightedSamplesStore:
         assert (expanded_indices == expanded_indices[:, :, 0][:, :, None]).all()
         self._feature_samples = torch.gather(self._feature_samples, 1, expanded_indices)
         self._feature_activations = torch.gather(self._feature_activations, 1, expanded_indices)
-        self._feature_sample_keys = torch.gather(self._feature_sample_keys, 1, expanded_indices)
+        self._feature_sample_keys = torch.gather(self._feature_sample_keys, 1, expanded_indices[:, :, 0])
 
         assert (prev_samples_sum == self._feature_samples.sum(dim=1)).all(), "Activations should not change"
 
@@ -286,6 +286,8 @@ class WeightedSamplesStore:
         # True for each feature where the new sample has a higher max activation
         # than the lowest currently stored sample.
         replace_mask: Bool[Tensor, " num_features"] = keys > min_cur_keys
+        if self.num_samples_added() < self.num_samples_per_feature():
+            assert replace_mask.count_nonzero() == self.num_features(), "All samples should be added"
 
         # Replace the lowest currently stored samples with the new sample.
         self._feature_samples[replace_mask, min_cur_key_indices[replace_mask], :] = sample_tokens[replace_mask, :]
@@ -293,9 +295,16 @@ class WeightedSamplesStore:
             replace_mask, :
         ]
         self._feature_max_activations[replace_mask, min_cur_key_indices[replace_mask]] = max_activations[replace_mask]
+        self._feature_sample_keys[replace_mask, min_cur_key_indices[replace_mask]] = keys[replace_mask]
 
         self._num_samples_added += 1
 
-        assert (self._feature_activations == -float("inf")).any(dim=0).any(dim=1).count_nonzero() == max(
-            self.num_samples_per_feature() - self.num_samples_added(), 0
+        return
+
+        num_non_inf = (
+            self.num_samples_per_feature()
+            - (self._feature_activations == -float("inf")).any(dim=0).any(dim=1).count_nonzero()
+        )
+        assert num_non_inf == min(self.num_samples_added(), self.num_samples_per_feature()), (
+            f"Number of non-inf activations: {num_non_inf}\n" f"Number of samples added: {self.num_samples_added()}\n"
         )
