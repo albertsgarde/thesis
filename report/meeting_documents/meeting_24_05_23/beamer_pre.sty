@@ -1,0 +1,198 @@
+\usepackage[utf8]{inputenc}
+
+% Selectively silence warnings
+\usepackage{silence}
+\WarningFilter{hyperref}{Token not allowed}
+
+% Math notation
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{bm} % Used for bold math
+
+% Subscript before
+\usepackage{tensor}
+
+% Framing
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems}
+
+% Placement of figures
+\usepackage{float}
+
+% Figures
+\usepackage{graphicx}
+\usepackage{subfig}
+
+% Better looking tables
+\usepackage{booktabs}
+
+% Pseudocode
+\usepackage{algorithmic}
+
+% Enumerations
+\usepackage{enumitem}
+
+% Potter proof!
+\usepackage{stmaryrd}
+
+% Units
+\usepackage{siunitx}
+
+% More complex arguments
+\usepackage{xparse}
+
+% Symbols
+%% Arabic symbols
+\usepackage{arabtex}
+\setarab
+\arabtrue
+
+\newcommand{\arj}{\RL{j}}
+\newcommand{\ark}{\RL{.k}}
+\newcommand{\artea}{\RL{.s}}
+\newcommand{\ardoublemu}{\RL{s}}
+\newcommand{\arsmiley}{\RL{t}}
+\newcommand{\arhandcuffs}{\RL{mh}}
+
+%% Standard symbols
+\newcommand{\e}{\mathrm{e}}
+\newcommand{\im}{\mathrm{i}}
+\newcommand{\diff}{\mathrm{d}}
+\newcommand{\id}{\mathrm{id}}
+\renewcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\M}{\mathbb{M}}
+\newcommand{\xor}{\oplus}
+
+
+%\newmdtheoremenv[nobreak=true]{theorem}{Theorem}
+%\newmdtheoremenv[nobreak=true]{lemma}{Lemma}
+%\newmdtheoremenv[nobreak=true]{corollary}{Corollary}
+%\newmdtheoremenv[nobreak=true]{definition}{Definition}
+%\newmdtheoremenv[nobreak=true]{problem}{Problem}
+%\newmdtheoremenv{example}{Example}
+
+% Symbol formatting
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\set}[1]{\mathcal{#1}}
+
+% Vector span
+\newcommand{\vspan}{\mathrm{span}}
+
+% Column vectors
+\makeatletter
+\newcommand{\cvec}[1]{
+    \left[\begin{array}{c}#1\cvecchecknextarg}
+\newcommand{\cvecchecknextarg}{\@ifnextchar\bgroup{\cvecgobblenextarg}{\end{array}\right]}}
+\newcommand{\cvecgobblenextarg}[1]{\\#1\@ifnextchar\bgroup{\cvecgobblenextarg}{\end{array}\right]}}
+\makeatother
+
+% Row vectors
+\makeatletter
+\newcommand{\rvec}[2]{
+    \left[\begin{array}{*{#1}{c}}#2\rvecchecknextarg}
+\newcommand{\rvecchecknextarg}{\@ifnextchar\bgroup{\rvecgobblenextarg}{\end{array}\right]}}
+\newcommand{\rvecgobblenextarg}[1]{&#1\@ifnextchar\bgroup{\rvecgobblenextarg}{\end{array}\right]}}
+\makeatother
+
+% Vertical iff
+\newcommand{\viff}{\Updownarrow}
+
+% Absolute
+\newcommand{\abs}[1]{\lvert#1\rvert}
+
+% Norm
+\newcommand{\norm}[1]{\lvert\lvert#1\rvert\rvert}
+
+% Inner product
+\newcommand{\iprod}[2]{\langle#1,#2\rangle}
+
+% Complex conjugate
+\newcommand{\conj}[1]{\overline{#1}}
+
+% Transpose
+\newcommand{\trans}[1]{#1^\top}
+
+% Conjugate transpose (adjunct)
+\newcommand{\adj}[1]{#1^*}
+
+% Infinite sum
+\newcommand{\infsum}[2][1]{\sum_{#2=#1}^\infty}
+
+% Label specific row in align
+\newcommand\numberthis[1]{\stepcounter{equation}\label{#1}\tag{\theequation}}
+
+% Conditional probability
+\newcommand\given[1][]{\:#1\vert\:}
+
+% Contradiction
+\newcommand{\contradiction}{\ensuremath{\lightning}}
+
+% Closure
+\newcommand{\closure}[1]{\overline{#1}}
+
+% Matrix trace
+\newcommand{\trace}{\mathrm{tr}}
+
+% Map image
+\DeclareMathOperator{\ima}{im}
+
+% Kronecker product	
+\newcommand{\kronprod}{\otimes}
+
+% Direct sum
+\newcommand{\dirsum}{\oplus}
+
+% Element-wise product
+\newcommand{\elemprod}{\circ}
+ 
+% Matrix representation of linear operator in basis
+\newcommand{\linopbasis}[3]{\tensor[_{#1}]{\left[#2\right]}{_{#3}}}
+
+\newcommand{\powerset}[1]{\mathcal{P}\left(#1\right)}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Remove numbers for headers
+%\setcounter{secnumdepth}{-2}
+
+% Image
+\newcommand{\image}[3]{
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=#3]{#1} 
+        \caption{#2}
+    \end{figure}
+} 
+
+\newcommand\matlist[2]{#1_1,#1_2,\dots,#1_{#2}}
+
+% References a Theorem/Lemma/Corollary depending on the label (thr/lemma/cor).
+% For example, if a label thr:hairy_ball exists, then \thref{hairy_ball} will evaluate to "Theorem \label{thr:hairy_ball}".
+% If the theorem is later changed to a lemma, so thr:hairy_ball is renamed lemma:hairy_ball, \thref{hairy_ball} will instead evaluate to "\Lemma \label{lemma:hairy_ball}".
+% What happens if two labels with the same name (both thr:hairy_ball and lemma:hairy_ball) is undefined.
+\makeatletter
+\newcommand\thref[1]{%
+	\@ifundefined{r@theorem:#1}{%
+		\@ifundefined{r@lemma:#1}{%
+			\@ifundefined{r@corollary:#1}{%
+				Definition \ref {definition:#1}%
+			}{%
+				Corollary \ref{corollary:#1}%
+			}%
+		}{%
+			Lemma \ref{lemma:#1}%
+		}%
+	}{%
+		Theorem \ref{theorem:#1}%
+	}%
+}
+\makeatother
