@@ -22,6 +22,21 @@ from .weighted_samples_store import WeightedSamplesStore
 
 @dataclass
 class MASParams:
+    """
+    Parameters for the MAS algorithm.
+
+    Args:
+        high_activation_weighting: How much to prefer samples with high activation.
+        sample_overlap: The number of tokens that overlap between samples.
+        num_max_samples: The number of samples to store per feature.
+        sample_length_pre: The number of tokens to store before the high activation token.
+        sample_length_post: The number of tokens to store after the high activation token.
+        samples_to_check: The number of samples to check.
+        seed: The seed to use for sampling.
+        activation_bins: The bins to use for the activation histogram.
+    """
+
+    high_activation_weighting: float
     sample_overlap: int
     num_max_samples: int
     sample_length_pre: int
@@ -97,6 +112,7 @@ def run(
         activation_bins = np.arange(0, 3, 0.1)
         mas_store = WeightedSamplesStore(
             list(activation_bins),
+            params.high_activation_weighting,
             params.num_max_samples,
             num_total_features,
             context_size,

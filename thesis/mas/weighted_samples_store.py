@@ -26,6 +26,8 @@ class WeightedSamplesStore:
     _feature_sample_keys: Float[Tensor, "num_features num_samples"]
     _feature_activation_densities: Int[Tensor, "num_features num_activation_bins"]
 
+    _high_activation_weighting: float
+
     _num_samples_added: int
 
     _sample_length_pre: int
@@ -38,6 +40,7 @@ class WeightedSamplesStore:
     def __init__(
         self,
         activation_bins: Sequence[float],
+        high_activation_weighting: float,
         num_samples: int,
         num_features: int,
         context_size: int,
@@ -55,7 +58,9 @@ class WeightedSamplesStore:
 
         sample_length = min(sample_length_pre + sample_length_post, context_size)
 
-        self._activation_bins = torch.tensor(activation_bins)
+        self._activation_bins = torch.tensor(activation_bins, device=device.torch())
+
+        self._high_activation_weighting = high_activation_weighting
 
         self._feature_samples = torch.zeros(
             size=(num_features, num_samples, sample_length),
@@ -94,6 +99,7 @@ class WeightedSamplesStore:
 
     def save(self, file_name: Path) -> None:
         values_dict = {
+            "high_activation_weighting": self._high_activation_weighting,
             "num_samples_added": self._num_samples_added,
             "sample_length_pre": self._sample_length_pre,
             "sample_length_post": self._sample_length_post,
@@ -133,23 +139,24 @@ class WeightedSamplesStore:
                 for name in tensors_serialized
             }
 
-        mas_store = WeightedSamplesStore.__new__(WeightedSamplesStore)
-        mas_store._activation_bins = tensors_dict["activation_bins"]
-        mas_store._feature_samples = tensors_dict["feature_samples"].long()
-        mas_store._feature_activations = tensors_dict["feature_activations"]
-        mas_store._feature_max_activations = tensors_dict["feature_max_activations"]
-        mas_store._feature_sample_keys = tensors_dict["feature_sample_keys"]
-        mas_store._feature_activation_densities = tensors_dict["feature_activation_densities"].long()
+        weighted_samples_store = WeightedSamplesStore.__new__(WeightedSamplesStore)
+        weighted_samples_store._activation_bins = tensors_dict["activation_bins"]
+        weighted_samples_store._feature_samples = tensors_dict["feature_samples"].long()
+        weighted_samples_store._feature_activations = tensors_dict["feature_activations"]
+        weighted_samples_store._feature_max_activations = tensors_dict["feature_max_activations"]
+        weighted_samples_store._feature_sample_keys = tensors_dict["feature_sample_keys"]
+        weighted_samples_store._feature_activation_densities = tensors_dict["feature_activation_densities"].long()
 
-        mas_store._num_samples_added = values_dict["num_samples_added"]
-        mas_store._sample_length_pre = values_dict["sample_length_pre"]
-        mas_store._sample_length_post = values_dict["sample_length_post"]
-        mas_store._pad_token_id = values_dict["pad_token_id"]
-        mas_store._rng = random.Random()
-        mas_store._rng.setstate(values_dict["rng_state"])
-        mas_store._device = device
+        weighted_samples_store._high_activation_weighting = values_dict["high_activation_weighting"]
+        weighted_samples_store._num_samples_added = values_dict["num_samples_added"]
+        weighted_samples_store._sample_length_pre = values_dict["sample_length_pre"]
+        weighted_samples_store._sample_length_post = values_dict["sample_length_post"]
+        weighted_samples_store._pad_token_id = values_dict["pad_token_id"]
+        weighted_samples_store._rng = random.Random()
+        weighted_samples_store._rng.setstate(values_dict["rng_state"])
+        weighted_samples_store._device = device
 
-        return mas_store
+        return weighted_samples_store
 
     def num_features(self) -> int:
         return self._feature_samples.shape[0]
@@ -217,7 +224,8 @@ class WeightedSamplesStore:
         max_activating_indices += overlap
 
         self._feature_activation_densities[
-            torch.arange(self.num_features()), torch.searchsorted(self._activation_bins, max_activations)
+            torch.arange(self.num_features(), device=self._device.torch()),
+            torch.searchsorted(self._activation_bins, max_activations),
         ] += 1
 
         # Find the starting index for the MAS sample for each feature.
@@ -256,9 +264,17 @@ class WeightedSamplesStore:
         ]
         assert sample_activations.shape == (self.num_features(), self.sample_length())
 
+        assert sample_activations.isnan().count_nonzero() == 0, "NaN activations found"
+        assert sample_activations.isinf().count_nonzero() == 0, "Infinite activations found"
+
         # Calculate the key for the sample for each feature.
         r: float = self._rng.uniform(0, 1)
-        keys: Float[Tensor, " num_features"] = torch.pow(r, 1 / max_activations)
+        keys: Float[Tensor, " num_features"] = torch.pow(
+            r, torch.exp(-self._high_activation_weighting * max_activations)
+        )
+
+        assert keys.isnan().count_nonzero() == 0, "NaN keys found"
+        assert keys.isinf().count_nonzero() == 0, "Infinite keys found"
 
         # Get minimum maximum activations of all currently stored samples for each feature.
         min_cur_keys: Float[Tensor, " num_features"]
