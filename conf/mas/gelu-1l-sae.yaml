@@ -3,6 +3,7 @@ defaults:
   - _self_
 
 params:
+  high_activation_weighting: 4.0
   sample_overlap: 256
   num_max_samples: 32
   sample_length_pre: 192
