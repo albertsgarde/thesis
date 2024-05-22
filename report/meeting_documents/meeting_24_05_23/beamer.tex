@@ -45,20 +45,42 @@
     \end{center}
 \end{frame}
 \begin{frame}[fragile=singleslide]
-    \frametitle{Plan for the next weeks}
+    \frametitle{Topics for meeting}
     \begin{itemize}
-        \item Continue literature review.
+        \item Clarification of terms
+        \item Plan for thesis content
     \end{itemize}
 \end{frame}
 \begin{frame}[fragile=singleslide]
-    \frametitle{Topics for meeting}
+    \frametitle{Clarification of terms}
     \begin{itemize}
-        \item Can we find other tasks?
-        \item Investigate universality hypothesis?
+        \item Language model: A generative model like the GPTs. 
         \begin{itemize}
-            \item Do features with the same graphs appear in many different models?
-            \item Does this differ between looking at MLP neurons and SAE features?
-            \item We will need to define what we mean by "same graph".
+            \item BERT is not an example of this type of model, since the attention is bidirectional.
+        \end{itemize}
+        \item N2G model: A model that models the \emph{activation pattern} of a single feature in a language model.
+        It says nothing directly about the model behaviour as a whole, e.g. next token predictions.
+        \item SAE: An autoencoder with a single hidden layer that is trained on the activations of a single layer of the model 
+        in a way so that the hidden layer activations are more interpretable than the direct model activations.
+    \end{itemize}
+\end{frame}
+\begin{frame}[fragile=singleslide]
+    \frametitle{Plan for thesis content}
+    \begin{itemize}
+        \item First part: Literature review of SAEs specifically.
+        This will include a short introduction to interpretability in general including the stuff covered by Bertology.
+        \item Second part: Experiments with N2G on SAEs.
+        I have 3 ideas for this. 
+        For all of them comparing MLP neurons to SAE features is interesting.
+        \begin{itemize}
+            \item How does N2G performance on features compare with other interpretability methods and interpretability metrics?
+            These include manual interpretability, automated interpretability, and sparsity.
+            \item Find a task for the language model to solve. 
+            Guess what N2G models of relevant features would look like.
+            See if performance degrades when ablating(removing) these features.
+            \item Investigate the universality hypothesis.
+            Do features with the same N2G models appear across many different models?
+            This would require us to formalize what we mean by "same N2G model".
         \end{itemize}
     \end{itemize}
 \end{frame}
