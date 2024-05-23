@@ -20,29 +20,12 @@
     \begin{itemize}
         \item Looked into the literature.
         \item Investigated tasks for the models to solve.
+        \item Attempted to get N2G working on \verb|gpt2-small| SAEs.
+        \begin{itemize}
+            \item Existing \verb|gpt2-small| SAEs have many features, which means that MAS data takes up a lot of space.
+            \item I have ideas for solutions, but none are great.
+        \end{itemize}
     \end{itemize}
-\end{frame}
-\begin{frame}[fragile=singleslide]
-    \frametitle{Literature}
-    \begin{itemize}
-        \item Failed to find literature that seemed directly relevant.
-        \item Found early work talking about SAE-like things, including in biology.
-        \item Found alternative interpretable units to SAE-features. Out of scope for this thesis, but probably worth mentioning.
-        \item 
-    \end{itemize}
-\end{frame}
-\begin{frame}[fragile=singleslide]
-    \frametitle{Tasks}
-    \begin{itemize}
-        \item \verb|gelu-11| is far too underpowered for any task.
-        \item The largest model we can comfortably work with is \verb|gpt2-small|, the largest we can practically work with is \verb|gpt2-xl|, and thats something of a stretch.
-        These models are still underpowered for many interesting tasks.
-        \item A possible task is correctly continuing the string \verb|The cat is sm| by completing a word.
-        \item Basically all models can do this task, and I expected removing neurons activting on \verb|sm| to make the task harder, but this is not the case.
-    \end{itemize}
-    \begin{center}
-        \includegraphics[scale=0.6]{images/fruit_colors.png}
-    \end{center}
 \end{frame}
 \begin{frame}[fragile=singleslide]
     \frametitle{Topics for meeting}
@@ -83,6 +66,19 @@
             This would require us to formalize what we mean by "same N2G model".
         \end{itemize}
     \end{itemize}
+\end{frame}
+\begin{frame}[fragile=singleslide]
+    \frametitle{Tasks}
+    \begin{itemize}
+        \item \verb|gelu-11| is far too underpowered for any task.
+        \item The largest model we can comfortably work with is \verb|gpt2-small|, the largest we can practically work with is \verb|gpt2-xl|, and thats something of a stretch.
+        These models are still underpowered for many interesting tasks.
+        \item A possible task is correctly continuing the string \verb|The cat is sm| by completing a word.
+        \item Basically all models can do this task, and I expected removing neurons activting on \verb|sm| to make the task harder, but this is not the case.
+    \end{itemize}
+    \begin{center}
+        \includegraphics[scale=0.6]{images/fruit_colors.png}
+    \end{center}
 \end{frame}
 
 \end{document}
