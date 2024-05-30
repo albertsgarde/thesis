@@ -1,0 +1,142 @@
+\documentclass[../../main.tex]{subfiles}
+
+
+\begin{document}
+
+
+\subsection{Interpretability in general}
+
+
+
+\subsection{Theoretical background}
+When interpreting a language model, there is a question of what the unit of interpretability should be.
+What part of the model should we be looking at?
+Mechanistic interpretability aims to understand models as granularly as possible, which makes individual neurons in either the residual stream, MLP layers or attention heads the obvious choice.
+Indeed, there is much research that aims to understand the behaviour and effect of individual neurons \citep{foote_neuron_2023}\citep{bills_language_2023}.
+However, there are reasons to believe that individual neurons are fundamentally difficult to interpret.
+According to the \emph{superposition hypothesis} \citep{elhage_toy_2022}, individual neurons do not cleanly represent interpretable features.
+Instead, features are spread over several neurons in order to pack more features into the same set of neuron dimensions.
+This is possible due to the Johnson-Lindenstrauss lemma which implies that there are exponentially many nearly-orthogonal directions in an $n$-dimenstional space.
+Therefore, by spreading out features across neurons, the model can store many more features at the cost of only a little interference.
+\citet{vaintrob_toward_2024} present a model for how the model performs computation on this representation of features.
+Since features are spread over multiple neurons, this also means that each neuron represents multiple features, that it is \emph{polysemantic}.
+
+Fortunately, even though features are not represented by individual neurons, there is some evidence for the \emph{linear representation hypothesis}.
+This states that features are represented as linear combinations of neurons, i.e. directions in activation space.
+\citet{park_linear_2023} formalize the hypothesis and provide both theoretical and empirical evidence for it.
+Though \citet{engels_not_2024} show that not all features are represented in this way, much work has been done to understand the linearly represented features.
+Given the linear representation hypothesis, an open problem becomes: what directions represent interpretable features?
+This can be formalized as finding a transformation $\vec f\in\R^n\to\R^d$ which takes an activation vector $\vec x\in\R^n$ and gives an encoding $\vec f(\vec x)$ whose basis vectors are interpretable features.
+The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders}.
+Later, in \ref{sec:alternatives_to_saes} we will also shortly cover alternative solutions to this problem.
+
+Apart from linearity, one of the main assumptions sparse autoencoders make is that features are \emph{sparse}.
+This means that while many possible features can be represented, only very few are present for any given input.
+\citet{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
+
+\subsection{Sparse autoencoders}
+In the context of mechanistic interpretability, sparse autoencoders encode an activation vector $\vec x\in\R^{n}$ into a latent vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
+Autoencoders are only interesting if the latent space is somehow restricted.
+In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
+The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \citep{cunningham_sparse_2023}.
+The loss function is the sum of mean squared error between the input and the output and the $L^1$ regularization mentioned above.
+Formally this can be written as
+\begin{align*}
+    \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+    \hat{\vec x}=&\mat W_d\vec y\\
+    \mathcal L(\vec x)=&\norm{\vec x-\hat{\vec x}}_2^2+\alpha\norm{\vec y}_1
+\end{align*}
+where $\mat W_e\in\R^{d\times n}$, $\mat W_d\in\R^{n\times d}$ and $\vec b\in\R^d$ are the parameters of the model and $\alpha\in\R^+$ is a hyperparameter controlling the sparsity of the latent representation.
+There are many variations to this, including in the seminal work \citet{bricken_towards_2023} where a post-decoder bias is added that is subtracted before encoding and added after decoding.
+We go into detail on some of these variations in \ref{sec:improvements_to_saes}.
+As to why $L^1$ regularization recovers features, \citet{sharkey_interim_2022} provide empirical evidence while \citet{wright_high-dimensional_2022} provide theoretical arguments.
+
+
+\subsection{Improvements to sparse autoencoders}\label{sec:improvements_to_saes}
+Though the performance of sparse autoencoders in the original papers \citep{bricken_towards_2023}\citep{cunningham_sparse_2023} was impressive, there are many ways in which they can be improved.
+\citet{taggart_prolu_2024} suggest an alternative nonlinearity to the ReLU, which they call the ProLU.
+They show that this improves the $L^1$/MSE Pareto frontier., but they do not use more direct interpretability metrics, so it is possible  which they show can improve the performance of the model.
+An issue that has received much attention is that of \emph{feature suppression}.
+Since the loss function is the sum of the mean squared error and the $L^1$ regularization, the model is encouraged not only to activate few features, but also to keep the activations smaller than what would cause the best reconstruction.
+Ideally, this would be fixed by using a $L^0$ regularization, which is what $L^1$ is a proxy for, but since $L^0$ doesn't have a gradient, this is not possible.
+Instead, various other approaches have been suggested \citep{wright_addressing_2024}.
+\citet{riggs_improving_2024} suggest taking the square root of the $L^1$ regularization term, which they show can improve the performance of the model.
+This is motivated by the square root penalizing small values more than large values.
+Therefore it still has the effect of encouraging sparcity, but should supress active features less.
+This however does not address supression of features that are active but have low activations.
+Although using an $L^0$ regularization is not possible, \citet{rajamanoharan_improving_2024} attempt to simulate it.
+They do this by separating the calculation of which features are active from that of their value.
+
+All these represent Pareto improvements over the original sparse autoencoders according to their own experiments, but since they are tested with different methods on different models and datasets, it is hard to compare them directly.
+However, \citet{rajamanoharan_improving_2024} provide a theoretical argument for why their method should fix the same issue as the ProLU activation function along with the other advantages, so there is reason to believe that it is the best of the three.
+Also, both \citet{taggart_prolu_2024} and \citet{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are they are overoptimizing for these and perform worse on other metrics.
+There is definitely room for work that compares thes methods directly to help future researchers choose the best one for their use case.
+
+
+% Improving Dictionary Learning with Gated Sparse Autoencoders
+% Addressing Feature Suppression in SAEs
+% Improving SAE's by Sqrting L1 & Removing Lowest Activating Features
+% ProLU - A Nonlinearity for Sparse Autoencoders
+
+\subsection{Interpretability}
+The last section hit on the issue of evaluating the performance of sparse autoencoders.
+This is a difficult problem, partly because we have yet to find a good definition for interpretability, however there are some metrics that are commonly used.
+The choice between them represents a tradeoff between expense and accuracy.
+At the most expensive end, we have human evaluation.
+This is the most accurate, since we are ultimately interested in human interpretability, but it is also the most expensive since a human must be paid to form interpretations of each individual neuron.
+This also makes it difficult to scale and to reproduce.
+One of the most thorough examples of this can be seen in \citet{bricken_towards_2023}.
+At the other end of the spectrum, we have the $L^1$ loss used in training.
+This is practically free since it is already calculated during training, but it is also a very indirect measure of interpretability.
+
+
+
+% Introduce different methods of judging the interpretability of features by discussing papers that do so, how they do it and what they find.
+
+% The two original papers
+% Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control
+% Research Report- Sparse Autoencoders find only 9 out of 180 board state features in OthelloGPT
+
+% Loss
+% Model loss when run with SAE inserted
+% L0 loss (sparsity)
+% Monosemanticity
+% Human evaluation
+% Success of interpretability methods
+%   Automatic interpretability
+% Finding known features
+
+\subsection{Applications}
+While finding interpretable features is interesting in itself, it is not the overall goal of interpretability.
+Luckily there have been many succesful attempts at using SAEs as a part of other methods.
+\citet{marks_sparse_2024} presents a fully automatic method for finding circuits \citep{elhage_mathematical_2021} responsible for specific model behaviours.
+They then manage to edit these to remove reliance on unintended signals, like gender or race.
+\citet{marks_discriminating_2024} describes how this can fit into a broader framework of scalable oversight.
+\citet{templeton_scaling_2024} explores how SAEs scale to much larger models than otherwise attempted by training SAEs on Anthropics Claude 3 Sonnet \citep{anthropic_introducing_nodate}.
+Since Claude 3 is closed source, we do not know how much larger it is, but we do know the size of the SAEs trained on it.
+While most SAEs trained in the literature have no more than 100,000 features, the SAEs trained on Claude 3 have between 1 and 34 million features.
+The overall conclusion is that many of the promising results from smaller models can be scaled up to larger models, with increased depth and nuance.
+
+
+% Discriminating Behaviorally Identical Classifiers - a model problem for applying interpretability to scalable oversight
+% Scaling Monosemanticity - Extracting Interpretable Features from Claude 3 Sonnet
+% Sparse Feature Circuits - Discovering and Editing Interpretable Causal Graphs in Language Models
+% Understanding SAE Features with the Logit Lens
+% We Inspected Every Head In GPT-2 Small using SAEs So You Don’t Have To
+% Towards Multimodal Interpretability - Learning Sparse Interpretable Features in Vision Transformers
+% Finding Sparse Linear Connections between Features in LLMs
+
+\subsection{Criticisms}
+% (Kind of) Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control
+% Reflections on Anthropic’s SAE Research Circa May 2024
+% Research Report- Sparse Autoencoders find only 9 out of 180 board state features in OthelloGPT
+
+
+\subsection{Alternatives to sparse autoencoders}\label{sec:alternatives_to_saes}
+% The Local Interaction Basis - Identifying Computationally-Relevant and Sparsely Interacting Features in Neural Networks
+% The Singular Value Decompositions of Transformer Weight Matrices are Highly Interpretable
+% Codebook Features - Sparse and Discrete Interpretability for Neural Networks
+% Interpreting Neural Networks through the Polytope Lens
+
+\subbib{../../main}
+\end{document}
