@@ -69,7 +69,7 @@ They do this by separating the calculation of which features are active from tha
 
 All these represent Pareto improvements over the original sparse autoencoders according to their own experiments, but since they are tested with different methods on different models and datasets, it is hard to compare them directly.
 However, \citet{rajamanoharan_improving_2024} provide a theoretical argument for why their method should fix the same issue as the ProLU activation function along with the other advantages, so there is reason to believe that it is the best of the three.
-Also, both \citet{taggart_prolu_2024} and \citet{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are they are overoptimizing for these and perform worse on other metrics.
+Also, \citet{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are they are overoptimizing for these and perform worse on other metrics.
 There is definitely room for work that compares these methods directly to help future researchers choose the best one for their use case.
 
 
@@ -88,6 +88,26 @@ This also makes it difficult to scale and to reproduce.
 One of the most thorough examples of this can be seen in \citet{bricken_towards_2023}.
 At the other end of the spectrum, we have the $L^1$ loss used in training.
 This is practically free since it is already calculated during training, but it is also a very indirect measure of interpretability.
+Since we are evaluating and so do not need gradients, we can also directly measure $L^0$ loss, which is a direct measure of sparsity.
+However, though there is evidence that the features we wish to find will be sparse, that does not mean that sparsity is sufficient for interpretability.
+
+Somewhere between these two extremes, we have automatic interpretability methods.
+The most commonly used of these is that presented by \citet{bills_language_2023}.
+It consists of feeding the activations of each feature on a set of samples to a (usually different) language model and getting it to interpret the feature.
+That interpretation is used by the language model to predict the activation of the feature on new samples, which can then be compared against the true activations.
+How well the language model can predict the activations is then used as a measure of the quality of the interpretation.
+As a measure of interpretability, it takes the quality of the LM's interpretation of the feature as a proxy of how interpretable the feature is to a human.
+While being far cheaper than human evaluation, it is still expensive since it generally requires advanced language models for useful results.
+
+A novel approach to evaluating features is presented by \citet{makelov_towards_2024}.
+It suggests methods not only for evaluating the interpretability of features, but also how well they represent important parts of the model, irrespective of human interpretability.
+To do this they attach attributes to samples and use these to create supervised feature dictionaries.
+These are then used to benchmark unsupervised feature dictionaries, like SAEs.
+It raises an important point that for many applications, human interpretability of features is not necessarily essential, as long as we can understand how to steer the model in the direction we want.
+However, though they do much to avoid dependence on the specific attributes assigned to the input, they still rely on good attributes.
+This may restrict usage to cases where we know what aspects of the input we are interested in, which is part of the issue SAEs are meant to solve.
+Despite this criticism, more work in the direction of finding more objective, reproduceable and scalable methods for evaluating features (on interpretability and other metrics) is sorely needed, and this is a step in the right direction.
+
 
 
 
@@ -110,9 +130,11 @@ This is practically free since it is already calculated during training, but it 
 \subsection{Applications}
 While finding interpretable features is interesting in itself, it is not the overall goal of interpretability.
 Luckily there have been many succesful attempts at using SAEs as a part of other methods.
+
 \citet{marks_sparse_2024} presents a fully automatic method for finding circuits \citep{elhage_mathematical_2021} responsible for specific model behaviours.
 They then manage to edit these to remove reliance on unintended signals, like gender or race.
 \citet{marks_discriminating_2024} describes how this can fit into a broader framework of scalable oversight.
+
 \citet{templeton_scaling_2024} explores how SAEs scale to much larger models than otherwise attempted by training SAEs on Anthropics Claude 3 Sonnet \citep{anthropic_introducing_nodate}.
 Since Claude 3 is not open to the public, we do not know how much larger it is than previously studied models, but we do know the size of the SAEs trained on it.
 While most SAEs trained in the literature have no more than 100,000 features, the SAEs trained on Claude 3 have between 1 and 34 million features.
@@ -120,13 +142,16 @@ This is a significant increase in scale, and the results are promising.
 As with smaller SAEs, SAEs at this scale continue to find more and more nuanced features that are still interpretable.
 Additionally, the authors show that these features can be used to steer the model in a desired direction.
 Since Claude 3 is a multimodal model, they also test how the features generalize to images and find that they do so well, despite having been trained only on activations from pure text inputs.
+
 In a similar vein, \citet{hugofry_towards_2024} train an SAE directly on a vision transformer.
 % Exhibits the ultra low-density cluster found in other SAEs
 They find that many features are interpretable based on the highest activating samples, but also find that most features activate very rarely and seemingly rarely (what \cite{bricken_towards_2023} call the "ultralow density cluster).
 This is more than generally seen for other SAEs, but more research is required to understand whether this is a general property of vision transformer SAEs or an artifact of the authors specific methodology.
+
 Turning back to language models, \citet{bloom_understanding_2024} attempt to understand features of SAEs based on logit attribution \citep{nostalgebraist_interpreting_2020} (see \citet{dao_adversarial_2023} for criticism), i.e. the direct effect of features on the model's output.
 They split features into 4 different categories based on statistical properties of each feature's logit attribution and find that these features within each category have interesting interpretable commonalities.
 However, they do not state how many features fit cleanly into each category.
+
 While most of the work on SAEs is done on either MLP neurons or the residual stream, \citet{kissane_sparse_2024} and \citet{kissane_attention_2024} show that they can also be used for understanding attention layers.
 In \citet{robertzk_we_2024} the same authors use the features of SAEs to study every attention head in GPT2-Small.
 To do this, they find the 10 features that each head most contributes to and interpret the head based on these.
@@ -140,6 +165,12 @@ However, it remains to be seen \todo{concluding statement on section}
 
 
 \subsection{Criticisms}
+While sparse autoencoders are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
+\citet{robert_aizi_research_2024} train SAEs on OthelloGPT \citep{li_emergent_2023} to see whether they recover the linear features found by \citet{neel_nanda_actually_2023}.
+The features each represent whether a specific cell has the colour of the current player and so represent the board in a human interpretable way.
+However, the authors find that the SAEs only recover $9$ of these features.
+While they do find other interpretable features, it highlights an important point that though SAEs often find interpretable features, they may not find any specific feature.
+\todo{not done at all}
 % (Kind of) Towards Principled Evaluations of Sparse Autoencoders for Interpretability and Control
 % Reflections on Anthropic’s SAE Research Circa May 2024
 % Research Report- Sparse Autoencoders find only 9 out of 180 board state features in OthelloGPT
@@ -152,6 +183,9 @@ However, it remains to be seen \todo{concluding statement on section}
 % The Singular Value Decompositions of Transformer Weight Matrices are Highly Interpretable
 % Codebook Features - Sparse and Discrete Interpretability for Neural Networks
 % Interpreting Neural Networks through the Polytope Lens
+The overall problem sparse autoencoders solve, is that of finding directions in the activation space that are interpretable by humans.
+
+
 
 \subbib{../../main}
 \end{document}
