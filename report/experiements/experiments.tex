@@ -1,0 +1,69 @@
+\documentclass[../../main.tex]{subfiles}
+
+
+\begin{document}
+
+
+\subsection{Interpretability score comparison}
+\subsubsection{Question}
+Is the set of neurons/features that N2G has difficulty interpreting the same as the set of neurons/features that are difficult for other methods?
+
+\subsubsection{Method}
+\begin{itemize}
+    \item Acquire some SAEs.
+    \item Train and evaluate N2G on a subset of the features of the SAEs.
+    \item Acquire interpretability scores for other methods on the same features.
+    \begin{itemize}
+        \item Examples include: Automated interpretability, manual evaluation, and feature density.
+        \item We can only compute the last one ourselves.
+    \end{itemize}
+    \item Compare the interpretability scores of N2G with the interpretability scores of other methods.
+    \begin{itemize}
+        \item I should design the statistical test beforehand.
+        \item I expect the means and variances to be different.
+        What I'm interested in is whether they disagree on which are interpretable and which are not.
+    \end{itemize}
+\end{itemize}
+We use the word "acquire" since we will likely run some methods ourselves while getting data for others from the literature.
+
+The main issue with this experiment is that I may not be able to get anything to compare N2G scores with.
+
+\subsection{N2G task performance}
+\subsubsection{Question}
+Given a task that can be solved with N2G, does performance improve with SAEs?
+
+\subsubsection{Method}
+\begin{itemize}
+    \item Acquire some SAEs.
+    \item Train N2G on both the features of the SAE and the MLP neurons.
+    \item Find a simple syntactical task and a way of guessing what features are responsible using their N2Gs.
+    \begin{itemize}
+        \item A possible example is to continue "The cat is sm" with a token that creates a word.
+    \end{itemize}
+    \item Perform task with and without those features ablated.
+    \begin{itemize}
+        \item Do try with multiple kinds of ablation.
+    \end{itemize}
+    \item Compare the performance with and without features and between MLP neurons and SAE neurons.
+    \begin{itemize}
+        \item As always, a statistical test should be designed beforehand.
+    \end{itemize}
+\begin{itemize}
+
+\subsection{Feature universality}
+\subsubsection{Question}
+Do the same features appear in different models?
+Does this hold to a lesser or higher degree with SAE features vs. MLP neurons?
+
+\subsubsection{Method}
+\begin{itemize}
+    \item Acquire some SAEs for several different models.
+    \item Train N2G on both MLP neurons and the features of the SAEs.
+    \item Compare N2G models across models and look for features that often appear.
+\end{itemize}
+
+Interesting sub questions: Is there a connection between characteristics of the N2G (e.g. performance, size...) and the universality of the features?
+Could also be tested across layers of the same model.
+
+\subbib{../../main}
+\end{document}
