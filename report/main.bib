@@ -172,14 +172,14 @@ We achieve better SAE performance by: …},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\DFF8YG2W\\improving-sae-s-by-sqrt-ing-l1-and-removing-lowest.html:text/html},
 }
 
-@article{robert_aizi_research_2024,
+@article{robert_huben_research_2024,
 	title = {Research {Report}: {Sparse} {Autoencoders} find only 9/180 board state features in {OthelloGPT}},
 	shorttitle = {Research {Report}},
 	url = {https://www.lesswrong.com/posts/BduCMgmjJnCtc7jKc/research-report-sparse-autoencoders-find-only-9-180-board},
 	abstract = {[3/7 Edit: I have rephrased the bolded claims in the abstract per this comment from Joseph Bloom, hopefully improving the heat-to-light ratio.  …},
 	language = {en},
 	urldate = {2024-05-29},
-	author = {Robert\_AIZI},
+	author = {Robert Huben},
 	month = mar,
 	year = {2024},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\8F5UHS7M\\research-report-sparse-autoencoders-find-only-9-180-board.html:text/html},
@@ -246,13 +246,13 @@ We achieve better SAE performance by: …},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\NY2F6V8Y\\understanding-sae-features-with-the-logit-lens.html:text/html},
 }
 
-@article{robertzk_we_2024,
+@article{krzyzanowski_we_2024,
 	title = {We {Inspected} {Every} {Head} {In} {GPT}-2 {Small} using {SAEs} {So} {You} {Don}’t {Have} {To}},
 	url = {https://www.alignmentforum.org/posts/xmegeW5mqiBsvoaim/we-inspected-every-head-in-gpt-2-small-using-saes-so-you-don},
 	abstract = {This is an interim report that we are currently building on. We hope this update will be useful to related research occurring in parallel. Produced a…},
 	language = {en},
 	urldate = {2024-05-29},
-	author = {robertzk and Kissane, Connor and Conmy, Arthur and Nanda, Neel},
+	author = {Krzyzanowski, Robert and Kissane, Connor and Conmy, Arthur and Nanda, Neel},
 	month = mar,
 	year = {2024},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\LVHE8TG5\\we-inspected-every-head-in-gpt-2-small-using-saes-so-you-don.html:text/html},
@@ -522,13 +522,15 @@ This paper presents ProLU, an alternative to ReLU for the activation function
 	year = {2024},
 }
 
-@misc{anthropic_introducing_nodate,
+@misc{anthropic_introducing_2024,
 	title = {Introducing the next generation of {Claude}},
 	url = {https://www.anthropic.com/news/claude-3-family},
 	abstract = {Today, we're announcing the Claude 3 model family, which sets new industry benchmarks across a wide range of cognitive tasks. The family includes three state-of-the-art models in ascending order of capability: Claude 3 Haiku, Claude 3 Sonnet, and Claude 3 Opus.},
 	language = {en},
 	urldate = {2024-05-30},
 	author = {Anthropic},
+	month = mar,
+	year = {2024},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\BVVN2R2Q\\claude-3-family.html:text/html},
 }
 
@@ -609,7 +611,7 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 	abstract = {This is an interim report that we are currently building on. We hope this update + open sourcing our SAEs will be useful to related research occurrin…},
 	language = {en},
 	urldate = {2024-05-31},
-	author = {Kissane, Connor and robertzk and Conmy, Arthur and Nanda, Neel},
+	author = {Kissane, Connor and Krzyzanowski, Robert and Conmy, Arthur and Nanda, Neel},
 	month = feb,
 	year = {2024},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\JJPS7KH9\\attention-saes-scale-to-gpt-2-small.html:text/html},
@@ -618,10 +620,19 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 @article{kissane_sparse_2024,
 	title = {Sparse {Autoencoders} {Work} on {Attention} {Layer} {Outputs}},
 	url = {https://www.alignmentforum.org/posts/DtdzGwFh9dCfsekZZ/sparse-autoencoders-work-on-attention-layer-outputs},
-	abstract = {This post is the result of a 2 week research sprint project during the training phase of Neel Nanda’s MATS stream.  …},
+	abstract = {We replicate Anthropic's MLP Sparse Autoencoder (SAE) paper on attention outputs and it works well: the SAEs learn sparse, interpretable features, which gives us insight into what attention layers learn. We study the second attention layer of a two layer language model (with MLPs).
+Specifically, rather than training our SAE on attn\_output, we train our SAE on “hook\_z” concatenated over all attention heads (aka the mixed values aka the attention outputs before a linear map - see notation here). This is valuable as we can see how much of each feature’s weights come from each head, which we believe is a promising direction to investigate attention head superposition, although we only briefly explore that in this work.
+We open source our SAE, you can use it via this Colab notebook.
+Shallow Dives: We do a shallow investigation to interpret each of the first 50 features. We estimate 82\% of non-dead features in our SAE are interpretable (24\% of the SAE features are dead).
+See this feature interface to browse the first 50 features.
+Deep dives: To verify our SAEs have learned something real, we zoom in on individual features for much more detailed investigations: the  “‘board’ is next by induction” feature, the local context feature of “in questions starting with ‘Which’”, and the more global context feature of “in texts about pets”.
+We go beyond the techniques from the Anthropic paper, and investigate the circuits used to compute the features from earlier components, including analysing composition with an MLP0 SAE. 
+We also investigate how the features are used downstream, and whether it's via MLP1 or the direct connection to the logits. 
+Automation: We automatically detect and quantify a large “\{token\} is next by induction” feature family. This represents {\textasciitilde}5\% of the living features in the SAE.
+Though the specific automation technique won't generalize to other feature families, this is notable, as if there are many “one feature per vocab token” families like this, we may need impractically wide SAEs for larger models.},
 	language = {en},
 	urldate = {2024-05-31},
-	author = {Kissane, Connor and robertzk and Conmy, Arthur and Nanda, Neel},
+	author = {Kissane, Connor and Krzyzanowski, Robert and Conmy, Arthur and Nanda, Neel},
 	month = jan,
 	year = {2024},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\9M4EDPGZ\\sparse-autoencoders-work-on-attention-layer-outputs.html:text/html},
@@ -639,7 +650,7 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 	month = feb,
 	year = {2023},
 	note = {arXiv:2210.13382 [cs]},
-	keywords = {Computer Science - Artificial Intelligence, Computer Science - Computation and Language, Computer Science - Machine Learning},
+	keywords = {Computer Science - Computation and Language, Computer Science - Machine Learning, Computer Science - Artificial Intelligence},
 	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\ACZPBJ8D\\Li et al. - 2023 - Emergent World Representations Exploring a Sequen.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\47FPHJ99\\2210.html:text/html},
 }
 
@@ -655,7 +666,7 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 	month = oct,
 	year = {2023},
 	note = {arXiv:2310.07582 [cs]},
-	keywords = {Computer Science - Artificial Intelligence, Computer Science - Machine Learning},
+	keywords = {Computer Science - Machine Learning, Computer Science - Artificial Intelligence},
 	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\SBTJJL3M\\Hazineh et al. - 2023 - Linear Latent World Models in Simple Transformers.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\CXTP5YHR\\2310.html:text/html},
 }
 
@@ -674,10 +685,12 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 @article{beren_singular_2022,
 	title = {The {Singular} {Value} {Decompositions} of {Transformer} {Weight} {Matrices} are {Highly} {Interpretable}},
 	url = {https://www.alignmentforum.org/posts/mkbGjzxD8d8XqKHzA/the-singular-value-decompositions-of-transformer-weight},
-	abstract = {Please go to the colab for interactive viewing and playing with the phenomena. For space reasons, not all results included in the colab are included…},
+	abstract = {If we take the SVD of the weight matrices of the OV circuit and of MLP layers of GPT models, and project them to token embedding space, we notice this results in highly interpretable semantic clusters. This means that the network learns to align the principal directions of each MLP weight matrix or attention head to read from or write to semantically interpretable directions in the residual stream.
+
+We can use this to both improve our understanding of transformer language models and edit their representations. We use this finding to design both a natural language query locator, where you can write a set of natural language concepts and find all weight directions in the network which correspond to it, and also to edit the network's representations by deleting specific singular vectors, which results in relatively large effects on the logits related to the semantics of that vector and relatively small effects on semantically different clusters},
 	language = {en},
 	urldate = {2024-06-01},
-	author = {beren and Black, Sid},
+	author = {beren and Sid Black, Beren Millidge},
 	month = nov,
 	year = {2022},
 	file = {Snapshot:C\:\\Users\\alber\\Zotero\\storage\\HXD7QF3V\\the-singular-value-decompositions-of-transformer-weight.html:text/html},
@@ -697,4 +710,89 @@ In this post I present my results from training a Sparse Autoencoder (SAE) on a 
 	note = {arXiv:2310.17230 [cs]},
 	keywords = {Computer Science - Computation and Language, Computer Science - Machine Learning},
 	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\47BZLQ76\\Tamkin et al. - 2023 - Codebook Features Sparse and Discrete Interpretab.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\QHGTTXYX\\2310.html:text/html},
+}
+
+@misc{schneider_explaining_2021,
+	title = {Explaining {Neural} {Networks} by {Decoding} {Layer} {Activations}},
+	url = {http://arxiv.org/abs/2005.13630},
+	doi = {10.48550/arXiv.2005.13630},
+	abstract = {We present a `CLAssifier-DECoder' architecture ({\textbackslash}emph\{ClaDec\}) which facilitates the comprehension of the output of an arbitrary layer in a neural network (NN). It uses a decoder to transform the non-interpretable representation of the given layer to a representation that is more similar to the domain a human is familiar with. In an image recognition problem, one can recognize what information is represented by a layer by contrasting reconstructed images of {\textbackslash}emph\{ClaDec\} with those of a conventional auto-encoder(AE) serving as reference. We also extend {\textbackslash}emph\{ClaDec\} to allow the trade-off between human interpretability and fidelity. We evaluate our approach for image classification using Convolutional NNs. We show that reconstructed visualizations using encodings from a classifier capture more relevant information for classification than conventional AEs. Relevant code is available at {\textbackslash}url\{https://github.com/JohnTailor/ClaDec\}},
+	urldate = {2024-06-02},
+	publisher = {arXiv},
+	author = {Schneider, Johannes and Vlachos, Michalis},
+	month = feb,
+	year = {2021},
+	note = {arXiv:2005.13630 [cs, stat]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\DW9NI3ZW\\Schneider and Vlachos - 2021 - Explaining Neural Networks by Decoding Layer Activ.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\B94232YR\\2005.html:text/html},
+}
+
+@misc{kim_disentangling_2019,
+	title = {Disentangling by {Factorising}},
+	url = {http://arxiv.org/abs/1802.05983},
+	doi = {10.48550/arXiv.1802.05983},
+	abstract = {We define and address the problem of unsupervised learning of disentangled representations on data generated from independent factors of variation. We propose FactorVAE, a method that disentangles by encouraging the distribution of representations to be factorial and hence independent across the dimensions. We show that it improves upon \${\textbackslash}beta\$-VAE by providing a better trade-off between disentanglement and reconstruction quality. Moreover, we highlight the problems of a commonly used disentanglement metric and introduce a new metric that does not suffer from them.},
+	urldate = {2024-06-02},
+	publisher = {arXiv},
+	author = {Kim, Hyunjik and Mnih, Andriy},
+	month = jul,
+	year = {2019},
+	note = {arXiv:1802.05983 [cs, stat]},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning},
+	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\QL4RKXVT\\Kim and Mnih - 2019 - Disentangling by Factorising.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\LJVUSRRU\\1802.html:text/html},
+}
+
+@misc{bengio_representation_2014,
+	title = {Representation {Learning}: {A} {Review} and {New} {Perspectives}},
+	shorttitle = {Representation {Learning}},
+	url = {http://arxiv.org/abs/1206.5538},
+	doi = {10.48550/arXiv.1206.5538},
+	abstract = {The success of machine learning algorithms generally depends on data representation, and we hypothesize that this is because different representations can entangle and hide more or less the different explanatory factors of variation behind the data. Although specific domain knowledge can be used to help design representations, learning with generic priors can also be used, and the quest for AI is motivating the design of more powerful representation-learning algorithms implementing such priors. This paper reviews recent work in the area of unsupervised feature learning and deep learning, covering advances in probabilistic models, auto-encoders, manifold learning, and deep networks. This motivates longer-term unanswered questions about the appropriate objectives for learning good representations, for computing representations (i.e., inference), and the geometrical connections between representation learning, density estimation and manifold learning.},
+	urldate = {2024-06-02},
+	publisher = {arXiv},
+	author = {Bengio, Yoshua and Courville, Aaron and Vincent, Pascal},
+	month = apr,
+	year = {2014},
+	note = {arXiv:1206.5538 [cs]},
+	keywords = {Computer Science - Machine Learning},
+	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\YRAIDM73\\Bengio et al. - 2014 - Representation Learning A Review and New Perspect.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\9V7NBPE5\\1206.html:text/html},
+}
+
+@misc{peebles_hessian_2020,
+	title = {The {Hessian} {Penalty}: {A} {Weak} {Prior} for {Unsupervised} {Disentanglement}},
+	shorttitle = {The {Hessian} {Penalty}},
+	url = {http://arxiv.org/abs/2008.10599},
+	doi = {10.48550/arXiv.2008.10599},
+	abstract = {Existing disentanglement methods for deep generative models rely on hand-picked priors and complex encoder-based architectures. In this paper, we propose the Hessian Penalty, a simple regularization term that encourages the Hessian of a generative model with respect to its input to be diagonal. We introduce a model-agnostic, unbiased stochastic approximation of this term based on Hutchinson's estimator to compute it efficiently during training. Our method can be applied to a wide range of deep generators with just a few lines of code. We show that training with the Hessian Penalty often causes axis-aligned disentanglement to emerge in latent space when applied to ProGAN on several datasets. Additionally, we use our regularization term to identify interpretable directions in BigGAN's latent space in an unsupervised fashion. Finally, we provide empirical evidence that the Hessian Penalty encourages substantial shrinkage when applied to over-parameterized latent spaces.},
+	urldate = {2024-06-02},
+	publisher = {arXiv},
+	author = {Peebles, William and Peebles, John and Zhu, Jun-Yan and Efros, Alexei and Torralba, Antonio},
+	month = aug,
+	year = {2020},
+	note = {arXiv:2008.10599 [cs]},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Graphics, Computer Science - Machine Learning, Computer Science - Neural and Evolutionary Computing},
+	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\MJUGB2GQ\\Peebles et al. - 2020 - The Hessian Penalty A Weak Prior for Unsupervised.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\IMMU7VVG\\2008.html:text/html},
+}
+
+@misc{bushnaq_using_2024,
+	title = {Using {Degeneracy} in the {Loss} {Landscape} for {Mechanistic} {Interpretability}},
+	url = {http://arxiv.org/abs/2405.10927},
+	doi = {10.48550/arXiv.2405.10927},
+	abstract = {Mechanistic Interpretability aims to reverse engineer the algorithms implemented by neural networks by studying their weights and activations. An obstacle to reverse engineering neural networks is that many of the parameters inside a network are not involved in the computation being implemented by the network. These degenerate parameters may obfuscate internal structure. Singular learning theory teaches us that neural network parameterizations are biased towards being more degenerate, and parameterizations with more degeneracy are likely to generalize further. We identify 3 ways that network parameters can be degenerate: linear dependence between activations in a layer; linear dependence between gradients passed back to a layer; ReLUs which fire on the same subset of datapoints. We also present a heuristic argument that modular networks are likely to be more degenerate, and we develop a metric for identifying modules in a network that is based on this argument. We propose that if we can represent a neural network in a way that is invariant to reparameterizations that exploit the degeneracies, then this representation is likely to be more interpretable, and we provide some evidence that such a representation is likely to have sparser interactions. We introduce the Interaction Basis, a tractable technique to obtain a representation that is invariant to degeneracies from linear dependence of activations or Jacobians.},
+	urldate = {2024-06-02},
+	publisher = {arXiv},
+	author = {Bushnaq, Lucius and Mendel, Jake and Heimersheim, Stefan and Braun, Dan and Goldowsky-Dill, Nicholas and Hänni, Kaarel and Wu, Cindy and Hobbhahn, Marius},
+	month = may,
+	year = {2024},
+	note = {arXiv:2405.10927 [cs]
+version: 2},
+	keywords = {Computer Science - Machine Learning},
+	file = {arXiv Fulltext PDF:C\:\\Users\\alber\\Zotero\\storage\\M9YV28GW\\Bushnaq et al. - 2024 - Using Degeneracy in the Loss Landscape for Mechani.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\alber\\Zotero\\storage\\W9QG4Q6T\\2405.html:text/html},
+}
+
+@article{elhage_softmax_2022,
+	title = {Softmax {Linear} {Units}},
+	journal = {Transformer Circuits Thread},
+	author = {Elhage, Nelson and Hume, Tristan and Olsson, Catherine and Nanda, Neel and Henighan, Tom and Johnston, Scott and ElShowk, Sheer and Joseph, Nicholas and DasSarma, Nova and Mann, Ben and Hernandez, Danny and Askell, Amanda and Ndousse, Kamal and Jones, Andy and Drain, Dawn and Chen, Anna and Bai, Yuntao and Ganguli, Deep and Lovitt, Liane and Hatfield-Dodds, Zac and Kernion, Jackson and Conerly, Tom and Kravec, Shauna and Fort, Stanislav and Kadavath, Saurav and Jacobson, Josh and Tran-Johnson, Eli and Kaplan, Jared and Clark, Jack and Brown, Tom and McCandlish, Sam and Amodei, Dario and Olah, Christopher},
+	year = {2022},
 }

@@ -5,6 +5,10 @@
 
 
 \subsection{Interpretability in general}
+% Representation Learning: A Review and New Perspectives
+% Explaining Neural Networks by Decoding Layer Activations
+% Disentangling by Factorising
+% The Hessian Penalty: A Weak Prior for Unsupervised Disentanglement
 
 
 
@@ -28,10 +32,10 @@ Though \citet{engels_not_2024} show that not all features are represented in thi
 Given the linear representation hypothesis, an open problem becomes: what directions represent interpretable features?
 This can be formalized as finding a transformation $\vec f\in\R^n\to\R^d$ which takes an activation vector $\vec x\in\R^n$ and gives an encoding $\vec f(\vec x)$ whose basis vectors are interpretable features.
 The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders}.
-Later, in \ref{sec:alternatives_to_saes} we will also shortly cover alternative solutions to this problem.
+Later, in \ref{sec:alternatives_to_saes} we will also briefly cover alternative solutions to this problem.
 
 Apart from linearity, one of the main assumptions sparse autoencoders make is that features are \emph{sparse}.
-This means that while many possible features can be represented, only very few are present for any given input.
+This means that while many possible features can\todo{this phrasing is not great} be represented, only very few are present for any given input.
 \citet{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \subsection{Sparse autoencoders}
@@ -82,14 +86,17 @@ There is definitely room for work that compares these methods directly to help f
 The last section hit on the issue of evaluating the performance of sparse autoencoders.
 This is a difficult problem, partly because we have yet to find a good definition for interpretability, however there are some metrics that are commonly used.
 The choice between them represents a tradeoff between expense and accuracy.
+
 At the most expensive end, we have human evaluation.
 This is the most accurate, since we are ultimately interested in human interpretability, but it is also the most expensive since a human must be paid to form interpretations of each individual neuron.
 This also makes it difficult to scale and to reproduce.
 One of the most thorough examples of this can be seen in \citet{bricken_towards_2023}.
+
 At the other end of the spectrum, we have the $L^1$ loss used in training.
 This is practically free since it is already calculated during training, but it is also a very indirect measure of interpretability.
 Since we are evaluating and so do not need gradients, we can also directly measure $L^0$ loss, which is a direct measure of sparsity.
 However, though there is evidence that the features we wish to find will be sparse, that does not mean that sparsity is sufficient for interpretability.
+While neither of these are reliable, \citet{bricken_towards_2023} find that they correlate sufficiently with more powerful measures to be useful as proxies during iteration.
 
 Somewhere between these two extremes, we have automatic interpretability methods.
 The most commonly used of these is that presented by \citet{bills_language_2023}.
@@ -135,7 +142,7 @@ Luckily there have been many succesful attempts at using SAEs as a part of other
 They then manage to edit these to remove reliance on unintended signals, like gender or race.
 \citet{marks_discriminating_2024} describes how this can fit into a broader framework of scalable oversight.
 
-\citet{templeton_scaling_2024} explores how SAEs scale to much larger models than otherwise attempted by training SAEs on Anthropics Claude 3 Sonnet \citep{anthropic_introducing_nodate}.
+\citet{templeton_scaling_2024} explores how SAEs scale to much larger models than otherwise attempted by training SAEs on Anthropics Claude 3 Sonnet \citep{anthropic_introducing_2024}.
 Since Claude 3 is not open to the public, we do not know how much larger it is than previously studied models, but we do know the size of the SAEs trained on it.
 While most SAEs trained in the literature have no more than 100,000 features, the SAEs trained on Claude 3 have between 1 and 34 million features.
 This is a significant increase in scale, and the results are promising.
@@ -153,7 +160,7 @@ They split features into 4 different categories based on statistical properties 
 However, they do not state how many features fit cleanly into each category.
 
 While most of the work on SAEs is done on either MLP neurons or the residual stream, \citet{kissane_sparse_2024} and \citet{kissane_attention_2024} show that they can also be used for understanding attention layers.
-In \citet{robertzk_we_2024} the same authors use the features of SAEs to study every attention head in GPT2-Small.
+In \citet{krzyzanowski_we_2024} the same authors use the features of SAEs to study every attention head in GPT2-Small.
 To do this, they find the 10 features that each head most contributes to and interpret the head based on these.
 Through this methods they reproduce previous results on the roles of some heads.
 They also answer an open question about the role of some of the heads and confirm with more rigorous methods that do not involve SAEs.
@@ -166,7 +173,7 @@ However, it remains to be seen \todo{concluding statement on section}
 
 \subsection{Criticisms}
 While sparse autoencoders are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
-\citet{robert_aizi_research_2024} train SAEs on OthelloGPT \citep{li_emergent_2023} to see whether they recover the linear features found by \citet{neel_nanda_actually_2023}.
+\citet{robert_huben_research_2024} train SAEs on OthelloGPT \citep{li_emergent_2023} to see whether they recover the linear features found by \citet{neel_nanda_actually_2023}.
 The features each represent whether a specific cell has the colour of the current player and so represent the board in a human interpretable way.
 However, the authors find that the SAEs only recover $9$ of these features.
 While they do find other interpretable features, it highlights an important point that though SAEs often find interpretable features, they may not find any specific feature.
@@ -183,8 +190,37 @@ While they do find other interpretable features, it highlights an important poin
 % The Singular Value Decompositions of Transformer Weight Matrices are Highly Interpretable
 % Codebook Features - Sparse and Discrete Interpretability for Neural Networks
 % Interpreting Neural Networks through the Polytope Lens
-The overall problem sparse autoencoders solve, is that of finding directions in the activation space that are interpretable by humans.
 
+% Explaining Neural Networks by Decoding Layer Activations
+The overall problem SAEs solve is that of finding directions in the activation space that are interpretable by humans.
+SAEs are not the only proposed solution to that problem.
+Instead of training a separate model to find interpretable directions in activation space, \citet{beren_singular_2022} looks directly at the weight matrix preceding the neurons of interest.
+They take the SVD of the matrix and project it using the unembedding matrix to the token space.
+Taking the top $k$ closest tokens shows that many singular vectors map to interpretable clusters of tokens.
+They also show that updating the weight matrices to remove the singular vector has a larger effect on the logits for those tokens than others.
+The advantage of this method is that it requires no training and is computationally far cheaper than SAEs and has fewer hyperparameters.
+However, interpretation of the singular values is based solely on clusters of tokens which likely covers only a small part of interesting use-cases,
+though this may be solvable by using singular vectors in other ways than the authors do.
+\citet{bushnaq_local_2024} builds on theory from \citet{bushnaq_using_2024} to find a new activation basis.
+The goal is to align the basis with the computationally important directions in order to provide an alternative but equivalent view of the model that more clearly represents the internal calculations.
+When comparing to PCA on modular addition and CIFAR-10 models, they find that their method does succesfully separate the activations into features that interact sparsely, but that these results do not transfer to language models.
+Both previous works differ from SAEs in that they assume (implicitly in the case of \citet{beren_singular_2022}) that the features of interest are not over-complete in activation space.
+Given the results from work on SAEs, especially \citet{templeton_scaling_2024}, this seems like an optimistic assumption, but since it is easier to work with and reason about fewer features, there may still be use cases for this kind of solution.
+
+Instead of transforming existing components of the model, \citet{tamkin_codebook_2023} inserts new components called "codebooks" into each layer.
+Each added codebook consists of a set of "codes" (linear features).
+For each input, the cosine similarity between each code and the input is found, and the output is the sum of the $k$ most similar codes. 
+They function much like SAEs, but differ in two important ways.
+Firstly, instead of encouraging sparsity with regularization, they enforce sparsity by including only some set $k$ codes.
+Secondly, instead of being trained to autoencode activations after the model model has been trained, the codebook is inserted into the model from the beginning.
+The first difference is interesting, since many of the issues that work presented in \ref{sec:improvements_to_saes} attempts to fix are related to precisely the $L^1$ loss, so this can be seen as a way of circumventing that entirely.
+The second one however can be a large disadvantage.
+There has been previous work \citep{elhage_softmax_2022} to change the architecture of language modles to make them inherently more interpretable, but this has been largely abandoned partly due to \todo{insert reasons}.
+It might therefore be of interest to investigate whether codebooks can be used on pre-trained models in the same way SAEs are.
+
+
+\citet{black_interpreting_2022} provide an alternative theoretical framework for the inner workings of neural networks based on the assumption of piecewise linear activation functions.
+They then \todo{should I include this?}
 
 
 \subbib{../../main}
