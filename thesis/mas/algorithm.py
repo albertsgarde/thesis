@@ -9,6 +9,7 @@ import numpy as np
 import torch
 from datasets import IterableDataset  # type: ignore[import]
 from jaxtyping import Float
+from sparse_autoencoder import Autoencoder as OAISparseAutoencoder
 from torch import Tensor
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
 from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
@@ -85,6 +86,10 @@ class MASLayer:
     def from_sae(sae: SparseAutoencoder) -> "MASLayer":
         return MASLayer(sae.hook_point, sae.num_features, sae.encode)
 
+    @staticmethod
+    def from_oai_sae(hook_id: str, sae: OAISparseAutoencoder) -> "MASLayer":
+        return MASLayer(hook_id, sae.n_latents, sae.encode)
+
 
 def run(
     model: HookedTransformer, dataset: IterableDataset, layers: list[MASLayer], params: MASParams, device: Device
@@ -109,9 +114,8 @@ def run(
 
         num_total_features = sum([layer.num_features for layer in layers])
         rng = random.Random(params.seed)
-        activation_bins = np.arange(0, 3, 0.1)
         mas_store = WeightedSamplesStore(
-            list(activation_bins),
+            params.activation_bins,
             params.high_activation_weighting,
             params.num_max_samples,
             num_total_features,

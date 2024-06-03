@@ -49,6 +49,6 @@ layers:
   - hook_id: blocks.0.mlp.hook_post
     num_features: 2048
   - hook_id: blocks.0.mlp.hook_post
-    sae_repo: NeelNanda/sparse_autoencoder
+    sae_hf_repo: NeelNanda/sparse_autoencoder
     sae_file: 25.pt
 out_path: gelu-1l-sae_store

@@ -49,6 +49,5 @@ layers:
   - hook_id: blocks.0.mlp.hook_post
     num_features: 3072
   - hook_id: blocks.0.mlp.hook_post
-    sae_repo: jacobcd52/gpt2-small-sparse-autoencoders
-    sae_file: gpt2-small_6144_mlp_out_0.pt
+    sae_oai_layer: 0
 out_path: gpt2-small_sae_store

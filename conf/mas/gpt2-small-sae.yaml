@@ -53,12 +53,9 @@ layers:
   - hook_id: blocks.5.mlp.hook_post
     num_features: 3072
   - hook_id: blocks.0.mlp.hook_post
-    sae_repo: jacobcd52/gpt2-small-sparse-autoencoders
-    sae_file: gpt2-small_6144_mlp_out_0.pt
+    sae_oai_layer: 0
   - hook_id: blocks.4.mlp.hook_post
-    sae_repo: jacobcd52/gpt2-small-sparse-autoencoders
-    sae_file: gpt2-small_6144_mlp_out_4.pt
+    sae_oai_layer: 4
   - hook_id: blocks.5.mlp.hook_post
-    sae_repo: jacobcd52/gpt2-small-sparse-autoencoders
-    sae_file: gpt2-small_6144_mlp_out_5.pt
+    sae_oai_layer: 5
 out_path: gpt2-small_sae_store
