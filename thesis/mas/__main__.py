@@ -55,6 +55,7 @@ class MASLayerConfig:
             with bf.BlobFile(file_name, "rb") as f:
                 state_dict = torch.load(f, map_location=device.torch())
                 sae = OAISparseAutoencoder.from_state_dict(state_dict)
+                sae.to(device.torch())
             return MASLayer.from_oai_sae(self.hook_id, sae)
 
 
