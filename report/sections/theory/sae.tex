@@ -16,7 +16,7 @@
 When interpreting a language model, there is a question of what the unit of interpretability should be.
 What part of the model should we be looking at?
 Mechanistic interpretability aims to understand models as granularly as possible, which makes individual neurons in either the residual stream, MLP layers or attention heads the obvious choice.
-Indeed, there is much research that aims to understand the behaviour and effect of individual neurons \citep{foote_neuron_2023}\citep{bills_language_2023}.
+Indeed, previous research has aimed to understand the behaviour and effect of individual neurons \citep{foote_neuron_2023}\citep{bills_language_2023}.
 However, there are reasons to believe that individual neurons are fundamentally difficult to interpret.
 According to the \emph{superposition hypothesis} \citep{elhage_toy_2022}, individual neurons do not cleanly represent interpretable features.
 Instead, features are spread over several neurons in order to pack more features into the same set of neuron dimensions.
@@ -31,15 +31,15 @@ This states that features are represented as linear combinations of neurons, i.e
 Though \citet{engels_not_2024} show that not all features are represented in this way, much work has been done to understand the linearly represented features.
 Given the linear representation hypothesis, an open problem becomes: what directions represent interpretable features?
 This can be formalized as finding a transformation $\vec f\in\R^n\to\R^d$ which takes an activation vector $\vec x\in\R^n$ and gives an encoding $\vec f(\vec x)$ whose basis vectors are interpretable features.
-The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders}.
+The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders} (SAEs).
 Later, in \ref{sec:alternatives_to_saes} we will also briefly cover alternative solutions to this problem.
 
-Apart from linearity, one of the main assumptions sparse autoencoders make is that features are \emph{sparse}.
+Apart from linearity, one of the main assumptions SAEs make is that features are \emph{sparse}.
 This means that while many possible features can\todo{this phrasing is not great} be represented, only very few are present for any given input.
 \citet{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \subsection{Sparse autoencoders}
-In the context of mechanistic interpretability, sparse autoencoders encode an activation vector $\vec x\in\R^{n}$ into a latent vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
+In the context of mechanistic interpretability, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a latent vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
 Autoencoders are only interesting if the latent space is somehow restricted.
 In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \citep{cunningham_sparse_2023}.
@@ -57,9 +57,9 @@ As to why $L^1$ regularization recovers features, \citet{sharkey_interim_2022} p
 
 
 \subsection{Improvements to sparse autoencoders}\label{sec:improvements_to_saes}
-Though the performance of sparse autoencoders in the original papers \citep{bricken_towards_2023}\citep{cunningham_sparse_2023} was impressive, there are many ways in which they can be improved.
-\citet{taggart_prolu_2024} suggest an alternative nonlinearity to the ReLU, which they call the ProLU.
-They show that this improves the $L^1$/MSE Pareto frontier., but they do not use more direct interpretability metrics, so it is possible  which they show can improve the performance of the model.
+Though the performance of SAEs in the original papers \citep{bricken_towards_2023}\citep{cunningham_sparse_2023} was impressive, there are many ways in which they can be improved.
+\citet{taggart_prolu_2024} suggest an alternative nonlinearity to the ReLU, which they call the ProLU and is designed to overcome a theoretical weakness in using ReLU for SAEs.
+They show that this improves the $L^1$/MSE Pareto frontier.
 An issue that has received much attention is that of \emph{feature suppression}.
 Since the loss function is the sum of the mean squared error and the $L^1$ regularization, the model is encouraged not only to activate few features, but also to keep the activations smaller than what would cause the best reconstruction.
 Ideally, this would be fixed by using a $L^0$ regularization, which is what $L^1$ is a proxy for, but since $L^0$ doesn't have a gradient, this is not possible.
@@ -71,9 +71,9 @@ This however does not address supression of features that are active but have lo
 Although using an $L^0$ regularization is not possible, \citet{rajamanoharan_improving_2024} attempt to simulate it.
 They do this by separating the calculation of which features are active from that of their value.
 
-All these represent Pareto improvements over the original sparse autoencoders according to their own experiments, but since they are tested with different methods on different models and datasets, it is hard to compare them directly.
+All these represent Pareto improvements over the original SAEs according to their own experiments, but since they are tested with different methods on different models and datasets, it is hard to compare them directly.
 However, \citet{rajamanoharan_improving_2024} provide a theoretical argument for why their method should fix the same issue as the ProLU activation function along with the other advantages, so there is reason to believe that it is the best of the three.
-Also, \citet{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are they are overoptimizing for these and perform worse on other metrics.
+Also, \citet{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are overoptimizing for these and perform worse on other metrics.
 There is definitely room for work that compares these methods directly to help future researchers choose the best one for their use case.
 
 
@@ -83,7 +83,7 @@ There is definitely room for work that compares these methods directly to help f
 % ProLU - A Nonlinearity for Sparse Autoencoders
 
 \subsection{Interpretability}
-The last section hit on the issue of evaluating the performance of sparse autoencoders.
+The last section touched on the issue of evaluating the performance of SAEs.
 This is a difficult problem, partly because we have yet to find a good definition for interpretability, however there are some metrics that are commonly used.
 The choice between them represents a tradeoff between expense and accuracy.
 
@@ -153,7 +153,7 @@ Since Claude 3 is a multimodal model, they also test how the features generalize
 In a similar vein, \citet{hugofry_towards_2024} train an SAE directly on a vision transformer.
 % Exhibits the ultra low-density cluster found in other SAEs
 They find that many features are interpretable based on the highest activating samples, but also find that most features activate very rarely and seemingly rarely (what \cite{bricken_towards_2023} call the "ultralow density cluster).
-This is more than generally seen for other SAEs, but more research is required to understand whether this is a general property of vision transformer SAEs or an artifact of the authors specific methodology.
+This is more than generally seen for other SAEs, but more research is required to understand whether this is a general property of vision transformer SAEs or an artifact of the authors' specific methodology.
 
 Turning back to language models, \citet{bloom_understanding_2024} attempt to understand features of SAEs based on logit attribution \citep{nostalgebraist_interpreting_2020} (see \citet{dao_adversarial_2023} for criticism), i.e. the direct effect of features on the model's output.
 They split features into 4 different categories based on statistical properties of each feature's logit attribution and find that these features within each category have interesting interpretable commonalities.
@@ -172,7 +172,7 @@ However, it remains to be seen \todo{concluding statement on section}
 
 
 \subsection{Criticisms}
-While sparse autoencoders are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
+While SAEs are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
 \citet{robert_huben_research_2024} train SAEs on OthelloGPT \citep{li_emergent_2023} to see whether they recover the linear features found by \citet{neel_nanda_actually_2023}.
 These linear features each represent whether a specific cell has the colour of the current player and so represent the board in a human interpretable way.
 However, the authors find that the SAEs only recover $9/180$ of these features.
