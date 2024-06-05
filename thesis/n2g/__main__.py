@@ -7,7 +7,7 @@ import n2g
 import torch
 import transformer_lens  # type: ignore[import]
 from jaxtyping import Float, Int
-from n2g import NeuronStats, Tokenizer
+from n2g import FeatureModel, NeuronModel, NeuronStats, Tokenizer
 from torch import Tensor
 from transformer_lens import HookedTransformer
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
@@ -93,6 +93,7 @@ def main() -> None:
     train_config = n2g.TrainConfig(fit_config=fit_config, stop_on_error=False)
 
     stats: list[NeuronStats]
+    models: list[NeuronModel]
     models, stats = n2g.run_layer(
         range(NUM_FEATURES),
         feature_activation,
@@ -119,6 +120,11 @@ def main() -> None:
                 pickle.dump(model, bin_file)
             with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
                 f.write(model.graphviz().source)
+    all_models_bytes = FeatureModel.list_to_bin(
+        [FeatureModel.from_model(tokenizer, feature_model) for feature_model in models]
+    )
+    with (models_path / "all_models.dat").open("wb") as bf:
+        bf.write(all_models_bytes)
 
 
 if __name__ == "__main__":
