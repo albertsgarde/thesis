@@ -29,7 +29,7 @@ def main() -> None:
     mas_store = MASStore.load(Path("outputs/gelu-1l-sae_store.zip"), device)
     assert mas_store.feature_activations().shape[0] == NUM_FEATURES, "Feature activations should have the correct shape"
 
-    model = transformer_lens.HookedTransformer.from_pretrained("gelu-1l", device.torch())
+    model = transformer_lens.HookedTransformer.from_pretrained("gelu-1l", device=device.torch())
     sae = SparseAutoencoder.from_hf("NeelNanda/sparse_autoencoder", "25.pt", "blocks.0.mlp.hook_post", device)
 
     tokenizer = Tokenizer(model)
