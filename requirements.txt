@@ -8,3 +8,5 @@ jaxtyping ~= 0.2.20
 datasets ~= 2.16.1
 graphviz ~= 0.20.1
 sparse_autoencoder @ git+https://github.com/UFO-101/sparse_autoencoder.git # Required to fix a dependency issue with transformer_lens
+aiofiles ~= 23.2.1
+nest-asyncio~=1.6.0
