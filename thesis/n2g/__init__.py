@@ -1,1 +1,1 @@
-from .load_models import load_models
+from .load_models import iter_models, load_models
