@@ -26,11 +26,21 @@ Is the set of neurons/features that N2G has difficulty interpreting the same as 
 \end{itemize}
 We use the word "acquire" since we will likely run some methods ourselves while getting data for others from the literature.
 
-The main issue with this experiment is that I may not be able to get anything to compare N2G scores with.
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Positive
+    \begin{itemize}
+        \item This would be by far the easiest experiment to do.
+    \end{itemize}
+    \item Negative
+    \begin{itemize}
+        \item It may not be possible to get the data for the other methods. Other papers have used them on the same features, but they have not published the data.
+    \end{itemize}
+\end{itemize}
 
 \subsection{N2G task performance}
 \subsubsection{Question}
-Given a task that can be solved with N2G, does performance improve with SAEs?
+Given a task the model can solve, can N2G guide us in changing performance? Is there difference when working with SAE features vs. MLP neurons directly?
 
 \subsubsection{Method}
 \begin{itemize}
@@ -48,12 +58,30 @@ Given a task that can be solved with N2G, does performance improve with SAEs?
     \begin{itemize}
         \item As always, a statistical test should be designed beforehand.
     \end{itemize}
+\end{itemize}
+
+\subsubsection{Considerations}
 \begin{itemize}
+    \item Positive
+    \begin{itemize}
+        \item Should be pretty simple once I have a task and the N2Gs.
+        \item Would be an interesting support/conterpoint to the rest of the literature showing that various methods work better on the features of SAEs
+    \end{itemize}
+    \item Negative
+    \begin{itemize}
+        \item It may be difficult to find any task that N2G can solve.
+        A test on the N2Gs of the gelu-1l MLP neurons showed no effect.
+        \item The gpt2-small SAEs I found may be too large to get N2Gs for all features, and it will likely be far harder to steer a model with only some features.
+    \end{itemize}
+\end{itemize}
+
 
 \subsection{Feature universality}
 \subsubsection{Question}
 Do the same features appear in different models?
 Does this hold to a lesser or higher degree with SAE features vs. MLP neurons?
+
+Interesting sub question: Is there a connection between characteristics of the N2G (e.g. performance, size...) and the universality of the feature? I.e., does N2G perform better on more universal features?
 
 \subsubsection{Method}
 \begin{itemize}
@@ -61,9 +89,20 @@ Does this hold to a lesser or higher degree with SAE features vs. MLP neurons?
     \item Train N2G on both MLP neurons and the features of the SAEs.
     \item Compare N2G models across models and look for features that often appear.
 \end{itemize}
-
-Interesting sub questions: Is there a connection between characteristics of the N2G (e.g. performance, size...) and the universality of the features?
 Could also be tested across layers of the same model.
+
+\subsubsection{Considerations}
+\begin{itemize}
+    \item Positive
+    \begin{itemize}
+        \item It feels like finding something interesting to say is pretty likely?
+    \end{itemize}
+    \item Negative
+    \begin{itemize}
+        \item We would have to find an appropriate definition of N2G similarity, which may be challenging.
+        \item We only have two models to compare.
+    \end{itemize}
+\end{itemize}
 
 \subbib{../../main}
 \end{document}
