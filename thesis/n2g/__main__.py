@@ -123,7 +123,7 @@ def main() -> None:
     all_models_bytes = FeatureModel.list_to_bin(
         [FeatureModel.from_model(tokenizer, feature_model) for feature_model in models]
     )
-    with (models_path / "all_models.dat").open("wb") as bf:
+    with (models_path / "all_models.bin").open("wb") as bf:
         bf.write(all_models_bytes)
 
 
