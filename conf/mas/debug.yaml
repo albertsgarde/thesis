@@ -49,4 +49,4 @@ layers:
     num_features: 2048
   - hook_id: blocks.1.mlp.hook_post
     num_features: 2048
-out_path: mas_store
+out_path: outputs/mas_store

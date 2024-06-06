@@ -51,4 +51,4 @@ layers:
   - hook_id: blocks.0.mlp.hook_post
     sae_hf_repo: NeelNanda/sparse_autoencoder
     sae_file: 25.pt
-out_path: gelu-1l-sae_store
+out_path: outputs/gelu-1l-sae_store

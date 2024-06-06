@@ -89,7 +89,7 @@ def main(config: MASScriptConfig) -> None:
 
     if not config.out_path.endswith(".zip"):
         config.out_path += ".zip"
-    out_path = "outputs" / Path(config.out_path)
+    out_path = Path(config.out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     mas_store.save(out_path)

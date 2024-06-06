@@ -50,4 +50,4 @@ layers:
     num_features: 3072
   - hook_id: blocks.0.mlp.hook_post
     sae_oai_layer: 0
-out_path: gpt2-small_sae_store
+out_path: outputs/gpt2-small_sae_store

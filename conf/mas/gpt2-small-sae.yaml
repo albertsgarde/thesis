@@ -58,4 +58,4 @@ layers:
     sae_oai_layer: 4
   - hook_id: blocks.5.mlp.hook_post
     sae_oai_layer: 5
-out_path: gpt2-small_sae_store
+out_path: outputs/gpt2-small_sae_store
