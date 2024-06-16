@@ -3,6 +3,37 @@
 
 \begin{document}
 
+% Overview
+
+\subsection{SAEs}
+Since SAEs are finnicky to train, we will be using a pre-trained SAE, namely \todo{cite}.
+Though the past months have seen the development of several open source SAE libraries \todo{cite}, we started this work before then and do not use any of them.
+
+\subsection{Feature samples}
+Our experiments require a number of samples and density information for each feature.
+In the original N2G paper \todo{cite}, maximum activating samples were used.
+However, we found that this lead to many of the samples being very similar which pollutes the test set.
+Because of this and arguments that maximum activating samples can be misleading \todo{cite}, we instead use a weighted random sampling approach.
+Like with maximum activating samples we assume that the samples that activate the feature most highly are the most important for understanding the feature, but we do not assume that they are the \emph{only} important samples.
+Inspired by softmax, we assign each sample a weight equal to
+\begin{align*}
+    \e^{\alpha a}
+\end{align*}
+where $a$ is the maximum activation of the feature on that sample and $\alpha$ is a hyperparameter controlling how much to prioritize the most activating samples.
+
+\subsection{N2G}
+Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite}.
+However the original was a single file with no documentation and since we needed to work in depth with the code we have done considerable refactoring work to improve code quality.
+In our fork \todo{link} the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \todo{cite}.
+During this work we found many redundancies, the removal of which has likely sped up the code though we have not done any formal benchmarking.
+We also found that the resulting N2Gs took up much more space, both in memory and on disk, than seemed necessary.
+Our solution which may have been a little overkill was to create a Rust implementation of the N2Gs (without training, since that requires PyTorch) which stores the graphs in a much more compact format.
+
+
+
+
+
+
 \begin{itemize}
     \item Acquire an SAE for a layer of the language model.
     \item Calculate MAS for the neurons of the layer and features of the SAE.
