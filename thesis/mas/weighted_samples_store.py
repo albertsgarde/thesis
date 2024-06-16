@@ -27,6 +27,7 @@ class WeightedSamplesStore:
     _feature_activation_densities: Int[Tensor, "num_features num_activation_bins"]
 
     _high_activation_weighting: float
+    _firing_threshold: float
 
     _num_samples_added: int
 
@@ -41,6 +42,7 @@ class WeightedSamplesStore:
         self,
         activation_bins: Sequence[float],
         high_activation_weighting: float,
+        firing_threshold: float,
         num_samples: int,
         num_features: int,
         context_size: int,
@@ -61,6 +63,7 @@ class WeightedSamplesStore:
         self._activation_bins = torch.tensor(activation_bins, device=device.torch())
 
         self._high_activation_weighting = high_activation_weighting
+        self._firing_threshold = firing_threshold
 
         self._feature_samples = torch.zeros(
             size=(num_features, num_samples, sample_length),
@@ -100,6 +103,7 @@ class WeightedSamplesStore:
     def save(self, file_name: Path) -> None:
         values_dict = {
             "high_activation_weighting": self._high_activation_weighting,
+            "firing_threshold": self._firing_threshold,
             "num_samples_added": self._num_samples_added,
             "sample_length_pre": self._sample_length_pre,
             "sample_length_post": self._sample_length_post,
@@ -148,6 +152,7 @@ class WeightedSamplesStore:
         weighted_samples_store._feature_activation_densities = tensors_dict["feature_activation_densities"].long()
 
         weighted_samples_store._high_activation_weighting = values_dict["high_activation_weighting"]
+        weighted_samples_store._firing_threshold = values_dict["firing_threshold"]
         weighted_samples_store._num_samples_added = values_dict["num_samples_added"]
         weighted_samples_store._sample_length_pre = values_dict["sample_length_pre"]
         weighted_samples_store._sample_length_post = values_dict["sample_length_post"]
@@ -279,7 +284,7 @@ class WeightedSamplesStore:
         r: float = self._rng.uniform(0, 1)
         keys: Float[Tensor, " num_features"] = torch.pow(
             r, torch.exp(-self._high_activation_weighting * max_activations)
-        )
+        ) - (max_activations < self._firing_threshold)
 
         assert keys.isnan().count_nonzero() == 0, "NaN keys found"
         assert keys.isinf().count_nonzero() == 0, "Infinite keys found"
