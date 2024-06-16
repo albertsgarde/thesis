@@ -1,0 +1,28 @@
+defaults:
+  - n2g
+  - _self_
+
+mas_path: 'outputs/gpt2-small_sae_store.zip'
+model_name: 'gpt2-small'
+out_path: outputs/gpt2-small-n2g
+params:
+  stop_on_error: false
+start_index: 0
+end_index: 107520
+create_dot: false
+create_pkl: false
+create_bin: true
+layers:
+  - hook_id: blocks.0.mlp.hook_post
+    num_features: 3072
+  - hook_id: blocks.4.mlp.hook_post
+    num_features: 3072
+  - hook_id: blocks.5.mlp.hook_post
+    num_features: 3072
+  - hook_id: blocks.0.mlp.hook_post
+    sae_oai_layer: 0
+  - hook_id: blocks.4.mlp.hook_post
+    sae_oai_layer: 4
+  - hook_id: blocks.5.mlp.hook_post
+    sae_oai_layer: 5
+      
