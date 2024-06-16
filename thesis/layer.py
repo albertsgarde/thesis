@@ -60,7 +60,7 @@ class LayerConfig:
         if num_sources_set != 1:
             raise ValueError("Exactly one of num_features, sae_hf_repo and sae_open_ai must be set.")
 
-    def to_mas_layer(self, device: Device) -> Layer:
+    def to_layer(self, device: Device) -> Layer:
         if self.num_features is not None:
             assert self.sae_hf_repo is None
             assert self.sae_file is None

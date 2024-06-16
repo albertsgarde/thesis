@@ -41,7 +41,7 @@ def main(config: MASScriptConfig) -> None:
 
     model: HookedTransformer = HookedTransformer.from_pretrained(config.model_name, device=device.torch())  # type: ignore[reportUnknownVariableType]
 
-    mas_layers = [layer.to_mas_layer(device) for layer in config.layers]
+    mas_layers = [layer.to_layer(device) for layer in config.layers]
 
     mas_store = algorithm.run(model, dataset, mas_layers, config.params, device)
 
