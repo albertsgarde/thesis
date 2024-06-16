@@ -9,6 +9,9 @@ params:
   stop_on_error: false
 start_index: 0
 end_index: 18432
+create_dot: false
+create_pkl: false
+create_bin: true
 layers:
   - hook_id: blocks.0.mlp.hook_post
     num_features: 2048

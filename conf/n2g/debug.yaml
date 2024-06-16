@@ -4,10 +4,11 @@ defaults:
 
 mas_path: 'outputs/gelu-1l_sae_store.zip'
 model_name: 'gelu-1l'
+out_path: outputs/gelu-1l-n2g
 params:
   stop_on_error: true
-start_index: 10
-end_index: 15
+start_index: 0
+end_index: 5
 create_dot: false
 create_pkl: false
 create_bin: true
@@ -17,4 +18,3 @@ layers:
   - hook_id: blocks.0.mlp.hook_post
     sae_hf_repo: NeelNanda/sparse_autoencoder
     sae_file: 25.pt
-out_path: outputs/gelu-1l-n2g
