@@ -11,15 +11,29 @@ Though the past months have seen the development of several open source SAE libr
 
 \subsection{Feature samples}
 Our experiments require a number of samples and density information for each feature.
+The text dataset we use is the same as was originally used to train both the model and the SAE, namely \todo{cite}.
+The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
+We solve this by creating overlapping samples of fixed length within each dataset sample, padding with the padding token when necessary.
+The overlap is to ensure that all tokens are included with some preceding context.
+
+\subsubsection{Sampling}
 In the original N2G paper \todo{cite}, maximum activating samples were used.
-However, we found that this lead to many of the samples being very similar which pollutes the test set.
+However, we found that this leads to many of the samples being very similar which pollutes the test set.
 Because of this and arguments that maximum activating samples can be misleading \todo{cite}, we instead use a weighted random sampling approach.
 Like with maximum activating samples we assume that the samples that activate the feature most highly are the most important for understanding the feature, but we do not assume that they are the \emph{only} important samples.
 Inspired by softmax, we assign each sample a weight equal to
 \begin{align*}
-    \e^{\alpha a}
+    w=\e^{\alpha a}
 \end{align*}
 where $a$ is the maximum activation of the feature on that sample and $\alpha$ is a hyperparameter controlling how much to prioritize the most activating samples.
+A \emph{key} is then calculated for each sample given by
+\begin{align*}
+    k=\xi^{\frac1w}-[a<c]
+\end{align*}
+where $\xi~\mathrm{Uniform}(0,1)$ is a random number and $[a<c]$ is $1$ when the activation is below a firing threshold and $0$ otherwise.
+Since the first term is always between $0$ and $1$, the second term ensures that samples with activations above the threshold are always prioritized.
+Sampling is then done by streaming through a part of the dataset, calculating the key for each sample, and keeping the $n$ samples with the highest keys.
+For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
 \subsection{N2G}
 Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite}.
