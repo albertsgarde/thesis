@@ -3,7 +3,7 @@ import math
 import random
 import time
 from dataclasses import dataclass
-from typing import Callable
+from typing import Any, Callable
 
 import numpy as np
 import torch
@@ -11,7 +11,7 @@ from datasets import IterableDataset  # type: ignore[import]
 from jaxtyping import Float
 from torch import Tensor
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
-from transformer_lens.HookedTransformer import HookedTransformer
+from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
 
 from thesis.layer import Layer  # type: ignore[import]
 
@@ -56,7 +56,6 @@ class MASParams:
             raise ValueError("Sample length post must be greater than 0.")
         if self.samples_to_check <= 0:
             raise ValueError("Samples to check must be greater than 0.")
-
 
 
 def run(
