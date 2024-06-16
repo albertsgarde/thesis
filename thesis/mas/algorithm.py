@@ -50,6 +50,7 @@ class MASParams:
     """
 
     high_activation_weighting: float
+    firing_threshold: float
     sample_overlap: int
     num_max_samples: int
     sample_length_pre: int
@@ -110,6 +111,7 @@ def run(
         mas_store = WeightedSamplesStore(
             bins,
             params.high_activation_weighting,
+            params.firing_threshold,
             params.num_max_samples,
             num_total_features,
             context_size,

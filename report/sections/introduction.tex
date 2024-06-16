@@ -3,15 +3,24 @@
 
 \begin{document}
 
-Large Language Models (LLMs) based on the transformer architecture \citep{vaswani_attention_2023} have shown exceptional performance across a range of tasks, yet their complexity renders their inner workings opaque.
-This opacity challenges our ability to understand, trust, and safely deploy these models in real-world applications.
-The field of mechanistic interpretability aims to address this issue by providing insights into the behaviour of these models.
-Transformer models contain both attention and multi-layer perceptron (MLP) layers, and the latter is the focus of this thesis.
-Most attempts at interpreting MLP neurons have focused on understanding the behaviour of individual neurons, but as demonstrated in \citet{elhage_toy_2022}, the behaviour of individual neurons often doesn't map onto human understandable concepts.
-\citet{bricken_towards_2023} shows a possible way forward by suggesting the features of SAEs (Sparse Autoencoders) as alternative units of interpretability.
-This thesis aims to apply the N2G \citep{foote_neuron_2023} method to the features of SAEs, with the goal of understanding the behaviour of these features and the potential for using this understanding to interpret the behaviour of LLMs.
-If SAEs truly do provide more interpretable features and N2G truly does provide a useful representation of feature behaviour, we would expect this to be reflected when comparing N2G graphs for individual neurons against those for features. \todo{Info on what comparisons we expect to make.}
-This means that the results of this thesis will inform the usefulness of these two methods.
+Large Language Models (LLMs) based on the transformer architecture \citep{vaswani_attention_2023} have shown exceptional performance across a range of tasks, yet how they achieve such impressive results remains poorly understood.
+Though it is easy to describe what mathematical operations occur on which numbers, we have yet to understand what algorithms and concepts these calculations represent.
+This opacity limits our ability to interpret, trust, and safely deploy these models in real-world applications.
+The related fields of interpretability and explainability aim to address this issue by providing insights into the behaviour of these models.
+Many approaches have been developed within these fields.
+\citet{bereska_mechanistic_2024} provides a recent overview and a useful taxonomy, while \citet{rauker_toward_2023} provides a more thorough survey including a list of previous reviews in the same area.
+Transformer models contain both attention and multi-layer perceptron (MLP) layers and the latter is the focus of this thesis.
+Previous attempts at interpreting MLP neurons have focused on understanding the behaviour of individual neurons\todo{cite. N2G}, but as demonstrated in \citet{elhage_toy_2022}, the behaviour of individual neurons often doesn't map onto human understandable concepts.
+\citet{bricken_towards_2023} shows a possible way forward by suggesting the features of SAEs (Sparse Autoencoders) trained on the MLP layer activations as alternative units of interpretability.
+In this work, we focus on these along with the Neuron2Graph \citep{foote_neuron_2023} method.
+This is an interesting combination, since if SAEs truly do provide more interpretable features and N2G truly does provide a useful representation of feature behaviour, we would expect this to be reflected when comparing N2G graphs for individual neurons against those for SAE features. 
+
+In this work we first provide a review of the literature on SAEs as applied to interpretability of transformer models.
+This review differs from the reviews mentioned above by focussing exclusively on SAEs.
+This allows us to go into considerable detail, and since the field is so young, it means we can cover essentially all relevant work.
+We then perform \todo{insert experiment here}.
+
+
 
 \begin{itemize}
     \item Recently LLMs have bla bla bla
