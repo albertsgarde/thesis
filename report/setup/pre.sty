@@ -1,78 +1,14 @@
-\usepackage[utf8]{inputenc}
-\usepackage{fullpage}
-
-% Stop Vincents stupid indryk ved at sætte længden af dem til 0
-\setlength\parindent{0pt}
-
-% Selectively silence warnings
-\usepackage{silence}
-\WarningFilter{hyperref}{Token not allowed}
-
-% Math notation
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsfonts}
-\usepackage{amsthm}
-\usepackage{mathrsfs}
-\usepackage{bm} % Used for bold math
-
-% Subscript before
-\usepackage{tensor}
-
-% Framing
-\usepackage{tcolorbox}
-\tcbuselibrary{theorems}
-
-% Placement of figures
-\usepackage{float}
-
-% Figures
-\usepackage{graphicx}
-\usepackage{subfig}
-
-% Pseudocode
-\usepackage{algorithmic}
-
-% Enumerations
-\usepackage{enumitem}
-
-% Potter proof!
-\usepackage{stmaryrd}
-
-% Units
-\usepackage{siunitx}
-
 % Todos
 \usepackage{todonotes}
-
-% Hyperref
-\usepackage[hidelinks]{hyperref}
-
-% More complex arguments
-\usepackage{xparse}
-
-% Bibliography
-\usepackage[authoryear]{natbib}
-
-% Symbols
-%% Arabic symbols
-\usepackage{arabtex}
-\setarab
-\arabtrue
-
-\newcommand{\arj}{\RL{j}}
-\newcommand{\ark}{\RL{.k}}
-\newcommand{\artea}{\RL{.s}}
-\newcommand{\ardoublemu}{\RL{s}}
-\newcommand{\arsmiley}{\RL{t}}
-\newcommand{\arhandcuffs}{\RL{mh}}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 %% Standard symbols
 \newcommand{\e}{\mathrm{e}}
 \newcommand{\im}{\mathrm{i}}
 \newcommand{\diff}{\mathrm{d}}
 \newcommand{\id}{\mathrm{id}}
-\renewcommand{\R}{\mathbb{R}}
+\newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
@@ -80,29 +16,6 @@
 \newcommand{\M}{\mathbb{M}}
 \newcommand{\xor}{\oplus}
 
-
-% Theorem boxes
-\newcommand{\ksjlcisavbff}{ksjlcisavbff}
-
-
-\newtcbtheorem{theorem}{Theorem}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{theorem}
-\newtcbtheorem[use counter from=theorem]{lemma}{Lemma}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{lemma}
-\newtcbtheorem[use counter from=theorem]{corollary}{Corollary}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{corollary}
-\newtcbtheorem[use counter from=theorem]{definition}{Definition}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{definition}
-\newtcbtheorem[use counter from=theorem]{example}{Example}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{example}
-\newtcbtheorem[use counter from=theorem]{problem}{Problem}%
-{colframe=black,fonttitle=\bfseries,
-separator sign={\ -}}{problem}
 
 %\newmdtheoremenv[nobreak=true]{theorem}{Theorem}
 %\newmdtheoremenv[nobreak=true]{lemma}{Lemma}
@@ -194,8 +107,6 @@ separator sign={\ -}}{problem}
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
 
-% Remove numbers for headers
-%\setcounter{secnumdepth}{-2}
 
 % Image
 \newcommand{\image}[3]{

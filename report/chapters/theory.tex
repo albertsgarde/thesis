@@ -1,13 +1,8 @@
-\documentclass[../main.tex]{subfiles}
-
-
-\begin{document}
-
 \section{Preliminaries}
 Before we can dive into the specifics of the methods used in this thesis, 
 we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
-transformer language model \citep{vaswani_attention_2023} 
+transformer language model \cite{vaswani_attention_2023} 
 which we want to interpret.
 We will refer to this as the \emph{language model}.
 We will also assume that we have a set of text samples 
@@ -20,13 +15,13 @@ of a model, but in the context of this thesis we will focus on two
 specific types.
 These are individual neurons or activations which can be read directly 
 from the model, and neurons in the hidden layer of 
-a sparse autoencoder \citep{conmy_towards_2023}.
+a sparse autoencoder \cite{conmy_towards_2023}.
 We will generally refer to these as \emph{neurons} and 
 \emph{features} or \emph{features of an SAE} respectively.
 
 Since we interpret features based on their value on various inputs, 
 it is useful to have notation for this.
-Taking inspiration from \citet{foote_neuron_2023} 
+Taking inspiration from \cite{foote_neuron_2023} 
 but diverging significantly, we use the function
 \begin{align*}
     a\in\mathcal{F}\times\mathcal{T}\times\N\to\R
@@ -55,7 +50,7 @@ Mathematically this can be written as
 \end{align*}
 for some feature $f\in\mathcal{F}$ 
 and dataset $\mathcal{D}\subseteq\mathcal{T}$.
-This method has faced criticism \citep{bolukbasi_interpretability_2021} 
+This method has faced criticism \cite{bolukbasi_interpretability_2021} 
 and should probably not be used in isolation, but it can be a useful
 starting point for understanding the behaviour of a feature.
 
@@ -71,7 +66,7 @@ but the computational cost will of course increase linearly.
 
 \section{Neuron2Graph}
 The second method of interest is the \emph{Neuron2Graph} 
-as described in \citet{foote_neuron_2023}.
+as described in \cite{foote_neuron_2023}.
 It attempts to build a graph model of the behaviours of a feature 
 by finding a set of patterns which activate the feature.
 Each pattern consists of a string of tokens (an $n$-gram) 
@@ -151,6 +146,3 @@ and nodes representing the same token on the same layer are collapsed.
 We refer to both this representation and the original trie $T$ 
 as the \emph{feature graph}.
 
-
-\subbib{../main}
-\end{document}

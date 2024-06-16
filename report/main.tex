@@ -1,40 +1,48 @@
-\RequirePackage{import}
-\makeatletter
-\def\@sub@import#1#2#3{%
-  \begingroup
-  \protected@edef\@tempa{\endgroup
-    \let\noexpand\IfFileExists\noexpand#2%
-    \noexpand\@import  \noexpand#1%  param 1
-      {\@ifundefined{input@path}{}{\input@path}}% 2
-      {\@ifundefined{Ginput@path}{}{\Ginput@path}}% 3
-      {\import@path#3}{\import@path}% 4,5
-      {\ifx\IfFileExists\im@@IfFileExists \noexpand\im@@IfFileExistjs
-       \else \noexpand\IfFileExists \fi}}% 6
-  \if\relax#3\relax% need expansion, for eg \filename@area
-    \endgroup\expandafter#1%
-  \else
-    \expandafter\@tempa
-  \fi}
-\makeatother
+\documentclass[a4paper,twoside,11pt]{report} %openright
+\input{setup/statics.tex}
+\input{setup/dtu_preamble.tex}
+\input{setup/settings.tex}
+\input{setup/pre.sty}
+\input{setup/symbols.sty}
 
-\documentclass[10pt,a4paper]{report}
-\usepackage{pre}
-\usepackage{symbols}
-\usepackage{subfiles} % Should be loaded last in the preamble apparently
-
-
-\title{Thesis}
-\author{Albert Ramus Sidenius Garde (s183969)}
-\date{\today}
 \begin{document}
-\maketitle
+
+\pagenumbering{roman}
+\input{frontmatter/frontpage.tex}
+\pagecolor{white}
+\newgeometry{top=2.81cm, bottom=2.75cm, outer=2.5cm, inner=3.5cm}
+\pagestyle{empty}
+\cleardoublepage 
+\input{frontmatter/copyright.tex}
+\clearpage 
+\pagestyle{main}
+\input{frontmatter/approval.tex}
+\clearpage 
+\input{frontmatter/abstract.tex}
+\clearpage 
+\input{frontmatter/acknowledgements.tex}
+\cleardoublepage 
 \tableofcontents
+\cleardoublepage 
 
-\def\isMain{true}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{arabic}
+\cleardoublepage
+\chapter{Introduction}
+\input{chapters/introduction.tex}
+\cleardoublepage
+\chapter{Theory}
+\input{chapters/theory/sae.tex}
+\cleardoublepage
+\chapter{Method}
+\input{chapters/method.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subfile{sections}
-
-\bibliographystyle{plainnat}
-\bibliography{main}
+\printbibliography[heading=bibintoc,title={Bibliography}]
+\cleardoublepage 
+\appendix
+\input{backmatter/appendix.tex}
+\cleartoleftpage
+\input{backmatter/backpage.tex}
 
 \end{document}

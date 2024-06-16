@@ -12,3 +12,6 @@
 *.fls
 *.nav
 *.snm
+*.bcf
+*.run.xml
+*.xdv

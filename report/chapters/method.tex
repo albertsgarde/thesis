@@ -1,22 +1,19 @@
-\documentclass[../main.tex]{subfiles}
 
-
-\begin{document}
 
 % Overview
 
-\subsection{SAEs}
+\section{SAEs}
 Since SAEs are finnicky to train, we will be using a pre-trained SAE, namely \todo{cite}.
 Though the past months have seen the development of several open source SAE libraries \todo{cite}, we started this work before then and do not use any of them.
 
-\subsection{Feature samples}
+\section{Feature samples}
 Our experiments require a number of samples and density information for each feature.
 The text dataset we use is the same as was originally used to train both the model and the SAE, namely \todo{cite}.
 The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
 We solve this by creating overlapping samples of fixed length within each dataset sample, padding with the padding token when necessary.
 The overlap is to ensure that all tokens are included with some preceding context.
 
-\subsubsection{Sampling}
+\subsection{Sampling}
 In the original N2G paper \todo{cite}, maximum activating samples were used.
 However, we found that this leads to many of the samples being very similar which pollutes the test set.
 Because of this and arguments that maximum activating samples can be misleading \todo{cite}, we instead use a weighted random sampling approach.
@@ -35,7 +32,7 @@ Since the first term is always between $0$ and $1$, the second term ensures that
 Sampling is then done by streaming through a part of the dataset, calculating the key for each sample, and keeping the $n$ samples with the highest keys.
 For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
-\subsection{N2G}
+\section{N2G}
 Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite}.
 However the original was a single file with no documentation and since we needed to work in depth with the code we have done considerable refactoring work to improve code quality.
 In our fork \todo{link} the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \todo{cite}.
@@ -61,5 +58,3 @@ The algorithm thus works by first training the N2Gs using the Python implementat
     \end{itemize}
 \end{itemize}
 
-\subbib{../main}
-\end{document}
