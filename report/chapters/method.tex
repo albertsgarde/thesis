@@ -31,15 +31,19 @@ A \emph{key} is then calculated for each sample given by
 where $\xi\sim\mathrm{Uniform}(0,1)$ is a random number and $[a<c]$ is $1$ when the activation is below a firing threshold and $0$ otherwise.
 Since the first term is always between $0$ and $1$, the second term ensures that samples with activations above the threshold are always prioritized.
 Sampling is then done by streaming through a part of the dataset, calculating the key for each sample, and keeping the $n$ samples with the highest keys.
+The second term ($[a<c]$) was included after noticing that some samples with all zero activations were included, which is a waste since they do not contribute to either training or evaluation.
+The implementation used for these experiments is available at \todo{path to python file}.
 For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
 \section{N2G}
-Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite}.
+Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite code not article}.
 However the original was a single script with no documentation and since we needed to work in depth with the code we have done considerable refactoring work to improve code quality.
 In our fork \todo{link} the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \todo{cite}.
 During this work we found many redundancies, the removal of which has likely sped up the code though we have not done any formal benchmarking.
 We also found that the resulting N2Gs took up much more space than seemed reasonable, both in memory and on disk.
+While the disk usage could be solved by compressing the files (n2g graphs compress very well), this would not solve the memory usage.
 Our solution was to create a Rust implementation of the N2Gs.
+While the memory impact is hard to measure, the compressed disk size is not and it fell by a factor of $10$.
 This implementation does not support training, but can be used to evaluate N2Gs and produce the visual graph representations.
 The algorithm thus works by first training the N2Gs using the Python implementation, before converting them to the Rust implmentation for storage.
 

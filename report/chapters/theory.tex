@@ -2,7 +2,7 @@
 Before we can dive into the specifics of the methods used in this thesis, 
 we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
-transformer language model \cite{vaswani_attention_2023} 
+transformer language model \parencite{vaswani_attention_2023} 
 which we want to interpret.
 We will refer to this as the \emph{language model}.
 We will also assume that we have a set of text samples 
@@ -15,7 +15,7 @@ of a model, but in the context of this thesis we will focus on two
 specific types.
 These are individual neurons or activations which can be read directly 
 from the model, and neurons in the hidden layer of 
-a sparse autoencoder \cite{conmy_towards_2023}.
+a sparse autoencoder \parencite{conmy_towards_2023}.
 We will generally refer to these as \emph{neurons} and 
 \emph{features} or \emph{features of an SAE} respectively.
 
@@ -36,8 +36,6 @@ the \verb|gpt2-small| model, $s$ is the token string
 then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
 "\verb| brown|" when \verb|gpt2-small| processes 
 the string "\verb|The quick brown fox|".
-
-\section{Sparse autoencoders}
 
 \section{MAS}
 The first method we will use is that of \emph{maximum activating samples}.
@@ -146,3 +144,5 @@ and nodes representing the same token on the same layer are collapsed.
 We refer to both this representation and the original trie $T$ 
 as the \emph{feature graph}.
 
+\section{Sparse autoencoders}
+\input{chapters/theory/sae.tex}
