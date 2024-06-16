@@ -143,8 +143,23 @@ def main(config: N2GScriptConfig) -> None:
     print(f"Errors: {num_none_models}/{len(models)}")
 
     stats_path = output_path / "stats.json"
+    if stats_path.exists():
+        with stats_path.open("r") as f:
+            json_object = json.load(f)
+            existing_stats = [
+                NeuronStats.from_dict(neuron_stats) if neuron_stats else None for neuron_stats in json_object
+            ]
+    else:
+        existing_stats = []
+    if len(existing_stats) < config.end_index:
+        existing_stats += [None] * (config.end_index - len(existing_stats))
+    for i, neuron_stats in enumerate(stats):
+        if neuron_stats is not None:
+            existing_stats[i + config.start_index] = neuron_stats
     with stats_path.open("w") as f:
-        json_object = [neuron_stats.model_dump() if neuron_stats is not None else {} for neuron_stats in stats]
+        json_object = [
+            neuron_stats.model_dump() if neuron_stats is not None else None for neuron_stats in existing_stats
+        ]
         json.dump(json_object, f)
 
     models_path = output_path / "models"
