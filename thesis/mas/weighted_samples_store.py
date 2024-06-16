@@ -207,6 +207,14 @@ class WeightedSamplesStore:
 
         return self._feature_max_activations[:, : self.num_samples_added()]
 
+    @property
+    def activation_bins(self) -> Float[Tensor, " num_activation_bins-1"]:
+        return self._activation_bins
+
+    @property
+    def feature_densities(self) -> Int[Tensor, "num_features num_activation_bins"]:
+        return self._feature_activation_densities
+
     @profile
     def add_sample(self, sample: Sample, activations: Float[Tensor, "context num_features"]) -> None:
         # Inputs must be padded to context length
