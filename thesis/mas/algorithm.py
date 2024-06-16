@@ -3,18 +3,17 @@ import math
 import random
 import time
 from dataclasses import dataclass
-from typing import Any, Callable, Tuple
+from typing import Callable
 
 import numpy as np
 import torch
 from datasets import IterableDataset  # type: ignore[import]
 from jaxtyping import Float
-from sparse_autoencoder import Autoencoder as OAISparseAutoencoder
 from torch import Tensor
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
-from transformer_lens.HookedTransformer import HookedTransformer  # type: ignore[import]
+from transformer_lens.HookedTransformer import HookedTransformer
 
-from thesis.sae.sae import SparseAutoencoder  # type: ignore[import]
+from thesis.layer import Layer  # type: ignore[import]
 
 from ..device import Device, get_device
 from .sample_loader import SampleDataset
@@ -59,40 +58,9 @@ class MASParams:
             raise ValueError("Samples to check must be greater than 0.")
 
 
-@dataclass
-class MASLayer:
-    """
-    A description of a layer to include in the MAS algorithm and how to handle it.
-
-    Attributes:
-        hook_id: The transformer_lens to get activations for this layer from.
-        num_features: The number of features to store for this layer.
-        activation_map: A function that takes the activations from the given hook and returns activations for the
-                features of the layer.
-                The last dimension of the output must always match the `num_features` attribute.
-    """
-
-    hook_id: str
-    num_features: int
-    activation_map: Callable[
-        [Float[Tensor, "batch context neurons_in_hook"]], Float[Tensor, "batch context _num_features"]
-    ]
-
-    @staticmethod
-    def from_hook_id(hook_id: str, num_features: int) -> "MASLayer":
-        return MASLayer(hook_id, num_features, lambda x: x)
-
-    @staticmethod
-    def from_sae(sae: SparseAutoencoder) -> "MASLayer":
-        return MASLayer(sae.hook_point, sae.num_features, sae.encode)
-
-    @staticmethod
-    def from_oai_sae(hook_id: str, sae: OAISparseAutoencoder) -> "MASLayer":
-        return MASLayer(hook_id, sae.n_latents, sae.encode)
-
 
 def run(
-    model: HookedTransformer, dataset: IterableDataset, layers: list[MASLayer], params: MASParams, device: Device
+    model: HookedTransformer, dataset: IterableDataset, layers: list[Layer], params: MASParams, device: Device
 ) -> WeightedSamplesStore:
     with torch.no_grad():
         device = get_device()
@@ -130,8 +98,8 @@ def run(
         activation_scratch = torch.zeros((context_size, num_total_features), device=device.torch())
 
         def create_hook(
-            layer: MASLayer, slice: slice
-        ) -> Tuple[str, Callable[[Float[Tensor, "batch context neurons_per_layer"], Any], None]]:
+            layer: Layer, slice: slice
+        ) -> tuple[str, Callable[[Float[Tensor, "batch context neurons_per_layer"], HookPoint], None]]:
             assert layer.num_features == slice.stop - slice.start
 
             def hook(activation: Float[Tensor, "batch context neurons_per_layer"], hook: HookPoint) -> None:
