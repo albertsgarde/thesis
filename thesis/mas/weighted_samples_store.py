@@ -282,9 +282,10 @@ class WeightedSamplesStore:
 
         # Calculate the key for the sample for each feature.
         r: float = self._rng.uniform(0, 1)
-        keys: Float[Tensor, " num_features"] = torch.pow(
-            r, torch.exp(-self._high_activation_weighting * max_activations)
-        ) - (max_activations < self._firing_threshold)
+        keys: Float[Tensor, " num_features"] = (
+            torch.pow(r, torch.exp(-self._high_activation_weighting * max_activations))
+            - (max_activations < self._firing_threshold).float()
+        )
 
         assert keys.isnan().count_nonzero() == 0, "NaN keys found"
         assert keys.isinf().count_nonzero() == 0, "Infinite keys found"
