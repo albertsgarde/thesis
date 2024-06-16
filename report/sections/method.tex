@@ -27,7 +27,9 @@ However the original was a single file with no documentation and since we needed
 In our fork \todo{link} the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \todo{cite}.
 During this work we found many redundancies, the removal of which has likely sped up the code though we have not done any formal benchmarking.
 We also found that the resulting N2Gs took up much more space, both in memory and on disk, than seemed necessary.
-Our solution which may have been a little overkill was to create a Rust implementation of the N2Gs (without training, since that requires PyTorch) which stores the graphs in a much more compact format.
+Our solution was to create a Rust implementation of the N2Gs.
+This implementation does not support training, but can be used to evaluate N2Gs and produce the visual graph representations.
+The algorithm thus works by first training the N2Gs using the Python implementation, before converting them to the Rust implmentation for storage.
 
 
 
