@@ -54,7 +54,9 @@ These predictions can then be compared to the actual activations of the feature 
 
 \section{Analysis}
 After N2G models have been trained and evaluated for all MLP and SAE features, we can compare the two populations.
-Since our goal is to compare the performance of N2G on the two populations, we are interested in the recall and precision of the models for each feature.
+Our analysis is based on 4 main statistics for each feature: recall, precision, F1-score, and feature density.
+The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of samples that activate the feature.
+To compare these statistics between the two populations, we implement two-sample bootstrap tests.
 
 
 
