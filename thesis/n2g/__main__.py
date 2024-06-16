@@ -1,51 +1,92 @@
 import json
 import pickle
+import typing
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Tuple
 
+import hydra
 import n2g
 import torch
 import transformer_lens  # type: ignore[import]
+from beartype import beartype
+from hydra.core.config_store import ConfigStore
 from jaxtyping import Float, Int
 from n2g import FeatureModel, NeuronModel, NeuronStats, Tokenizer
+from omegaconf import OmegaConf
 from torch import Tensor
-from transformer_lens import HookedTransformer
 from transformer_lens.hook_points import HookPoint  # type: ignore[import]
 
 from thesis.device import Device
+from thesis.layer import Layer, LayerConfig
 from thesis.mas.mas_store import MASStore
-from thesis.sae.sae import SparseAutoencoder
-
-NUM_NEURONS = 2048
-NUM_SAE_FEATURES = 16384
-NUM_FEATURES = NUM_NEURONS + NUM_SAE_FEATURES
 
 
-def main() -> None:
+@dataclass
+class N2GParams:
+    stop_on_error: bool
+
+
+@dataclass
+class N2GLayerConfig:
+    start_mas_index: int
+    layer_config: LayerConfig
+
+
+@dataclass
+class N2GScriptConfig:
+    mas_path: str
+    model_name: str
+    layers: list[N2GLayerConfig]
+    out_path: str
+    params: N2GParams
+
+
+cs = ConfigStore.instance()
+
+cs.store(name="n2g", node=N2GScriptConfig)
+
+
+@beartype
+def main(config: N2GScriptConfig) -> None:
     torch.set_grad_enabled(False)
 
     device = Device.get()
 
-    mas_store = MASStore.load(Path("outputs/gelu-1l-sae_store.zip"), device)
-    assert mas_store.feature_activations().shape[0] == NUM_FEATURES, "Feature activations should have the correct shape"
+    mas_store = MASStore.load(Path(config.mas_path), device)
 
-    model = transformer_lens.HookedTransformer.from_pretrained("gelu-1l", device=device.torch())
-    sae = SparseAutoencoder.from_hf("NeelNanda/sparse_autoencoder", "25.pt", "blocks.0.mlp.hook_post", device)
+    model = transformer_lens.HookedTransformer.from_pretrained(config.model_name, device=device.torch())
+
+    output_path = Path(config.out_path)
+    output_path.mkdir(exist_ok=True, parents=True)
 
     tokenizer = Tokenizer(model)
 
-    def feature_samples(feature_index: int) -> Tuple[list[str], float]:
-        if feature_index < 0:
-            raise ValueError(f"Feature index must be non-negative. {feature_index=}")
-        elif feature_index < NUM_NEURONS:
-            store_index = feature_index
-        elif feature_index < NUM_FEATURES:
-            store_index = feature_index
-        else:
-            raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
+    layers: list[tuple[int, Layer]] = [
+        (layer_config.start_mas_index, layer_config.layer_config.to_layer(device)) for layer_config in config.layers
+    ]
+    num_features = sum(layer.num_features for _, layer in layers)
 
-        samples = mas_store.feature_samples()[store_index, :, :]
-        max_activation = mas_store.feature_max_activations()[store_index, :].max().item()
+    def n2g_to_layer_index(n2g_index: int) -> Tuple[int, int]:
+        if n2g_index < 0:
+            raise ValueError(f"Feature index must be non-negative. {n2g_index=}")
+        start_index = 0
+        for i, (_, layer) in enumerate(layers):
+            if start_index + layer.num_features > n2g_index:
+                return i, n2g_index - start_index
+            start_index += layer.num_features
+        raise ValueError(f"Feature index must be less than {start_index}. {n2g_index=}")
+
+    def feature_samples(n2g_index: int) -> Tuple[list[str], float]:
+        layer_index, feature_index = n2g_to_layer_index(n2g_index)
+        start_mas_index, _layer = layers[layer_index]
+
+        mas_index = start_mas_index + feature_index
+        samples = mas_store.feature_samples()[mas_index, :, :]
+        max_activation = mas_store.feature_max_activations()[mas_index, :].max().item()
+
+        if model.tokenizer is None:
+            raise AttributeError("Model tokenizer must not be None.")
 
         tokens = [
             "".join(model.tokenizer.batch_decode(sample, clean_up_tokenization_spaces=False)) for sample in samples
@@ -53,34 +94,30 @@ def main() -> None:
 
         return tokens, max_activation
 
-    def model_feature_activation(
-        model: HookedTransformer, layer_id: str, neuron_index: int
+    def feature_activation(
+        n2g_index: int,
     ) -> Callable[[Int[Tensor, "num_samples sample_length"]], Float[Tensor, "num_samples sample_length"]]:
+        layer_index, feature_index = n2g_to_layer_index(n2g_index)
+        _start_mas_index, layer = layers[layer_index]
+
         def result(samples: Int[Tensor, "num_samples sample_length"]) -> Float[Tensor, "num_samples sample_length"]:
+            squeeze = samples.ndim == 1
+            if squeeze:
+                samples = samples.unsqueeze(0)
             activations: Float[Tensor, "num_samples sample_length"] = torch.full(samples.shape, float("nan"))
 
             def hook(activation: Float[Tensor, "num_samples sample_length neurons_per_layer"], hook: HookPoint) -> None:
-                activations[:] = activation[:, :, neuron_index]
+                activations[:, :] = layer.activation_map(activation)[:, :, feature_index]
 
             with torch.no_grad():
-                model.run_with_hooks(samples, fwd_hooks=[(layer_id, hook)])
+                model.run_with_hooks(samples, fwd_hooks=[(layer.hook_id, hook)])
                 assert not torch.isnan(activations).any(), "Activations should not contain NaNs"
 
+            if squeeze:
+                activations = activations.squeeze(0)
             return activations
 
         return result
-
-    def feature_activation(
-        feature_index: int,
-    ) -> Callable[[Int[Tensor, "num_samples sample_length"]], Float[Tensor, "num_samples sample_length"]]:
-        if feature_index < 0:
-            raise ValueError(f"Feature index must be non-negative. {feature_index=}")
-        elif feature_index < NUM_NEURONS:
-            return model_feature_activation(model, "blocks.0.mlp.hook_post", feature_index)
-        elif feature_index < NUM_FEATURES:
-            return lambda samples: sae.feature_activations(model, samples, feature_index - NUM_NEURONS)
-        else:
-            raise ValueError(f"Feature index must be less than {NUM_FEATURES}. {feature_index=}")
 
     with (Path(__file__).parent / "word_to_casings.json").open("r", encoding="utf-8") as f:
         word_to_casings = json.load(f)
@@ -90,12 +127,12 @@ def main() -> None:
         importance_config=n2g.ImportanceConfig(prepend_bos=False),
         augmentation_config=n2g.AugmentationConfig(prepend_bos=False),
     )
-    train_config = n2g.TrainConfig(fit_config=fit_config, stop_on_error=False)
+    train_config = n2g.TrainConfig(fit_config=fit_config, stop_on_error=config.params.stop_on_error)
 
     stats: list[NeuronStats]
     models: list[NeuronModel]
     models, stats = n2g.run_layer(
-        range(NUM_FEATURES),
+        range(num_features),
         feature_activation,
         feature_samples,
         tokenizer,
@@ -107,12 +144,12 @@ def main() -> None:
     none_models = sum(model is None for model in models)
     print(f"Errors: {none_models}/{len(models)}")
 
-    stats_path = Path("outputs") / "stats.json"
+    stats_path = output_path / "stats.json"
     with stats_path.open("w") as f:
         json_object = [neuron_stats.model_dump() if neuron_stats is not None else {} for neuron_stats in stats]
         json.dump(json_object, f)
 
-    models_path = Path("outputs") / "models"
+    models_path = output_path / "models"
     models_path.mkdir(exist_ok=True, parents=True)
     for i, model in enumerate(models):
         if model is not None:
@@ -127,5 +164,20 @@ def main() -> None:
         bf.write(all_models_bytes)
 
 
+@hydra.main(config_path="../../conf/n2g", version_base="1.3", config_name="n2g")
+def hydra_main(omega_config: OmegaConf) -> None:
+    dict_config = typing.cast(
+        dict[typing.Any, typing.Any], OmegaConf.to_container(omega_config, resolve=True, enum_to_str=True)
+    )
+    dict_config["layers"] = [
+        N2GLayerConfig(layer["start_mas_index"], LayerConfig(**layer["layer_config"]))
+        for layer in dict_config["layers"]
+    ]
+    dict_config["params"] = N2GParams(**dict_config["params"])
+    config = N2GScriptConfig(**dict_config)
+    assert isinstance(config, N2GScriptConfig)
+    main(config)
+
+
 if __name__ == "__main__":
-    main()
+    hydra_main()
