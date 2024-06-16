@@ -3,7 +3,7 @@ import math
 import random
 import time
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Callable
 
 import numpy as np
 import torch
@@ -18,6 +18,19 @@ from thesis.layer import Layer  # type: ignore[import]
 from ..device import Device, get_device
 from .sample_loader import SampleDataset
 from .weighted_samples_store import WeightedSamplesStore
+
+
+@dataclass
+class BinRange:
+    start: float
+    end: float
+    num_bins: int
+
+
+@dataclass
+class BinSet:
+    ranges: list[BinRange] | None = None
+    bin_list: list[float] | None = None
 
 
 @dataclass
@@ -43,7 +56,7 @@ class MASParams:
     sample_length_post: int
     samples_to_check: int
     seed: int
-    activation_bins: list[float]
+    activation_bins: BinSet
 
     def __post_init__(self):
         if self.sample_overlap < 0:
@@ -56,6 +69,13 @@ class MASParams:
             raise ValueError("Sample length post must be greater than 0.")
         if self.samples_to_check <= 0:
             raise ValueError("Samples to check must be greater than 0.")
+        if isinstance(self.activation_bins, dict):
+            if "ranges" in self.activation_bins:
+                self.activation_bins["ranges"] = [
+                    BinRange(**range_dict) for range_dict in self.activation_bins["ranges"]
+                ]
+
+            self.activation_bins = BinSet(**self.activation_bins)
 
 
 def run(
@@ -79,10 +99,16 @@ def run(
 
         sample_dataset = SampleDataset(context_size, params.sample_overlap, model, dataset)
 
+        bins: list[float] = params.activation_bins.bin_list if params.activation_bins.bin_list is not None else []
+        if params.activation_bins.ranges is not None:
+            for range in params.activation_bins.ranges:
+                bins.extend(np.linspace(range.start, range.end, range.num_bins, endpoint=True).tolist())
+        bins.sort()
+
         num_total_features = sum([layer.num_features for layer in layers])
         rng = random.Random(params.seed)
         mas_store = WeightedSamplesStore(
-            params.activation_bins,
+            bins,
             params.high_activation_weighting,
             params.num_max_samples,
             num_total_features,
