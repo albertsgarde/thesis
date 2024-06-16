@@ -6,9 +6,15 @@ mas_path: 'outputs/gelu-1l_sae_store.zip'
 model_name: 'gelu-1l'
 params:
   stop_on_error: true
+start_index: 10
+end_index: 15
+create_dot: false
+create_pkl: false
+create_bin: true
 layers:
-  - start_mas_index: 0
-    layer_config:
-      hook_id: blocks.0.mlp.hook_post
-      num_features: 5
+  - hook_id: blocks.0.mlp.hook_post
+    num_features: 2048
+  - hook_id: blocks.0.mlp.hook_post
+    sae_hf_repo: NeelNanda/sparse_autoencoder
+    sae_file: 25.pt
 out_path: outputs/gelu-1l-n2g

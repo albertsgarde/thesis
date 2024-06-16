@@ -28,17 +28,16 @@ class N2GParams:
 
 
 @dataclass
-class N2GLayerConfig:
-    start_mas_index: int
-    layer_config: LayerConfig
-
-
-@dataclass
 class N2GScriptConfig:
     mas_path: str
     model_name: str
-    layers: list[N2GLayerConfig]
+    start_index: int
+    end_index: int
+    layers: list[LayerConfig]
     out_path: str
+    create_dot: bool
+    create_pkl: bool
+    create_bin: bool
     params: N2GParams
 
 
@@ -62,26 +61,25 @@ def main(config: N2GScriptConfig) -> None:
 
     tokenizer = Tokenizer(model)
 
-    layers: list[tuple[int, Layer]] = [
-        (layer_config.start_mas_index, layer_config.layer_config.to_layer(device)) for layer_config in config.layers
-    ]
-    num_features = sum(layer.num_features for _, layer in layers)
+    layers: list[Layer] = [layer_config.to_layer(device) for layer_config in config.layers]
+    num_features = sum(layer.num_features for layer in layers)
 
-    def n2g_to_layer_index(n2g_index: int) -> Tuple[int, int]:
-        if n2g_index < 0:
-            raise ValueError(f"Feature index must be non-negative. {n2g_index=}")
+    if num_features != mas_store.num_features():
+        raise ValueError(
+            f"Number of features in MAS store does not match number of features in layers. {num_features=}, {mas_store.num_features()=}"
+        )
+
+    def mas_to_layer_index(mas_index: int) -> Tuple[int, int]:
+        if mas_index < 0:
+            raise ValueError(f"Index must be non-negative. {mas_index=}")
         start_index = 0
-        for i, (_, layer) in enumerate(layers):
-            if start_index + layer.num_features > n2g_index:
-                return i, n2g_index - start_index
+        for i, layer in enumerate(layers):
+            if start_index + layer.num_features > mas_index:
+                return i, mas_index - start_index
             start_index += layer.num_features
-        raise ValueError(f"Feature index must be less than {start_index}. {n2g_index=}")
+        raise ValueError(f"Feature index must be less than {start_index}. {mas_index=}")
 
-    def feature_samples(n2g_index: int) -> Tuple[list[str], float]:
-        layer_index, feature_index = n2g_to_layer_index(n2g_index)
-        start_mas_index, _layer = layers[layer_index]
-
-        mas_index = start_mas_index + feature_index
+    def feature_samples(mas_index: int) -> Tuple[list[str], float]:
         samples = mas_store.feature_samples()[mas_index, :, :]
         max_activation = mas_store.feature_max_activations()[mas_index, :].max().item()
 
@@ -95,10 +93,10 @@ def main(config: N2GScriptConfig) -> None:
         return tokens, max_activation
 
     def feature_activation(
-        n2g_index: int,
+        mas_index: int,
     ) -> Callable[[Int[Tensor, "num_samples sample_length"]], Float[Tensor, "num_samples sample_length"]]:
-        layer_index, feature_index = n2g_to_layer_index(n2g_index)
-        _start_mas_index, layer = layers[layer_index]
+        layer_index, feature_index = mas_to_layer_index(mas_index)
+        layer = layers[layer_index]
 
         def result(samples: Int[Tensor, "num_samples sample_length"]) -> Float[Tensor, "num_samples sample_length"]:
             squeeze = samples.ndim == 1
@@ -132,7 +130,7 @@ def main(config: N2GScriptConfig) -> None:
     stats: list[NeuronStats]
     models: list[NeuronModel]
     models, stats = n2g.run_layer(
-        range(num_features),
+        range(config.start_index, config.end_index),
         feature_activation,
         feature_samples,
         tokenizer,
@@ -141,8 +139,8 @@ def main(config: N2GScriptConfig) -> None:
         train_config,
     )
 
-    none_models = sum(model is None for model in models)
-    print(f"Errors: {none_models}/{len(models)}")
+    num_none_models = sum(model is None for model in models)
+    print(f"Errors: {num_none_models}/{len(models)}")
 
     stats_path = output_path / "stats.json"
     with stats_path.open("w") as f:
@@ -151,17 +149,34 @@ def main(config: N2GScriptConfig) -> None:
 
     models_path = output_path / "models"
     models_path.mkdir(exist_ok=True, parents=True)
-    for i, model in enumerate(models):
-        if model is not None:
-            with (models_path / f"{i}.pkl").open("wb") as bin_file:
-                pickle.dump(model, bin_file)
-            with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
-                f.write(model.graphviz().source)
-    all_models_bytes = FeatureModel.list_to_bin(
-        [FeatureModel.from_model(tokenizer, feature_model) for feature_model in models]
-    )
-    with (models_path / "all_models.bin").open("wb") as bf:
-        bf.write(all_models_bytes)
+    if config.create_dot or config.create_pkl:
+        for i, model in enumerate(models):
+            i = i + config.start_index
+            if model is not None:
+                if config.create_dot:
+                    with (models_path / f"{i}.pkl").open("wb") as bin_file:
+                        pickle.dump(model, bin_file)
+                if config.create_pkl:
+                    with (models_path / f"{i}.dot").open("w", encoding="utf-8") as f:
+                        f.write(model.graphviz().source)
+    if config.create_bin:
+        bin_path = models_path / "all_models.bin"
+        if bin_path.exists():
+            with bin_path.open("rb") as read_file:
+                feature_models = FeatureModel.list_from_bin(tokenizer, read_file.read())
+        else:
+            feature_models = []
+        if len(feature_models) < config.end_index:
+            feature_models += [None] * (config.end_index - len(feature_models))
+        for i, model in enumerate(models):
+            i = i + config.start_index
+            if model is not None:
+                feature_models[i] = FeatureModel.from_model(tokenizer, model)
+        all_models_bytes = FeatureModel.list_to_bin(
+            feature_models,
+        )
+        with bin_path.open("wb") as write_file:
+            write_file.write(all_models_bytes)
 
 
 @hydra.main(config_path="../../conf/n2g", version_base="1.3", config_name="n2g")
@@ -169,10 +184,7 @@ def hydra_main(omega_config: OmegaConf) -> None:
     dict_config = typing.cast(
         dict[typing.Any, typing.Any], OmegaConf.to_container(omega_config, resolve=True, enum_to_str=True)
     )
-    dict_config["layers"] = [
-        N2GLayerConfig(layer["start_mas_index"], LayerConfig(**layer["layer_config"]))
-        for layer in dict_config["layers"]
-    ]
+    dict_config["layers"] = [LayerConfig(**layer) for layer in dict_config["layers"]]
     dict_config["params"] = N2GParams(**dict_config["params"])
     config = N2GScriptConfig(**dict_config)
     assert isinstance(config, N2GScriptConfig)

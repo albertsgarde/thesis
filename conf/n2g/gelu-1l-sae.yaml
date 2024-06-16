@@ -7,14 +7,12 @@ model_name: 'gelu-1l'
 out_path: outputs/gelu-1l-n2g
 params:
   stop_on_error: false
+start_index: 0
+end_index: 18432
 layers:
-  - start_mas_index: 0
-    layer_config:
-      hook_id: blocks.0.mlp.hook_post
-      num_features: 2048
-  - start_mas_index: 2048
-    layer_config:
-      hook_id: blocks.0.mlp.hook_post
-      sae_hf_repo: NeelNanda/sparse_autoencoder
-      sae_file: 25.pt
+  - hook_id: blocks.0.mlp.hook_post
+    num_features: 2048
+  - hook_id: blocks.0.mlp.hook_post
+    sae_hf_repo: NeelNanda/sparse_autoencoder
+    sae_file: 25.pt
       
