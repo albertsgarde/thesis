@@ -1,0 +1,26 @@
+#!/bin/bash
+#BSUB -J n2g_gpt2-small
+#BSUB -o logs/n2g_gpt2-small_%J.out
+#BSUB -e logs/n2g_gpt2-small_%J.err
+#BSUB -q gpua100
+#BSUB -n 12
+#BSUB -W 0:30
+#BSUB -R "span[hosts=1]"
+#BSUB -R "rusage[mem=4096]"
+#BSUB -gpu "num=1:mode=exclusive_process"
+
+module load python3/3.11.3
+module load nvhpc/22.11-nompi
+module load cuda/11.8
+
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+cd ~/Neuron2Graph/n2g-rs
+maturin develop --release
+cd ~/Neuron2Graph
+python3 -m pip install .
+cd ~/thesis
+
+python3 -m thesis.n2g --config-name gpt2-small-sae.yaml mas_path=/work3/s183969/outputs/gpt2-small_sae_store.zip out_path=/work3/s183969/outputs/gpt2-small_sae_n2g end_index=128
+
