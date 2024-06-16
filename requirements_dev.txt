@@ -13,5 +13,8 @@ mkdocs-material <= 9.4.6
 mkdocstrings <= 0.23.0
 mkdocstrings[python]>=0.18
 
+# type checking
+mypy ~= 1.10.0
+
 # test coverage
 coverage ~= 7.4.0
