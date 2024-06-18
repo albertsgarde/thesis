@@ -40,7 +40,7 @@ where $\xi\sim\mathrm{Uniform}(0,1)$ is a random number and $[a<c]$ is $1$ when 
 Since the first term is always between $0$ and $1$, the second term ensures that samples with activations above the threshold are always prioritized.
 Sampling is then done by streaming through a part of the dataset, calculating the key for each sample, and keeping the $n$ samples with the highest keys.
 The second term ($[a<c]$) was included after noticing that some samples with all zero activations were included, which is a waste since they do not contribute to either training or evaluation.
-The implementation used for these experiments is available at \todo{path to python file}.
+The implementation used for these experiments is available \footnote{\url{https://github.com/albertsgarde/thesis/blob/main/thesis/mas/weighted_samples_store.py}} in the repo.
 For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
 \section{N2G}
