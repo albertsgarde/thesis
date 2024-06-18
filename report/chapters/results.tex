@@ -1,0 +1,142 @@
+We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
+For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of samples does its activation exceed some threshold.
+Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations.
+A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
+This is also indicated by the figures, but more interesting is that while the statistics for MLP features are roughly unimodal, the statistics for SAE features are bimodal.
+There seems to be a cluster of high-scoring features in the SAE population that is not present in the MLP population.
+Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE features with both near perfect recall and near perfect precision.
+
+An interesting question is whether the performance of the N2G model is related to the density of the feature.
+Figure \ref{fig:density} shows the distribution of feature densities across the two populations, first for all features and then for only features with an F1-score above 0.5.
+Interestingly, the high density features of the SAE almost disappear when only considering high-scoring features, which indicates that these are hard to interpret.
+Instead we get that the high-scoring SAE features are of lower density, around $10^{-2}$.
+
+Lastly, figure \ref{fig:density_f1} shows the relationship between density and F1-score for the two populations.
+This mainly confirms what we have already seen.
+
+\begin{table}[]
+    \centering
+    \input{images/figures/distribution_table.tex}
+    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
+    \label{tab:distributions}
+    \end{table}
+
+\begin{figure}[h]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/distribution_recall.pdf}
+        \caption{Recall Distribution}
+        \label{fig:distributions_recall}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/distribution_precision.pdf}
+        \caption{Precision Distribution}
+        \label{fig:distributions_precision}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/distribution_f1.pdf}
+        \caption{F1 Distribution}
+        \label{fig:distributions_f1}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/distribution_log_density.pdf}
+        \caption{Density Distribution}
+        \label{fig:distributions_log_density}
+    \end{subfigure}
+    
+    \caption{Distributions of our statistics across the two populations. Only includes features with a non-nan F1-score and a nonzero density.}
+    \label{fig:distributions}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/recall_precision_mlp.pdf}
+        \caption{Recall vs Precision for MLP}
+        \label{fig:recall_precision_mlp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/recall_precision_sae.pdf}
+        \caption{Recall vs Precision for SAE}
+        \label{fig:recall_precision_sae}
+    \end{subfigure}
+    
+    \caption{Distributions of our statistics across the two populations. Only includes features with a non-nan F1-score and a nonzero density.}
+    \label{fig:recall_precision}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_mlp.pdf}
+        \caption{MLP Feature Densities}
+        \label{fig:density_mlp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_sae.pdf}
+        \caption{SAE Feature Densities}
+        \label{fig:density_sae}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_mlp_good.pdf}
+        \caption{MLP Feature Densities (F1 >= 0.5)}
+        \label{fig:density_mlp_good}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_sae_good.pdf}
+        \caption{SAE Feature Densities (F1 >= 0.5)}
+        \label{fig:density_sae_good}
+    \end{subfigure}
+    
+    \caption{Histograms of feature densities. The lower two plots only include features with an F1-score about 0.5 Only includes features with a non-nan F1-score and a nonzero density.}
+    \label{fig:density}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp.pdf}
+        \caption{Density vs F1 for MLP}
+        \label{fig:density_f1_mlp}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_f1_sae.pdf}
+        \caption{Density vs F1 for SAE}
+        \label{fig:density_f1_sae}
+    \end{subfigure}
+    
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp_good.pdf}
+        \caption{Density vs F1 for MLP (F1 >= 0.5)}
+        \label{fig:density_f1_mlp_good}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/figures/density_f1_sae_good.pdf}
+        \caption{Density vs F1 for SAE (F1 >= 0.5)}
+        \label{fig:density_f1_sae_good}
+    \end{subfigure}
+    
+    \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE features more visible. Only includes features with a non-nan F1-score and a nonzero density.}
+    \label{fig:density_f1}
+\end{figure}
