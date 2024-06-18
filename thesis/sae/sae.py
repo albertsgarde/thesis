@@ -79,6 +79,10 @@ class SparseAutoencoder:
         result = torch.relu(x @ self._w_enc + self._b_enc)
         return result + (result == 0).float() * 1e-7
 
+    def decode(self, x: Float[Tensor, "*batch num_sae_features"]) -> Float[Tensor, "*batch layer_dim"]:
+        result = x @ self._w_dec + self._b_dec
+        return result
+
     def hook(
         self, destination: Float[Tensor, "*batch sample_length num_sae_features"]
     ) -> Tuple[str, Callable[[Float[Tensor, "*batch sample_length layer_dim"], HookPoint], None]]:
