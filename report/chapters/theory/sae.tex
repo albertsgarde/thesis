@@ -1,11 +1,3 @@
-\section{Interpretability in general}
-% Representation Learning: A Review and New Perspectives
-% Explaining Neural Networks by Decoding Layer Activations
-% Disentangling by Factorising
-% The Hessian Penalty: A Weak Prior for Unsupervised Disentanglement
-
-
-
 \section{Theoretical background}
 When interpreting a language model, there is a question of what the unit of interpretability should be.
 What part of the model should we be looking at?
@@ -29,7 +21,7 @@ The most studied solution to this problem, and the one we shall focus on, is tha
 Later, in \ref{sec:alternatives_to_saes} we will also briefly cover alternative solutions to this problem.
 
 Apart from linearity, one of the main assumptions SAEs make is that features are \emph{sparse}.
-This means that while many possible features can\todo{this phrasing is not great} be represented, only very few are present for any given input.
+This means that only very few features are present for each input.
 \cite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \section{Sparse autoencoders}

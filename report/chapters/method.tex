@@ -11,6 +11,7 @@ Though the past months have seen the development of several open source SAE libr
 Attempts were made extend the experiments to SAEs on \verb|gpt2-small|, specifically those provided at \textcite{wu_openaisparse_autoencoder_2024}, but they proved unsuccesful due to memory constraints making the process too time consuming.
 
 \section{Dataset}
+\label{sec:dataset}
 Our experiments require data in the form of a number of samples for each feature.
 The text dataset we use is the same as was originally used to train both the model and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
 The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
@@ -18,6 +19,7 @@ We solve this by creating overlapping samples of fixed length within each datase
 The overlap is to ensure that all tokens are included with some preceding context.
 
 \subsection{Sampling}
+\label{sec:sampling}
 For N2G to run on a feature, it needs a set of samples that activate the feature.
 Since the running time scales linearly in the number of samples, we would like to keep this number as low as possible.
 At the same time, what samples N2G is run on has a large impact on the results.

@@ -20,20 +20,18 @@ specific types.
 The first type is the individual neurons of the model, i.e. the activations which can be read directly from the model, that are actually represented on the GPU during inference.
 The second type is the latent neurons of an SAE (see section \ref{sec:sae}).
 We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{features of an SAE} or just \emph{features}.
+\todo{Define sparsity and density}
 
 \section{Neuron2Graph}
 \label{sec:n2g}
-The second method of interest is the \emph{Neuron2Graph} 
+The main interpretability method we use to investigate SAEs is N2G (Neuron2Graph)
 as described in \cite{foote_neuron_2023}.
 It attempts to build a graph model of the behaviours of a feature 
 by finding a set of patterns which activate the feature.
 Each pattern consists of a string of tokens (an $n$-gram) 
 with the possibility of a special ignore token 
 which signal that the token at that position does not matter.
-It does this on the basis of maximum activating samples,
-\todo{though it doesn't have to}s 
-so it is dependent on that method and 
-can be argued to share some of its weaknesses.
+In the original paper, this is done on the basis of maximum activating samples, but we use a different method as described in section \ref{sec:sampling}.
 
 To run this method for a particular feature $f\in\mathcal{F}$, 
 we need a set of highly activating samples $\mathcal S\subseteq \mathcal T$.
