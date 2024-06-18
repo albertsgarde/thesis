@@ -4,7 +4,7 @@
 
 \section{Experimental design}
 \subsection{Setting}
-We have two sets of N2G models of individual neurons or SAE features, 
+We have two sets of N2G models of individual neurons or SAE latents, 
 and a set of text samples for each N2G model.
 We also decide on a firing threshold that determines 
 whether a neuron or feature is considered active for a given token.
@@ -18,7 +18,7 @@ There are two main goals of this experiment:
     \item To compare the overall performance of the two sets of N2G models.
     This allows us to compare different ways of creating N2G models 
     and to compare the performance of N2G models of individual neurons 
-    to those of SAE features.
+    to those of SAE latents.
 \end{enumerate}
 \subsection{Procedure}
 The procedure for each goal is as follows:
@@ -34,7 +34,7 @@ The procedure for each goal is as follows:
     Currently I just take the average statistics over all N2G models 
     in each set.
     We could also see each set as a single model for predicting 
-    the activations of all neurons/features 
+    the activations of all neurons/latents 
     and calculate a single set of statistics for each set.
 \end{enumerate}
 We currently use \verb|sklearn.metrics| to calculate the statistics 

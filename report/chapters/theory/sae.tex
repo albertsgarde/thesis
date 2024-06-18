@@ -5,7 +5,7 @@ Mechanistic interpretability aims to understand models as granularly as possible
 Indeed, previous research has aimed to understand the behaviour and effect of individual neurons \cite{foote_neuron_2023}\cite{bills_language_2023}.
 However, there are reasons to believe that individual neurons are fundamentally difficult to interpret.
 According to the \emph{superposition hypothesis} \cite{elhage_toy_2022}, individual neurons do not cleanly represent interpretable features.
-Instead, features are spread over several neurons in order to pack more features into the same set of neuron dimensions.
+Instead, interpretable features are spread over several neurons in order to pack more features into the same set of neuron dimensions.
 This is possible due to the Johnson-Lindenstrauss lemma which implies that there are exponentially many nearly-orthogonal directions in an $n$-dimenstional space.
 Therefore, by spreading out features across neurons, the model can store many more features at the cost of only a little interference.
 \cite{vaintrob_toward_2024} present a model for how the model performs computation on this representation of features.
@@ -25,8 +25,8 @@ This means that only very few features are present for each input.
 \cite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \section{Sparse autoencoders}
-In the context of mechanistic interpretability, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a latent vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
-Autoencoders are only interesting if the latent space is somehow restricted.
+In the context of mechanistic interpretability, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
+Autoencoders are only interesting if the feature space is somehow restricted.
 In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \cite{cunningham_sparse_2023}.
 The loss function is the sum of mean squared error between the input and the output and the $L^1$ regularization mentioned above.
@@ -36,7 +36,7 @@ Formally this can be written as
     \hat{\vec x}=&\mat W_d\vec y\\
     \mathcal L(\vec x)=&\norm{\vec x-\hat{\vec x}}_2^2+\alpha\norm{\vec y}_1
 \end{align*}
-where $\mat W_e\in\R^{d\times n}$, $\mat W_d\in\R^{n\times d}$ and $\vec b\in\R^d$ are the parameters of the model and $\alpha\in\R^+$ is a hyperparameter controlling the sparsity of the latent representation.
+where $\mat W_e\in\R^{d\times n}$, $\mat W_d\in\R^{n\times d}$ and $\vec b\in\R^d$ are the parameters of the model and $\alpha\in\R^+$ is a hyperparameter controlling the sparsity of the feature representation.
 There are many variations to this, including in the seminal work \cite{bricken_towards_2023} where a post-decoder bias is added that is subtracted before encoding and added after decoding.
 We go into detail on some of these variations in \ref{sec:improvements_to_saes}.
 As to why $L^1$ regularization recovers features, \cite{sharkey_interim_2022} provide empirical evidence while \cite{wright_high-dimensional_2022} provide theoretical arguments.
@@ -62,11 +62,6 @@ However, \cite{rajamanoharan_improving_2024} provide a theoretical argument for 
 Also, \cite{riggs_improving_2024} only test their methods on reconstruction loss and $L^1$, so it is possible that they are overoptimizing for these and perform worse on other metrics.
 There is definitely room for work that compares these methods directly to help future researchers choose the best one for their use case.
 
-
-% Improving Dictionary Learning with Gated Sparse Autoencoders
-% Addressing Feature Suppression in SAEs
-% Improving SAE's by Sqrting L1 & Removing Lowest Activating Features
-% ProLU - A Nonlinearity for Sparse Autoencoders
 
 \section{Interpretability}
 The last section touched on the issue of evaluating the performance of SAEs.

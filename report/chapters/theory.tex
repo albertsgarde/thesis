@@ -19,8 +19,12 @@ of a model, but in the context of this thesis we will focus on two
 specific types.
 The first type is the individual neurons of the model, i.e. the activations which can be read directly from the model, that are actually represented on the GPU during inference.
 The second type is the latent neurons of an SAE (see section \ref{sec:sae}).
-We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{features of an SAE} or just \emph{features}.
-\todo{Define sparsity and density}
+We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{SAE latents} or just \emph{latents}.
+
+Note that there is some ambiguity in the literature, and in this report, about the term "feature".
+Sometimes it is meant as we describe here, a function of the model's activations, sometimes it is used specifically for what we call SAE latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the model.
+This is worth being aware of even though it is generally clear from context what is meant.
+In fact, we use the term in its abstract sense at the begining of section \ref{sec:sae} despite using it in the first sense otherwise.
 
 \section{Neuron2Graph}
 \label{sec:n2g}

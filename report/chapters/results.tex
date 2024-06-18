@@ -1,10 +1,15 @@
+First a note on terminology, since it can be confusing.
+As described in section \ref{sec:preliminaries}, features are functions of the language models activations.
+In the following, we look at two sets of features: MLP neurons and SAE latents.
+We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
+
 We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
 For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of samples does its activation exceed some threshold.
 Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations.
 A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
-This is also indicated by the figures, but more interesting is that while the statistics for MLP features are roughly unimodal, the statistics for SAE features are bimodal.
+This is also indicated by the figures, but more interesting is that while the statistics for MLP neurons are roughly unimodal, the statistics for SAE latents are bimodal.
 There seems to be a cluster of high-scoring features in the SAE population that is not present in the MLP population.
-Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE features with both near perfect recall and near perfect precision.
+Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
 
 An interesting question is whether the performance of the N2G model is related to the density of the feature.
 Figure \ref{fig:density} shows the distribution of feature densities across the two populations, first for all features and then for only features with an F1-score above 0.5.
@@ -137,6 +142,6 @@ This mainly confirms what we have already seen.
         \label{fig:density_f1_sae_good}
     \end{subfigure}
     
-    \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE features more visible. Only includes features with a non-nan F1-score and a nonzero density.}
+    \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE latents more visible. Only includes features with a non-nan F1-score and a nonzero density.}
     \label{fig:density_f1}
 \end{figure}
