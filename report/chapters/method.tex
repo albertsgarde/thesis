@@ -1,12 +1,18 @@
-% Overview
+In this chapter we describe the methods used in this work.
+We first describe what SAEs we use.
+Then we describe which text dataset we use, and how we obtain the samples needed for N2G from that dataset.
+Afterwards we go into detail about the implementation of the N2G method, including the code changes needed from the original implementation as well as how we evaluate the resulting N2G models.
+Finally we describe the statistical methods used to analyse the data on the features and N2G models.
+Most code used in this work is available at \footnote{\url{https://github.com/albertsgarde/thesis}} while our modifications to the N2G code can be found at \footnote{\url{https://github.com/albertsgarde/Neuron2Graph}}.
 
 \section{SAEs}
-Since SAEs are finnicky to train, we will be using a pre-trained SAE, namely \todo{cite}.
-Though the past months have seen the development of several open source SAE libraries \todo{cite}, we started this work before then and do not use any of them.
+Since SAEs are finnicky to train, we will be using a pre-trained SAE, namely \textcite{nanda_neelnandasparse_autoencoder_nodate}.
+Though the past months have seen the development of several open source SAE libraries \parencite{bloom_jbloomaussaelens_2024}\parencite{cooney_ai-safety-foundationsparse_autoencoder_2024}, we started this work before then and do not use any of them.
+Attempts were made extend the experiments to SAEs on \verb|gpt2-small|, specifically those provided at \textcite{wu_openaisparse_autoencoder_2024}, but they proved unsuccesful due to memory constraints making the process too time consuming.
 
 \section{Dataset}
 Our experiments require data in the form of a number of samples for each feature.
-The text dataset we use is the same as was originally used to train both the model and the SAE, namely \todo{cite}.
+The text dataset we use is the same as was originally used to train both the model and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
 The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
 We solve this by creating overlapping samples of fixed length within each dataset sample, padding with the padding token when necessary.
 The overlap is to ensure that all tokens are included with some preceding context.
@@ -15,9 +21,9 @@ The overlap is to ensure that all tokens are included with some preceding contex
 For N2G to run on a feature, it needs a set of samples that activate the feature.
 Since the running time scales linearly in the number of samples, we would like to keep this number as low as possible.
 At the same time, what samples N2G is run on has a large impact on the results.
-In the original N2G paper \todo{cite}, maximum activating samples were used.
+In the original N2G paper \parencite{foote_neuron_2023}, maximum activating samples were used.
 However, we found that this leads to many of the samples being very similar which pollutes the test set.
-Because of this and arguments that maximum activating samples can be misleading \todo{cite}, we instead use a weighted random sampling approach.
+Because of this and arguments that maximum activating samples can be misleading \parencite{bolukbasi_interpretability_2021}, we instead use a weighted random sampling approach.
 Like with maximum activating samples we assume that the samples that activate the feature most highly are the most important for understanding the feature, but we do not assume that they are the \emph{only} important samples.
 Inspired by softmax, we assign each sample a weight equal to
 \begin{align*}
@@ -36,12 +42,12 @@ The implementation used for these experiments is available at \todo{path to pyth
 For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
 \section{N2G}
-Our code for training and evaluating N2G models is heavily based on the original implementation \todo{cite code not article}.
+Our code for training and evaluating N2G models is heavily based on the original implementation \parencite{foote_apartresearchneuron2graph_2024}.
 However the original was a single script with no documentation and since we needed to work in depth with the code we have done considerable refactoring work to improve code quality.
-In our fork \todo{link} the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \todo{cite}.
+In our fork, the code is split into many files, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \parencite{marsh_astral-shruff_2024}.
 During this work we found many redundancies, the removal of which has likely sped up the code though we have not done any formal benchmarking.
 We also found that the resulting N2Gs took up much more space than seemed reasonable, both in memory and on disk.
-While the disk usage could be solved by compressing the files (n2g graphs compress very well), this would not solve the memory usage.
+While the disk usage could be solved by compressing the files (N2G graphs compress very well), this would not solve the memory usage.
 Our solution was to create a Rust implementation of the N2Gs.
 While the memory impact is hard to measure, the compressed disk size is not and it fell by a factor of $10$.
 This implementation does not support training, but can be used to evaluate N2Gs and produce the visual graph representations.
@@ -57,18 +63,4 @@ After N2G models have been trained and evaluated for all MLP and SAE features, w
 Our analysis is based on 4 main statistics for each feature: recall, precision, F1-score, and feature density.
 The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of samples that activate the feature.
 To compare these statistics between the two populations, we implement two-sample bootstrap tests.
-
-
-
-
-\begin{itemize}
-    \item Acquire an SAE for a layer of the language model.
-    \item Calculate MAS for the neurons of the layer and features of the SAE.
-    \item Train N2G models for each neuron of the layer and feature of the SAE based on the calculated MAS.
-    \item Evaluate all N2G models.
-    \item Compare performance statistics between the two populations.
-    \begin{itemize}
-        \item Use bootstrap to compare recall, precision, and F1-score.
-    \end{itemize}
-\end{itemize}
-
+\todo{more detail on the bootstrap implementation}

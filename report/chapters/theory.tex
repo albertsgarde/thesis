@@ -1,4 +1,8 @@
+In this chapter we define the terminology used the rest of the report (section \ref{sec:preliminaries}) and present the prior work that serves as a basis for the thesis (section \ref{sec:n2g}).
+We also provide a more in depth overview of the literature on SAEs (section \ref{sec:sae}).
+
 \section{Preliminaries}
+\label{sec:preliminaries}
 Before we can dive into the specifics of the methods used in this thesis, 
 we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
@@ -13,56 +17,12 @@ Next we introduce the unit of interpretability, namely \emph{features}.
 In the most general form, a feature is any function of the activations 
 of a model, but in the context of this thesis we will focus on two 
 specific types.
-These are individual neurons or activations which can be read directly 
-from the model, and neurons in the hidden layer of 
-a sparse autoencoder \parencite{conmy_towards_2023}.
-We will generally refer to these as \emph{neurons} and 
-\emph{features} or \emph{features of an SAE} respectively.
-
-Since we interpret features based on their value on various inputs, 
-it is useful to have notation for this.
-Taking inspiration from \cite{foote_neuron_2023} 
-but diverging significantly, we use the function
-\begin{align*}
-    a\in\mathcal{F}\times\mathcal{T}\times\N\to\R
-\end{align*} 
-where $\mathcal{F}$ is the set of possible features and
-$\mathcal{T}$ is the set of possible token strings.
-$a$ then takes a feature, a token string, and an index, and returns 
-the value of the feature on the token string at the given index.
-For example, if $f$ is the 423rd neuron in the second MLP layer of 
-the \verb|gpt2-small| model, $s$ is the token string 
-\verb="<|BOS|>","The"," quick"," brown"," fox"=
-then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
-"\verb| brown|" when \verb|gpt2-small| processes 
-the string "\verb|The quick brown fox|".
-
-\section{MAS}
-The first method we will use is that of \emph{maximum activating samples}.
-It consists of finding the samples which maximally activate a given feature.
-The hope is that these samples will give us some insight 
-into what the feature is doing.
-Mathematically this can be written as
-\begin{align*}
-    \argmax_{\substack{s\in\mathcal{D}\\ \text{top }k}}\left(\max_{i\leq|s|}\left(a(f,s,i)\right)\right)
-\end{align*}
-for some feature $f\in\mathcal{F}$ 
-and dataset $\mathcal{D}\subseteq\mathcal{T}$.
-This method has faced criticism \cite{bolukbasi_interpretability_2021} 
-and should probably not be used in isolation, but it can be a useful
-starting point for understanding the behaviour of a feature.
-
-Calculation of the maximum activating samples is rather simple.
-Simply iterate over the dataset 
-and for each of the $n$ features of interest 
-keep track of the $k$ samples which maximally activate the feature.
-Here "keep track" means storing the token that causes the activation and 
-surrounding $c$ tokens of context along with the activations on that context.
-This can be done for the entire model with a single pass over the dataset.
-The more of the dataset is used, the "better" the found samples will be, 
-but the computational cost will of course increase linearly.
+The first type is the individual neurons of the model, i.e. the activations which can be read directly from the model, that are actually represented on the GPU during inference.
+The second type is the latent neurons of an SAE (see section \ref{sec:sae}).
+We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{features of an SAE} or just \emph{features}.
 
 \section{Neuron2Graph}
+\label{sec:n2g}
 The second method of interest is the \emph{Neuron2Graph} 
 as described in \cite{foote_neuron_2023}.
 It attempts to build a graph model of the behaviours of a feature 
@@ -113,7 +73,7 @@ given the rest of $s'$ as context.
 All alternative strings that activates $f$ sufficiently are stored.
 
 \subsection{Graph building}
-After performing the $3$ previous steps on all strings in $\mathcal S$, 
+After performing the 3 previous steps on all strings in $\mathcal S$, 
 We have a set $\mathcal S'\subseteq\mathcal T$ 
 of pruned and augmented strings that all activate $f$ highly.
 In order to make predictions we must build a model from these strings.
@@ -145,4 +105,5 @@ We refer to both this representation and the original trie $T$
 as the \emph{feature graph}.
 
 \section{Sparse autoencoders}
+\label{sec:sae}
 \input{chapters/theory/sae.tex}
