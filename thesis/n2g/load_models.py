@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Sequence
 
 import aiofiles
-from n2g import NeuronModel
+from n2g import FeatureModel, NeuronModel, Tokenizer
 
 
 async def read_model(models_path: Path, index: int) -> NeuronModel:
@@ -73,3 +73,9 @@ class N2GModelIter:
 
 def iter_models(models_path: Path, indices: Sequence[int], batch_size: int = 2048) -> N2GModelIter:
     return N2GModelIter(models_path, indices, batch_size)
+
+
+def load_all_models(tokenizer: Tokenizer, models_path: Path) -> list[FeatureModel | None]:
+    with models_path.open("rb") as f:
+        data = f.read()
+        return FeatureModel.list_from_bin(tokenizer, data)
