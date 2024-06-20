@@ -12,6 +12,7 @@ end_index: 18432
 create_dot: false
 create_pkl: false
 create_bin: true
+save_activations: true
 layers:
   - hook_id: blocks.0.mlp.hook_post
     num_features: 2048

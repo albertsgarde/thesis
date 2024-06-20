@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Callable, Tuple
 
 import hydra
+import numpy as np
 import n2g
 import torch
 import transformer_lens  # type: ignore[import]
@@ -38,6 +39,7 @@ class N2GScriptConfig:
     create_dot: bool
     create_pkl: bool
     create_bin: bool
+    save_activations: bool
     params: N2GParams
 
 
@@ -129,7 +131,7 @@ def main(config: N2GScriptConfig) -> None:
 
     stats: list[NeuronStats]
     models: list[NeuronModel]
-    models, stats = n2g.run_layer(
+    models, stats, activations, pred_activations = n2g.run_layer(
         range(config.start_index, config.end_index),
         feature_activation,
         feature_samples,
@@ -192,6 +194,10 @@ def main(config: N2GScriptConfig) -> None:
         )
         with bin_path.open("wb") as write_file:
             write_file.write(all_models_bytes)
+
+    if config.save_activations:
+        activations_path = output_path / "activations.npz"
+        np.savez(activations_path, activations=activations, pred_activations=pred_activations)
 
 
 @hydra.main(config_path="../../conf/n2g", version_base="1.3", config_name="n2g")
