@@ -1,4 +1,4 @@
-\section{Theoretical background}
+\subsection{Theoretical background}
 When interpreting a language model, there is a question of what the unit of interpretability should be.
 What part of the model should we be looking at?
 Mechanistic interpretability aims to understand models as granularly as possible, which makes individual neurons in either the residual stream, MLP layers or attention heads the obvious choice.
@@ -24,7 +24,7 @@ Apart from linearity, one of the main assumptions SAEs make is that features are
 This means that only very few features are present for each input.
 \textcite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
-\section{Sparse autoencoders}
+\subsection{Sparse autoencoders}
 In the context of mechanistic interpretability, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
 Autoencoders are only interesting if the feature space is somehow restricted.
 In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
@@ -42,7 +42,7 @@ We go into detail on some of these variations in \ref{sec:improvements_to_saes}.
 As to why $L^1$ regularization recovers features, \textcite{sharkey_interim_2022} provide empirical evidence while \textcite{wright_high-dimensional_2022} provide theoretical arguments.
 
 
-\section{Improvements to sparse autoencoders}\label{sec:improvements_to_saes}
+\subsection{Improvements to sparse autoencoders}\label{sec:improvements_to_saes}
 Though the performance of SAEs in the original papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} was impressive, there are many ways in which they can be improved.
 \textcite{taggart_prolu_2024} suggest an alternative nonlinearity to the ReLU, which they call the ProLU and is designed to overcome a theoretical weakness in using ReLU for SAEs.
 They show that this improves the $L^1$/MSE Pareto frontier.
@@ -63,14 +63,14 @@ Also, \textcite{riggs_improving_2024} only test their methods on reconstruction 
 
 Luckily, there is work that attempts to compare these methods directly.
 \textcite{gao_scaling_2024} train SAEs with many of the activations suggested above along with introducing a new TopK activation function that only keeps the $k$ largest SAE latents and therefore does not need a sparsity regularization term.
-Their experiments (see section \ref{sec:evaluation}) on GPT-4 \parencite{openai_gpt-4_2024} show that the TopK activation function performs best overall.
+Their experiments (see subsection \ref{sec:evaluation}) on GPT-4 \parencite{openai_gpt-4_2024} show that the TopK activation function performs best overall.
 This result is somewhat supported by \textcite{quaisley_research_2024} which uses the methods of \textcite{huben_research_2024} to find that the a leaky TopK activation function performs best.
 
 
 
-\section{Evaluation}
+\subsection{Evaluation}
 \label{sec:evaluation}
-The last section touched on the issue of evaluating the performance of SAEs.
+The last subsection touched on the issue of evaluating the performance of SAEs.
 This is a difficult problem, partly because we have yet to find a good definition for interpretability, however there are some metrics that are commonly used.
 The choice between them represents a tradeoff between expense and accuracy.
 
@@ -120,7 +120,7 @@ Despite this criticism, more work in the direction of finding more objective, re
 %   Automatic interpretability
 % Finding known features
 
-\section{Applications}
+\subsection{Applications}
 \label{sec:applications}
 While finding interpretable features is interesting in itself, it is not the overall goal of interpretability.
 Luckily there have been many succesful attempts at using SAEs as a part of other methods.
@@ -156,7 +156,7 @@ The reliance on the top 10 features for each head risks running into interpretab
 All these applications suggest that SAEs are indeed useful both for getting a handle on what is happening inside the models and for controlling behaviour.
 However, it remains to be seen whether this works in practice for models of interest.
 
-\section{Criticisms}
+\subsection{Criticisms}
 While SAEs are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
 \textcite{huben_research_2024} train SAEs on OthelloGPT \parencite{li_emergent_2023} to see whether they recover the linear features found by \textcite{neel_nanda_actually_2023}.
 These linear features each represent whether a specific cell has the colour of the current player and so represent the board in a human interpretable way.
@@ -169,7 +169,7 @@ The arguments are partly based on the social media coverage surrounding the pape
 That does not mean that it is not a method that can provide valuable insight, only that once should be wary of updating too forcefully on such possible cherry-picked examples.
 
 Another issue that is often mentioned is the reliance on unproven proxies.
-This is mentioned in many of the papers, especially those mentioned in section \ref{sec:evaluation}, that luckily are taking steps to resolve this issue.
+This is mentioned in many of the papers, especially those mentioned in subsection \ref{sec:evaluation}, that luckily are taking steps to resolve this issue.
 
 As mentioned in \ref{sec:applications}, we have yet to see a concrete example of SAEs being used to solve problems in the real world, though given that the field is still young, this is perhaps to be expected.
 Unfortunately, this is also connected to the issue that much of the important work of applying SAEs to real-world problems will be difficult to contribute to outside of a few large companies.
@@ -177,7 +177,7 @@ This is both due to the fact that only those companies have the resources to tra
 This is mostly a property of the field of modern ML in general, but there may be ways to work around it, like by working on open source models like those in the Llama family \parencite{touvron_llama_nodate} and by finding ways of vastly reducing the resource requirements for training SAEs.
 
 
-\section{Alternatives to sparse autoencoders}\label{sec:alternatives_to_saes}
+\subsection{Alternatives to sparse autoencoders}\label{sec:alternatives_to_saes}
 % The Local Interaction Basis - Identifying Computationally-Relevant and Sparsely Interacting Features in Neural Networks
 % The Singular Value Decompositions of Transformer Weight Matrices are Highly Interpretable
 % Codebook Features - Sparse and Discrete Interpretability for Neural Networks
