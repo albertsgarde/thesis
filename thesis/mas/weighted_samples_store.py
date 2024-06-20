@@ -18,7 +18,7 @@ from .sample_loader import Sample
 class WeightedSamplesStore:
     _rng: Random
 
-    _activation_bins: Float[Tensor, " num_activation_bins-1"]
+    _activation_bins: Float[Tensor, " num_activation_bins+1"]
 
     _feature_samples: Int[Tensor, "num_features num_samples sample_length"]
     _feature_activations: Float[Tensor, "num_features num_samples sample_length"]
@@ -60,7 +60,13 @@ class WeightedSamplesStore:
 
         sample_length = min(sample_length_pre + sample_length_post, context_size)
 
-        self._activation_bins = torch.tensor(activation_bins, device=device.torch())
+        self._activation_bins = torch.concat(
+            [
+                torch.tensor([-float("inf")], device=device.torch()),
+                torch.tensor(activation_bins, device=device.torch()),
+                torch.tensor([float("inf")], device=device.torch()),
+            ]
+        )
 
         self._high_activation_weighting = high_activation_weighting
         self._firing_threshold = firing_threshold
@@ -86,7 +92,7 @@ class WeightedSamplesStore:
         self._feature_sample_keys.fill_(-float("inf"))
 
         self._feature_activation_densities = torch.zeros(
-            size=(num_features, self._activation_bins.shape[0] + 1), dtype=torch.int64, device=device.torch()
+            size=(num_features, self._activation_bins.shape[0] - 1), dtype=torch.int64, device=device.torch()
         )
 
         self._num_samples_added = 0
@@ -236,10 +242,10 @@ class WeightedSamplesStore:
         max_activations, max_activating_indices = activations[overlap : sample.length, :].max(dim=-2)
         max_activating_indices += overlap
 
-        self._feature_activation_densities[
-            torch.arange(self.num_features(), device=self._device.torch()),
-            torch.searchsorted(self._activation_bins, max_activations),
-        ] += 1
+        bin_mask = (self._activation_bins[None, None, :-1] <= activations[:, :, None]) & (
+            self._activation_bins[None, None, 1:] > activations[:, :, None]
+        )
+        self._feature_activation_densities += bin_mask.sum(dim=0).sum(dim=0)
 
         # Find the starting index for the MAS sample for each feature.
         # The sample should start at the maximum activating index minus the pre sample length.

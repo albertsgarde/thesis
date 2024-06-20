@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Callable, Tuple
 
 import hydra
-import numpy as np
 import n2g
+import numpy as np
 import torch
 import transformer_lens  # type: ignore[import]
 from beartype import beartype
