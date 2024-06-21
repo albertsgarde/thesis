@@ -242,11 +242,6 @@ class WeightedSamplesStore:
         max_activations, max_activating_indices = activations[overlap : sample.length, :].max(dim=-2)
         max_activating_indices += overlap
 
-        bin_mask = (self._activation_bins[None, None, :-1] <= activations[:, :, None]) & (
-            self._activation_bins[None, None, 1:] > activations[:, :, None]
-        )
-        self._feature_activation_densities += bin_mask.sum(dim=0).sum(dim=0)
-
         # Find the starting index for the MAS sample for each feature.
         # The sample should start at the maximum activating index minus the pre sample length.
         # However, this is sometimes not possible, either because the index would be negative or
@@ -285,6 +280,15 @@ class WeightedSamplesStore:
 
         assert sample_activations.isnan().count_nonzero() == 0, "NaN activations found"
         assert sample_activations.isinf().count_nonzero() == 0, "Infinite activations found"
+
+        bin_mask = (self._activation_bins[None, None, :-1] <= sample_activations[:, :, None]) & (
+            self._activation_bins[None, None, 1:] > sample_activations[:, :, None]
+        )
+        self._feature_activation_densities += bin_mask.sum(dim=1)
+        assert (
+            self._feature_activation_densities.sum()
+            == (self.num_samples_added() + 1) * self.num_features() * self.sample_length()
+        ), "All samples should be added"
 
         # Calculate the key for the sample for each feature.
         r: float = self._rng.uniform(0, 1)
