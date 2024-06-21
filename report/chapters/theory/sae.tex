@@ -30,7 +30,7 @@ Autoencoders are only interesting if the feature space is somehow restricted.
 In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \parencite{cunningham_sparse_2023}.
 The loss function is the sum of mean squared error between the input and the output and the $L^1$ regularization mentioned above.
-Formally this can be written as
+Illustration is available in figure \ref{fig:cunningham_sae_illustration} and formally this can be written as
 \begin{align*}
     \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
     \hat{\vec x}=&\mat W_d\vec y\\
@@ -41,6 +41,13 @@ There are many variations to this, including in the seminal work \textcite{brick
 We go into detail on some of these variations in \ref{sec:improvements_to_saes}.
 As to why $L^1$ regularization recovers features, \textcite{sharkey_interim_2022} provide empirical evidence while \textcite{wright_high-dimensional_2022} provide theoretical arguments.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/cunningham_sae_illustration.png}
+    \caption{Borrowed from \textcite{cunningham_sparse_2023}. 
+    Figure showing the structure of a SAE and its place in a language model.}
+    \label{fig:cunningham_sae_illustration}
+\end{figure}
 
 \subsection{Improvements to sparse autoencoders}\label{sec:improvements_to_saes}
 Though the performance of SAEs in the original papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} was impressive, there are many ways in which they can be improved.
