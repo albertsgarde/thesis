@@ -24,7 +24,7 @@ This mainly confirms what we have already seen.
     \input{images/figures/distribution_table.tex}
     \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
     \label{tab:distributions}
-    \end{table}
+\end{table}
 
 \begin{figure}[h]
     \centering
@@ -84,39 +84,6 @@ This mainly confirms what we have already seen.
     
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/figures/density_mlp.pdf}
-        \caption{MLP Feature Densities}
-        \label{fig:density_mlp}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_sae.pdf}
-        \caption{SAE Feature Densities}
-        \label{fig:density_sae}
-    \end{subfigure}
-    
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_mlp_good.pdf}
-        \caption{MLP Feature Densities (F1 >= 0.5)}
-        \label{fig:density_mlp_good}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_sae_good.pdf}
-        \caption{SAE Feature Densities (F1 >= 0.5)}
-        \label{fig:density_sae_good}
-    \end{subfigure}
-    
-    \caption{Histograms of feature densities. The lower two plots only include features with an F1-score about 0.5 Only includes features with a non-nan F1-score and a nonzero density.}
-    \label{fig:density}
-\end{figure}
-
-\begin{figure}[h]
-    \centering
-    
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
         \includegraphics[width=\textwidth]{images/figures/density_f1_mlp.pdf}
         \caption{Density vs F1 for MLP}
         \label{fig:density_f1_mlp}
@@ -127,7 +94,6 @@ This mainly confirms what we have already seen.
         \caption{Density vs F1 for SAE}
         \label{fig:density_f1_sae}
     \end{subfigure}
-    
     
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
@@ -145,3 +111,10 @@ This mainly confirms what we have already seen.
     \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE latents more visible. Only includes features with a non-nan F1-score and a nonzero density.}
     \label{fig:density_f1}
 \end{figure}
+
+\begin{table}[]
+    \centering
+    \input{images/figures/direction_table.tex}
+    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
+    \label{tab:directions}
+\end{table}
