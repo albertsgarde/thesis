@@ -3,26 +3,12 @@ As described in section \ref{sec:preliminaries}, features are functions of the l
 In the following, we look at two sets of features: MLP neurons and SAE latents.
 We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
 
-We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
-For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of samples does its activation exceed some threshold.
-Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations.
-A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
-This is also indicated by the figures, but more interesting is that while the statistics for MLP neurons are roughly unimodal, the statistics for SAE latents are bimodal.
-There seems to be a cluster of high-scoring features in the SAE population that is not present in the MLP population.
-Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
 
-An interesting question is whether the performance of the N2G model is related to the density of the feature.
-Figure \ref{fig:density} shows the distribution of feature densities across the two populations, first for all features and then for only features with an F1-score above 0.5.
-Interestingly, the high density features of the SAE almost disappear when only considering high-scoring features, which indicates that these are hard to interpret.
-Instead we get that the high-scoring SAE features are of lower density, around $10^{-2}$.
-
-Lastly, figure \ref{fig:density_f1} shows the relationship between density and F1-score for the two populations.
-This mainly confirms what we have already seen.
 
 \begin{table}[]
     \centering
     \input{images/figures/distribution_table.tex}
-    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
+    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means for all statistics are different with $p<0.0001$.}
     \label{tab:distributions}
 \end{table}
 
@@ -55,9 +41,20 @@ This mainly confirms what we have already seen.
         \label{fig:distributions_log_density}
     \end{subfigure}
     
-    \caption{Distributions of our statistics across the two populations. Only includes features with a non-nan F1-score and a nonzero density.}
+    \caption{Distributions of our statistics across the two populations. 
+    Density is calculated with a activation threshold of $0.6$. Since for some of the features the N2G model never predicts an activation, the precision and F1 is sometimes undefined. A value of NaN is used to indicate this.}
     \label{fig:distributions}
 \end{figure}
+
+\section{N2G Performance}
+We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
+For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
+Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
+A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
+More interesting is what the plots show about the nature of this distribution difference.
+Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the SAE population has a second mode at almost $1$.
+This indicates that while most SAE latents are as badly modelled by N2G as the MLP neurons, there is a cluster of SAE latents that are modelled almost perfectly.
+Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
 
 \begin{figure}[h]
     \centering
@@ -79,42 +76,59 @@ This mainly confirms what we have already seen.
     \label{fig:recall_precision}
 \end{figure}
 
+\section{Density and performance}
+Density also has a bimodal distribution for SAEs, though here neither mode lines up well with the MLP distribution.
+This begs the question of whether the modes of the performance metric distributions are related to the modes of the density distribution.
+To investigate this, we can look at figure \ref{fig:density_f1_cluster_check}.
+Figure \ref{fig:density_f1} shows that while some features with poorly performing N2G models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
+Likewise, figure \ref{fig:f1_density} shows that while low density features are spread over much of the N2G performance spectrum, the dense features are almost entirely located in the low performing cluster.
+Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by N2G.
+In other words, the high F1 cluster is a subset of the low density cluster.
+This is backed up by the \texttt{N} column of \ref{tab:directions} which confirms that almost all high F1 features are low density.
+
 \begin{figure}[h]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp.pdf}
-        \caption{Density vs F1 for MLP}
-        \label{fig:density_f1_mlp}
+        \includegraphics[width=\textwidth]{images/figures/density_f1.pdf}
+        \caption{Density in each F1 cluster}
+        \label{fig:density_f1}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_sae.pdf}
-        \caption{Density vs F1 for SAE}
-        \label{fig:density_f1_sae}
+        \includegraphics[width=\textwidth]{images/figures/f1_density.pdf}
+        \caption{F1 in each density cluster}
+        \label{fig:f1_density}
     \end{subfigure}
     
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp_good.pdf}
-        \caption{Density vs F1 for MLP (F1 >= 0.5)}
-        \label{fig:density_f1_mlp_good}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_sae_good.pdf}
-        \caption{Density vs F1 for SAE (F1 >= 0.5)}
-        \label{fig:density_f1_sae_good}
-    \end{subfigure}
-    
-    \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE latents more visible. Only includes features with a non-nan F1-score and a nonzero density.}
-    \label{fig:density_f1}
+    \caption{The relationship between density and F1-score for SAE features.
+    Each plot splits the features into clusters based on one metric and shows the distribution of the other within each cluster.
+    The cluster boundaries are chosen based on figure \ref{fig:distributions_f1} and \ref{fig:distributions_log_density}.}
+    \label{fig:density_f1_cluster_check}
 \end{figure}
+
+\section{Feature directions}
+We have shown a strong relationship between density and N2G performance.
+Both of these are empirical measures of the behaviour of the feature on a dataset.
+This raises a question of whether these clusters are also meaningful directly in terms of the feature directions (\autoref{sec:feature_directions})?
+It turns out the answer is yes.
+Specifically, it turns out that features in the high density cluster all represent directions that are very similar, i.e. they all point in the same direction.
+This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and the mean distance of a direction in the normalized cluster to the mean direction of that cluster is $0.15$.
+Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a mean distance to mean direction of at least $0.99$.
+Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
+The high density cluster is characterized by all features pointing in the same direction, while the low density, high F1 cluster is characterized by a spread of directions.
 
 \begin{table}[]
     \centering
     \input{images/figures/direction_table.tex}
-    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
+    \caption{Results of statistical analysis on the directions (see \autoref{sec:feature_directions}) of various feature clusters.
+    The clusters are the same as those used in previous figures (log density threshold is $-1.2$ and F1 threshold is $0.5$), except the random cluster which is a set of directions randomly generated according to the standard $2048$-dimensional normal distribution.
+    \texttt N is the number of features in the cluster.
+    \texttt{Cos sim.} is the mean cosine similiarity between pairs of directions in the cluster.
+    \texttt{PCA} is the variance explained by the first 16 principal components.
+    \texttt{Mean dist.} is the mean distance between directions in the cluster to the mean cluster direction.
+    \texttt{PCA} and \texttt{Mean dist.} are split into raw and normalized, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
+    }
     \label{tab:directions}
 \end{table}
