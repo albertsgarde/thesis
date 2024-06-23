@@ -33,7 +33,7 @@ The loss function is the sum of mean squared error between the input and the out
 Illustration is available in figure \ref{fig:cunningham_sae_illustration} and formally this can be written as
 \begin{align*}
     \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
-    \hat{\vec x}=&\mat W_d\vec y\\
+    \hat{\vec x}=&\mat W_d\vec y \numberthis{eq:sae_structure}\\
     \mathcal L(\vec x)=&\norm{\vec x-\hat{\vec x}}_2^2+\alpha\norm{\vec y}_1
 \end{align*}
 where $\mat W_e\in\R^{d\times n}$, $\mat W_d\in\R^{n\times d}$ and $\vec b\in\R^d$ are the parameters of the model and $\alpha\in\R^+$ is a hyperparameter controlling the sparsity of the feature representation.
@@ -45,7 +45,11 @@ As to why $L^1$ regularization recovers features, \textcite{sharkey_interim_2022
     \centering
     \includegraphics[width=\textwidth]{images/cunningham_sae_illustration.png}
     \caption{Borrowed from \textcite{cunningham_sparse_2023}. 
-    Figure showing the structure of a SAE and its place in a language model.}
+    Figure showing the structure of a SAE and its place in a language model.
+    The left part of the figure shows how the input of the SAE is the activations of the language model.
+    The middle part illustrates the structure of an SAE in the same way as equation \ref{eq:sae_structure}.
+    $\mat W_e$ is the encoder matrix, $\mat W_d$ is the decoder matrix, $\vec b$ is the bias vector, $\vec x$ is the activation vector, and $\hat{\vec x}$ is the reconstructed activation vector and $\vec y$ is the sparse feature coefficients (latents).
+    }
     \label{fig:cunningham_sae_illustration}
 \end{figure}
 
