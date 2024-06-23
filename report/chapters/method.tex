@@ -63,13 +63,17 @@ These predictions can then be compared to the actual activations of the feature 
 \section{Analysis}
 After N2G models have been trained and evaluated for all MLP and SAE features, we can compare the two populations.
 Our analysis is based on 4 main statistics for each feature: recall, precision, F1-score, and feature density.
-The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of samples that activate the feature.
+The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of tokens that activate the feature.
 To compare these statistics between the two populations, we implement two-sample bootstrap tests.
+For SAE latents, along with these statistical representations of the behaviour of features on a dataset, we also look at the directions in MLP activation space these features represent.
+These directions can be read directly from the encoding matrix of the SAE ($\mat W_e$ in \autoref{eq:sae_structure}).
+We define a number of ad-hoc clusters based and compare the directions in these clusters using intra-cluster cosine similarity and distance to mean direction.
 
 \subsection{Density}
 \label{sec:density}
-\todo{define density}
-
-\subsection{Feature directions}
-\label{sec:feature_directions}
-\todo{define feature directions}
+To calculate density, we first define a threshold for what counts as an "activating" feature.
+In this work, we choose a threshold of $0.6$.
+This is somewhat arbitrary, but seems like a good balance between including high activations and excluding noise.
+Experiments with other thresholds such as $0.2$ showed that the results were not particularly sensitive to the choice of threshold.
+After defining a threshold, we run the language model on the dataset and count the number of tokens where each feature has an activation above the threshold.
+The density of a feature is then the number of such tokens divided by the total number of tokens in the dataset.
