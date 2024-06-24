@@ -1,14 +1,21 @@
-First a note on terminology, since it can be confusing.
+In this chapter we present the results of our experiments.
+We start by investigating the performance of N2G on the two populations of features: MLP neurons and SAE latents.
+We then look at the relationship between feature density and N2G performance.
+Finally, we investigate the relationship between feature directions and the clusters we have identified.
+In all cases, we focus on the direct results of our experiments and do not attempt to draw any broader conclusions.
+This we leave for the discussion in \autoref{sec:discussion}
+
+First, a quick note on terminology, since it can be confusing.
 As described in section \ref{sec:preliminaries}, features are functions of the language models activations.
 In the following, we look at two sets of features: MLP neurons and SAE latents.
 We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
 
 
 
-\begin{table}[]
+\begin{table}[h]
     \centering
     \input{images/figures/distribution_table.tex}
-    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means for all statistics are different with $p<0.0001$.}
+    \caption{Means and standard deviations for the statistics (N2G performance and feature density) of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means for all statistics are different with $p<0.0001$.}
     \label{tab:distributions}
 \end{table}
 
@@ -111,24 +118,26 @@ This is backed up by the \texttt{N} column of \ref{tab:directions} which confirm
 \section{Feature directions}
 We have shown a strong relationship between density and N2G performance.
 Both of these are empirical measures of the behaviour of the feature on a dataset.
-This raises a question of whether these clusters are also meaningful directly in terms of the feature directions (\autoref{sec:feature_directions})?
+This raises a question of whether these clusters are also meaningful directly in terms of the feature directions read directly from the $\mat W_e$ encoding matrix in the SAE?
 It turns out the answer is yes.
 Specifically, it turns out that features in the high density cluster all represent directions that are very similar, i.e. they all point in the same direction.
-This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and the mean distance of a direction in the normalized cluster to the mean direction of that cluster is $0.15$.
-Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a mean distance to mean direction of at least $0.99$.
+This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and a variance of $0.04$.
+Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a variance of at least $0.98$.
+The variance of the raw low density feature directions implies that though the vectors point in roughly the same direction, they still vary significantly in magnitude.
+
 Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
 The high density cluster is characterized by all features pointing in the same direction, while the low density, high F1 cluster is characterized by a spread of directions.
 
-\begin{table}[]
+\begin{table}[h]
     \centering
     \input{images/figures/direction_table.tex}
-    \caption{Results of statistical analysis on the directions (see \autoref{sec:feature_directions}) of various feature clusters.
+    \caption{Results of statistical analysis on the directions of various feature clusters.
     The clusters are the same as those used in previous figures (log density threshold is $-1.2$ and F1 threshold is $0.5$), except the random cluster which is a set of directions randomly generated according to the standard $2048$-dimensional normal distribution.
     \texttt N is the number of features in the cluster.
     \texttt{Cos sim.} is the mean cosine similiarity between pairs of directions in the cluster.
     \texttt{PCA} is the variance explained by the first 16 principal components.
-    \texttt{Mean dist.} is the mean distance between directions in the cluster to the mean cluster direction.
-    \texttt{PCA} and \texttt{Mean dist.} are split into raw and normalized, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
+    \texttt{Variance} trace of the covariance matrix.
+    \texttt{PCA} and \texttt{Variance} are split into raw and normalized, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
     }
     \label{tab:directions}
 \end{table}
