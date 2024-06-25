@@ -123,7 +123,9 @@ It turns out the answer is yes.
 Specifically, it turns out that features in the high density cluster all represent directions that are very similar, i.e. they all point in the same direction.
 This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and a variance of $0.04$.
 Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a variance of at least $0.98$.
-The variance of the raw low density feature directions implies that though the vectors point in roughly the same direction, they still vary significantly in magnitude.
+This is further confirmed when looking at the highly activating samples for the high density cluster, 10 of which can be seen at \footnote{\url{https://www.student.dtu.dk/~s183969/thesis/features/}}.
+E.g, of the first 10 dense features, 6 have the same top activating sample.
+The variance of the raw high density feature directions implies that though the vectors point in roughly the same direction, they still vary significantly in magnitude.
 
 Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
 The high density cluster is characterized by all features pointing in the same direction, while the low density, high F1 cluster is characterized by a spread of directions.

@@ -1,4 +1,25 @@
 \section{Results}
+In the previous section, we showed four properties of features in a \texttt{gelu-1l} SAE: 
+\begin{enumerate}[ref={observation~\arabic*}]
+    \item The performance of N2G on SAE latents is significantly better than on MLP neurons.\label{obs:n2g_performance}
+    \item The distribution of both N2G performance and feature density is bimodal with the high performance cluster being a subset of the low density cluster.\label{obs:bimodal}
+    \item The directions in MLP space represented by the high density features are very similar.\label{obs:directions}
+\end{enumerate}
+I has been argued \parencite{gao_scaling_2024} \todo{Add link to discussion of this in methods section} that the performance of N2G on a feature is an indicator of the interpretability of that feature.
+In that case, \ref{obs:n2g_performance} is in line with the core property of SAEs, namely that their features are more interpretable than MLP neurons \parencite{cunningham_sparse_2023}\parencite{bricken_towards_2023}.
+
+\textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of SAE latents based on their density.
+Specifically they find an "ultra low density cluster" and a "high density cluster" (we will call the "high density cluster" the "mid density cluster").
+They also find that the high density cluster is more interpretable than the ultra low density cluster with the latter being almost entirely uninterpretable.
+This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our clusters are the other way round.
+We also have a "mid density cluster" with many interpretable features, but our cluster with uninterpretable features is instead characterized by very high density.
+Where this difference comes from is unclear, especially since it is so large.
+The obvious explanation is that either the model, SAE or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
+This only leaves the experiment and data analysis.
+One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
+This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find a high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
+
+
 \begin{itemize}
     \item No ultra low density cluster. This is especially weird since the SAE should be roughly the one used in Neel Nanda's replication.
     \item Instead we have an ultra high density cluster.
@@ -6,8 +27,13 @@
 \end{itemize}
 
 \section{Methods}
+
 \begin{itemize}
     \item N2G is purely syntactical, though this can represent other stuff.
+    \item Argue that features modellable by N2G are more interpretable. From OpenAI's scaling paper: "Results for GPT-2 small are found in Figure 25a and 25b. Note that dense token patterns are trivial to
+    explain, thus n = 2048, k = 512 latents are easy to explain on average since many latents activate
+    extremely densely (see Section E.5)14. In general, autoencoders with more total latents and fewer
+    active latents are easiest to model with N2G."
     \item OpenAI also use N2G
     \item Alternative method would be the othello gpt one
     \item Maybe could have used tinystories?
