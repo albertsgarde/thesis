@@ -43,7 +43,7 @@ There are many variations to this, including in the seminal work \textcite{brick
 We go into detail on some of these variations in \ref{sec:improvements_to_saes}.
 As to why $L^1$ regularization recovers features, \textcite{sharkey_interim_2022} provide empirical evidence while \textcite{wright_high-dimensional_2022} provide theoretical arguments.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{images/cunningham_sae_illustration.png}
     \caption{Borrowed from \textcite{cunningham_sparse_2023}. 
@@ -106,7 +106,7 @@ How well the language model can predict the activations is then used as a measur
 As a measure of interpretability, it takes the quality of the LM's interpretation of the feature as a proxy of how interpretable the feature is to a human.
 While being far cheaper than human evaluation, it is still expensive since it generally requires advanced language models for useful results.
 
-A novel approach to evaluating features is presented by \textcite{makelov_towards_2024} (followup at \textcite{makelov_saes_2024}).
+A novel approach to evaluating features is presented by \textcite{makelov_towards_2024} (followup at \textcite{makelov_saes_2023}).
 It suggests methods not only for evaluating the interpretability of features, but also how well they represent important parts of the model, irrespective of human interpretability.
 To do this they attach attributes to samples and use these to create supervised feature dictionaries.
 These are then used to benchmark unsupervised feature dictionaries, like SAEs.
