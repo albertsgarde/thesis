@@ -12,14 +12,14 @@ We use "features" to refer to the union of the two sets while "neurons" and "lat
 
 
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \input{images/figures/distribution_table.tex}
     \caption{Means and standard deviations for the statistics (N2G performance and feature density) of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means for all statistics are different with $p<0.0001$.}
     \label{tab:distributions}
 \end{table}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
@@ -56,14 +56,14 @@ We use "features" to refer to the union of the two sets while "neurons" and "lat
 \section{N2G Performance}
 We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
 For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
-Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
+\autoref{tab:distributions} and \autoref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
 A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
 More interesting is what the plots show about the nature of this distribution difference.
 Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the SAE population has a second mode at almost $1$.
 This indicates that while most SAE latents are as badly modelled by N2G as the MLP neurons, there is a cluster of SAE latents that are modelled almost perfectly.
-Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
+\autoref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
@@ -86,14 +86,14 @@ Figure \ref{fig:recall_precision} confirms this by showing that there is a set o
 \section{Density and performance}
 Density also has a bimodal distribution for SAEs, though here neither mode lines up well with the MLP distribution.
 This begs the question of whether the modes of the performance metric distributions are related to the modes of the density distribution.
-To investigate this, we can look at figure \ref{fig:density_f1_cluster_check}.
-Figure \ref{fig:density_f1} shows that while some features with poorly performing N2G models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
-Likewise, figure \ref{fig:f1_density} shows that while low density features are spread over much of the N2G performance spectrum, the dense features are almost entirely located in the low performing cluster.
+To investigate this, we can look at \autoref{fig:density_f1_cluster_check}.
+\autoref{fig:density_f1} shows that while some features with poorly performing N2G models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
+Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the N2G performance spectrum, the dense features are almost entirely located in the low performing cluster.
 Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by N2G.
 In other words, the high F1 cluster is a subset of the low density cluster.
-This is backed up by the \texttt{N} column of \ref{tab:directions} which confirms that almost all high F1 features are low density.
+This is backed up by the \texttt{N} column of \autoref{tab:directions} which confirms that almost all high F1 features are low density.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
@@ -130,7 +130,7 @@ The variance of the raw high density feature directions implies that though the 
 Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
 The high density cluster is characterized by all features pointing in the same direction, while the low density, high F1 cluster is characterized by a spread of directions.
 
-\begin{table}[h]
+\begin{table}[ht]
     \centering
     \input{images/figures/direction_table.tex}
     \caption{Results of statistical analysis on the directions of various feature clusters.
