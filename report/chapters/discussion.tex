@@ -5,8 +5,9 @@ In the previous section, we showed four properties of features in a \texttt{gelu
     \item The distribution of both N2G performance and feature density is bimodal with the high performance cluster being a subset of the low density cluster.\label{obs:bimodal}
     \item The directions in MLP space represented by the high density features are very similar.\label{obs:directions}
 \end{enumerate}
-I has been argued \parencite{gao_scaling_2024} \todo{Add link to discussion of this in methods section} that the performance of N2G on a feature is an indicator of the interpretability of that feature.
-In that case, \ref{obs:n2g_performance} is in line with the core property of SAEs, namely that their features are more interpretable than MLP neurons \parencite{cunningham_sparse_2023}\parencite{bricken_towards_2023}.
+Viewing the performance of N2G as a measure of interpretability, \ref{obs:n2g_performance} suggests that SAE latents are more interpretable than MLP neurons.
+This replicates the findings of both original SAE papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
+We discuss the merits of N2G as an interpretability measurement in \autoref{sec:n2g_interpretability} and it is also used as such \textcite{gao_scaling_2024}.
 
 \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of SAE latents based on their density.
 Specifically they find an "ultra low density cluster" and a "high density cluster" (we will call the "high density cluster" the "mid density cluster").
@@ -18,15 +19,32 @@ The obvious explanation is that either the model, SAE or dataset is different, b
 This only leaves the experiment and data analysis.
 One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
 This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find a high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
+Overall the discrepancy remains a mystery.
 
+Our \ref{obs:directions} matches the result in \textcite{nanda_open_2023} that the encoder directions of features in the uninterpretable cluster are very similar.
+\todo{Not done}
 
-\begin{itemize}
-    \item No ultra low density cluster. This is especially weird since the SAE should be roughly the one used in Neel Nanda's replication.
-    \item Instead we have an ultra high density cluster.
-    \item In general the results are more different from Neel Nanda's replication that we expect. This may in part be because of the different dataset used. He hasn't uploaded the entire dataset, only part.
-\end{itemize}
 
 \section{Methods}
+\subsection{N2G as a measure of interpretability}
+\label{sec:n2g_interpretability}
+Our conclusions are based on a measure of interpretability that is not widely used in the literature, namely N2G.
+This potentially has a large effect on our results.
+The main reason for using N2G is that it is far cheaper than the more poweful interpretability measurements like automated interpretability with LLMs or human evaluation.
+This was crucial for us since we do not have the resources of e.g. Anthropic, but as SAEs are scaled to larger sizes, finding cheaper interpretability measures becomes more important.
+Indeed, while we were doing this work, \textcite{gao_scaling_2024} published a paper on scaling SAEs where they used N2G as a measure of interpretability for their 16 million latent SAE.
+This does not mean that N2G is without faults.
+First of all, the N2G interpretation of each feature is based on a set of text samples.
+Though it performs some augmentation of these samples to explore the sample space more, the result is still heavily dependent on the samples chosen and can easily miss aspects of behaviour not present in them.
+This can be mitigated by improving the method of choosing samples, as we have attempted to do here, and by increasing the number of samples.
+However, the compute cost of N2G scales linearly with the number of samples, so eventually, this removes the cost advantage of N2G.
+A second issue is that N2G is purely syntactical.
+While any semantic pattern can be represented by a sufficiently complex syntactical pattern, it is not clear how well N2G can capture these patterns.
+This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which shows that performance of N2G falls in the later layers of the model.
+This is consistent with later layers representing more abstract and semantic features which are difficult for N2G's purely syntactical approach to capture.
+Given this, it seems natural to think that N2G would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
+Testing this and how N2G relates to other measures of interpretability is an interesting avenue for further research.
+
 
 \begin{itemize}
     \item N2G is purely syntactical, though this can represent other stuff.
@@ -39,3 +57,5 @@ This could explain why we find a slightly lower density for the interpretable cl
     \item Maybe could have used tinystories?
     \item 
 \end{itemize}
+
+\section{Further work}
