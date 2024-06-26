@@ -25,7 +25,9 @@ This means that only very few features are present for each input.
 \textcite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \subsection{Sparse autoencoders}
-In the context of mechanistic interpretability, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
+Sparse coding has been an active area of research for at least 30 years, especially in relation to biological mammalian neurons responsible for vision \parencite{olshausen_sparse_1997}\parencite{lee_efficient_2006}.
+This long-standing research provides a foundation for the use of sparse autoencoders in the context of mechanistic interpretability.
+In this context, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
 Autoencoders are only interesting if the feature space is somehow restricted.
 In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \parencite{cunningham_sparse_2023}.
