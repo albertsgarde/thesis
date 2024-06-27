@@ -3,26 +3,29 @@ In the previous section, we showed four properties of features in a \texttt{gelu
 \begin{enumerate}[ref={observation~\arabic*}]
     \item The performance of N2G on SAE latents is significantly better than on MLP neurons.\label{obs:n2g_performance}
     \item The distribution of both N2G performance and feature density is bimodal with the high performance cluster being a subset of the low density cluster.\label{obs:bimodal}
-    \item The directions in MLP space represented by the high density features are very similar.\label{obs:directions}
+    \item The directions in MLP space represented by the high density features are very similar, while the the directions of the other clusters much closer to orthogonal.\label{obs:directions}
 \end{enumerate}
 Viewing the performance of N2G as a measure of interpretability, \ref{obs:n2g_performance} suggests that SAE latents are more interpretable than MLP neurons.
 This replicates the findings of both original SAE papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
 We discuss the merits of N2G as an interpretability measurement in \autoref{sec:n2g_interpretability} and it is also used as such \textcite{gao_scaling_2024}.
 
 \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of SAE latents based on their density.
-Specifically they find an "ultra low density cluster" and a "high density cluster" (we will call the "high density cluster" the "mid density cluster").
+Specifically they find a cluster of features with density around $-3$ (roughly matching our low density cluster) and an "ultra low density cluster" with density at or below $-6$.
 They also find that the high density cluster is more interpretable than the ultra low density cluster with the latter being almost entirely uninterpretable.
-This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our clusters are the other way round.
+This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our extreme density cluster is on the other side.
 We also have a "mid density cluster" with many interpretable features, but our cluster with uninterpretable features is instead characterized by very high density.
 Where this difference comes from is unclear, especially since it is so large.
 The obvious explanation is that either the model, SAE or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
 This only leaves the experiment and data analysis.
 One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
-This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find a high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
+This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find an ultra high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
 Overall the discrepancy remains a mystery.
 
 Our \ref{obs:directions} matches the result in \textcite{nanda_open_2023} that the encoder directions of features in the uninterpretable cluster are very similar.
-\todo{Not done}
+The results of the other clusters are more difficult to interpret.
+With a cosine similarity no higher than $1.9\%$ and variance no less than $0.98$, the other cluster directions are far more distributed than the high density cluster, they are much more similar than even randomly generated directions.
+A more thorough investigation is needed to understand the implications of this.
+
 
 
 \section{Methods}
@@ -45,19 +48,6 @@ This is consistent with later layers representing more abstract and semantic fea
 Given this, it seems natural to think that N2G would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
 Testing this and how N2G relates to other measures of interpretability is an interesting avenue for further research.
 
-
-\begin{itemize}
-    \item N2G is purely syntactical, though this can represent other stuff.
-    \item Argue that features modellable by N2G are more interpretable. From OpenAI's scaling paper: "Results for GPT-2 small are found in Figure 25a and 25b. Note that dense token patterns are trivial to
-    explain, thus n = 2048, k = 512 latents are easy to explain on average since many latents activate
-    extremely densely (see Section E.5)14. In general, autoencoders with more total latents and fewer
-    active latents are easiest to model with N2G."
-    \item OpenAI also use N2G
-    \item Alternative method would be the othello gpt one
-    \item Maybe could have used tinystories?
-    \item 
-\end{itemize}
-
 \section{Further work}
 The experiments in this work have focussed on the behaviour of features, i.e. what they activate on.
 It would be interesting to explore whether the results also extend to the effects of the features, i.e. how they affect the SAE and the model.
@@ -70,6 +60,7 @@ The finding that the features of the high density cluster all point in the same 
 Though this was originally discovered right after the publication of the original SAE papers in \textcite{nanda_open_2023}, we have not found any sign of further exploration.
 Therefore, a first step would be to see whether it still holds for modern SAEs and SAEs trained on e.g. the residual stream, since though the overall structure has not changed much, as we saw in \autoref{sec:improvements_to_saes} many details have.
 If it does, potential hypotheses to explore includes those presented in the comments to \textcite{nanda_open_2023}.
+Gaining a greater understanding of this phenomenon could potentially aid in the training of SAEs, since the avoiding dead neurons could save many resources.
 
 Lastly, exploring empirically the arguments made in \autoref{sec:n2g_interpretability} would be a useful avenue of research, since it could help establish N2G as a measure of interpretability.
 Further work in that direction could include investigating how the size of the N2G graph relates to the interpretability of the features.

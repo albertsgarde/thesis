@@ -1,5 +1,27 @@
+
 \begin{itemize}
     \item Replicated the main results of original articles with a new measure of interpretability.
     \item Replicated clusters in SAE latents based on density and interpretability, but found a ultra high density cluster instead of an ultra low density cluster.
     \item Replicated the as yet unexplained fact that the directions of features in the uninterpretable cluster are very similar.
+    \item Failed to conclude anything about the directions of the other clusters.
 \end{itemize}
+
+In this thesis, we have explored several aspects of SAEs as used in the context of interpretability of language models.
+We use a novel measure of interpretability, N2G, to replicate several findings from previous work.
+
+First and foremost, we replicate the finding that SAE latents are more interpretable than MLP neurons.
+This replication lends credence to the robustness of the original findings and suggests that N2G can serve as a viable alternative for assessing the interpretability of SAE latents.
+
+Secondly, our research identified clusters of SAE latents based on their density and interpretability, aligning with previous studies.
+However, a notable divergence from existing literature emerged in our findings: we observed an ultra-high density cluster instead of the previously reported ultra-low density cluster. 
+
+Thirdly, we corroborated the unexplained phenomenon that the directions of the extreme density cluster exhibit remarkable similarity.
+Further work into the causes of this could potentially shed light on the issue of "dead neurons" in SAEs.
+
+Lastly, we observed that these directions were more distributed than those in the high-density cluster, they still demonstrated a degree of similarity that exceeded random chance.
+Unfortunately we did not have time to dive deeper into this, but a more thorough investigation of the direction distribution could provide more conclusive results on whether it is true that nearly orthogonal directions are exploited by language models.
+
+In conclusion, our work has provided further evidence that SAE latents are more interpretable than MLP neurons, has introduced a new methods for measuring interpretability, and replicated several other findings.
+Additionally, several new questions have been raised that could be the subject of future research.
+
+

@@ -136,10 +136,8 @@ The high density cluster is characterized by all features pointing in the same d
     \caption{Results of statistical analysis on the directions of various feature clusters.
     The clusters are the same as those used in previous figures (log density threshold is $-1.2$ and F1 threshold is $0.5$), except the random cluster which is a set of directions randomly generated according to the standard $2048$-dimensional normal distribution.
     \texttt N is the number of features in the cluster.
-    \texttt{Cos sim.} is the mean cosine similiarity between pairs of directions in the cluster.
-    \texttt{PCA} is the variance explained by the first 16 principal components.
-    \texttt{Variance} trace of the covariance matrix.
-    \texttt{PCA} and \texttt{Variance} are split into raw and normalized, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
+    \texttt{Cos sim.} is the mean pairwise cosine similarity of directions in the cluster.
+    \texttt{Variance} is the trace of the covariance matrix and is split into a raw and a normalized column, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
     }
     \label{tab:directions}
 \end{table}

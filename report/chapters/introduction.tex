@@ -15,9 +15,12 @@ In this work, we focus on these along with the N2G (Neuron2Graph) \parencite{foo
 This is an interesting combination, since if SAEs truly do provide more interpretable features and N2G truly does provide a useful representation of feature behaviour, we would expect this to be reflected when comparing N2G graphs for individual neurons against those for SAE latents.
 Indeed, \textcite{gao_scaling_2024} uses N2G to test the interpretability of the latents of their SAEs.
 
-In this work we first provide a review of the literature on SAEs as applied to interpretability of transformer models as well as giving a short description of the N2G method.
+In this work we first provide a review of the literature on SAEs as applied to interpretability of transformer models as well as giving a description of the N2G method.
 The review differs from the reviews mentioned above by focussing exclusively on SAEs and including the most recent work.
 To our knowledge there is no other review that does this.
 This allows us to go into considerable detail, and since the field is so young, it means we can cover essentially all relevant work.
-We then perform/try to answer the question \todo{insert experiment here}.
-
+We then move on to our own experiments, where our main goal is to explore the clusters found in the SAE latents by \textcite{bricken_towards_2023}.
+To do so we use measure the density of both SAE latents and MLP neurons and estimate their interpretability using the proxy of N2G performance.
+However, to start, we replicate the main finding of \textcite{bricken_towards_2023} and \textcite{cunningham_sparse_2023} that the SAE latents are more interpretable than the MLP neurons.
+Finally, we wish to investigate the hypothesis that language models exploit the exponentially many nearly orthogonal directions in the MLP activation space to encode information.
+We do this by looking at the encoding vectors for the SAE latents.
