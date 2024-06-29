@@ -5,8 +5,8 @@
 \input{../setup/statics.tex}
 \input{../setup/pre.sty}
 
-\subtitle{\thesissubtitle}
 \title{\thesistitle}
+\subtitle{\thesissubtitle}
 
 \setdepartment{\thesisdepartment}
 \setcolor{dtured}
@@ -49,11 +49,12 @@
     % Circuits, automated interpretability, 
 \end{frame}
 \note{
-    
+    When I talk about "the original articles", I mean the two articles by Anthropic and Cunningham et el. that introduced SAEs in the context of mech. interp back in October 2023.
 }
 
 \begin{frame}{Goals} % 2 minutes
     \begin{itemize}
+        \item Present existing work on SAEs (only in report)
         \item Confirm that SAE latents are more interpretable with novel interpretability metric (N2G)
         \item Investigate clusters in SAE latents based on N2G, density, and geometry
         \item Investigate the hypothesis that LMs exploit nearly orthogonal directions in MLP neurons
@@ -114,57 +115,204 @@
 
 \section{Method} % 8 minutes
 \begin{frame}{Models and dataset} % 1 minute
-    
+    \begin{itemize}
+        \item Language model: \texttt{gelu-1l}
+        \item Dataset: \texttt{NeelNanda/c4-code-20k}
+        \item SAE: \texttt{NeelNanda/sparse\_autoencoder/25.pt}
+    \end{itemize}
 \end{frame}
 \note{
+    In our experiments we use the same language model, dataset and SAE as in Neel Nanda's replication of the original Anthropic article.
+    The language model is a single layer model.
+    The dataset is a combination of code and text.
 
+    Generalization from small LM and from early SAE.
 }
 
 
 \begin{frame}{Neuron2Graph} % 3 minutes
-    
+    \begin{itemize}
+        \item Code based heavily on original implementation
+        \item Refactored for readability and maintainability
+        \item Original partial implementation in Rust to reduce memory and disk usage
+    \end{itemize}
 \end{frame}
 \note{
-
+    Original code is a rough translation of a Jupyter notebook.
+    It is therefore very difficult to work with.
+    We refactored it into a more maintainable form including a more modular structure and typing.
+    This made our modifications easier to implement and test.
+    Lastly, we also created a partial Rust implementation to reduce memory and disk usage.
+    After training the N2Gs in Python, we convert them to the Rust implementation for storage and analysis.
 }
 
 
-\begin{frame}{Analysis} % 4 minutes
-    
+\begin{frame}{Data sampling} % 3 minutes
+    \begin{itemize}
+        \item N2G originally used maximum activating samples
+        \item We use a weighted random sampling approach
+    \end{itemize}
+    \begin{align*}
+        w=&\e^{\alpha a}\\
+        k=&\xi^{\frac1w}-[a<c]
+    \end{align*}
 \end{frame}
 \note{
+    N2G needs a set of samples that activate the feature.
+    The original paper used maximum activating samples.
+    This caused near-duplicates which contaminated the test set.
+    Also other worries about maximum activating samples.
+    We use a weighted random sampling approach.
 
+    Explain the formulas.
 }
 
 
 \section{Results} % 9 minutes
 \begin{frame}{Interpretability} % 3 minutes
-    
+    \only<1>{
+    \begin{table}[ht]
+        \centering
+        \input{../images/figures/distribution_table.tex}
+    \end{table}
+    }
+    \only<2>{
+    \begin{figure}[ht]
+        \centering
+        
+        \begin{subfigure}[b]{0.37\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_recall.pdf}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.37\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_precision.pdf}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.37\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_f1.pdf}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.37\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_log_density.pdf}
+        \end{subfigure}
+    \end{figure}
+    }
+    \only<3>{
+        \begin{figure}[ht]
+            \centering
+            
+            \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/recall_precision_mlp.pdf}
+                \caption{Recall vs Precision for MLP}
+                \label{fig:recall_precision_mlp}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/recall_precision_sae.pdf}
+                \caption{Recall vs Precision for SAE}
+            \end{subfigure}
+        \end{figure}
+    }
 \end{frame}
 \note{
+    First slide:
+    Table shows performance of N2G models on the two populations along with the feature densities, which we will come back to later.
+    A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
+    More interesting is the nuance in the distributions illustrated by these plots.
 
-}
+    Second slide:
+    Look at performance metrics.
+    Both populations seem to share a mode around 0, but SAE has second mode around 1.
+    Indicates most are badly modelled, but some are very well modelled.
+    To confirm this, we can look at...
+
+    Third slide:
+    We see that the recall and precision modes are generally aligned.
+    }
 
 
 \begin{frame}{Density} % 3 minutes
+    \only<1>{
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}[b]{0.7\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_log_density.pdf}
+        \end{subfigure}
+    \end{figure}
+    }
+    \only<2>{
+        \begin{figure}[ht]
+            \centering
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/distribution_log_density.pdf}
+            \end{subfigure}
+
     
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/density_f1.pdf}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/f1_density.pdf}
+            \end{subfigure}
+        \end{figure}
+    }
 \end{frame}
 \note{
+    Explain density.
 
+    First slide:
+    As we saw before, the density distribution of the SAE features is bimodal, just like for the performance metrics.
+    This raises the question of whether these modes are related.
+    To investigate this, we can look at...
+
+    Second slide:
+    We partition the SAE features first by N2G F1 and then by density.
+    While the low density cluster is not the same as the interpretable cluster, there is a clear relation.
+    Indeed, the interpretable cluster is almost a subset of the low density cluster.
+    In other words, all interpretable features have low density.
 }
 
 
 \begin{frame}{Geometry} % 3 minutes
-    
+    \only<1>{
+        \begin{align*}
+            \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+            \hat{\vec x}=&\mat W_d\vec y
+        \end{align*}
+    }
+    \only<2>{
+        \begin{table}[ht]
+            \centering
+            \input{../images/figures/direction_table.tex}
+        \end{table}
+    }
 \end{frame}
 \note{
+    A last thing we will relate to these clusters is the geometry of the SAE latents.
+    By "geometry", we mean the directions in MLP activation space that the SAE latents represent.
+    Describe direction with reference to algebra.
 
+    Second slide:
+    To investigate these directions, we use cosine similarity and variance.
+    Explain cosine similarity and variance.
+    Explain table.
+    We see that the high density cluster has over half of latents and very high cosine similarity.
+
+    The rest has far lower cosine similarity (less than 1.9\%) but still far more than randomly chosen directions.
 }
 
 
 \section{Discussion} % 12 munutes
 \begin{frame}{Results} % 5 minutes
-    
+    \begin{itemize}
+        \item 
+    \end{itemize}
 \end{frame}
 \note{
 
