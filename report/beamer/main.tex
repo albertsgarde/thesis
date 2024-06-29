@@ -1,6 +1,9 @@
 \documentclass[aspectratio=169,hyperref={pdfpagelabels=false}]{beamer}
+\setbeameroption{show notes}
+
 \input{preamble.tex}
 \input{../setup/statics.tex}
+\input{../setup/pre.sty}
 
 \subtitle{\thesissubtitle}
 \title{\thesistitle}
@@ -18,72 +21,180 @@
 	\tableofcontents
 
 \end{frame}
+\note{
+
+}
+
 
 \section{Introduction} % 8 minutes
 \begin{frame}{Motivation} % 3 minutes
-
+    % Either a graph showing LLM progress or a thematic image
+    % For a graph, the zwi blog post has a good one
 \end{frame}
+\note{
+    LLMs getting powerful.
+
+    Potential danger in several ways.
+
+    Interpretability could be key to controlling and gaining confidence in LLMs.
+
+    Neurons seem uninterpretable.
+
+    Need another unit of interpretation.
+}
 
 \begin{frame}{Related work} % 3 minutes
-
+    % Much work not published in academic journals.
+    % Either on forums (Alignment forum) or in company blogs (OpenAI, Anthropic)
+    % Circuits, automated interpretability, 
 \end{frame}
+\note{
+    
+}
 
-\begin{frame}{Our questions} % 2 minutes
-
+\begin{frame}{Goals} % 2 minutes
+    \begin{itemize}
+        \item Confirm that SAE latents are more interpretable with novel interpretability metric (N2G)
+        \item Investigate clusters in SAE latents based on N2G, density, and geometry
+        \item Investigate the hypothesis that LMs exploit nearly orthogonal directions in MLP neurons
+    \end{itemize}
 \end{frame}
+\note{
+    The metrics we will cluster based on: interpretability (N2G), density, geometry    
+}
 
 \section{Background} % 8 minutes
+% Possibly insert some kind of "preliminaries" slide
 \begin{frame}{Neuron2Graph} % 4 minutes
-
+    \only<1>{
+    \begin{itemize}
+        \item Automated interpretability method
+        \item Models a feature by building a syntactical graph
+    \end{itemize}
+    }
+    \only<2>{
+        \begin{itemize}
+            \item \texttt{"The"," big"," ten"}
+        \end{itemize}
+    }
+    \only<3>{
+        \begin{itemize}
+            \item \texttt{"The"," last"," ten"}
+        \end{itemize}
+    }
+    \includegraphics[height=0.7\textheight]{../images/gpt2-small_2_1817.pdf}
 \end{frame}
+\note{
+    Is an automated interpretability method published last year by Alex Foote.
+    Models a feature by building a syntactical graph based on a set of sample token strings.
+    The point being that this model has an easily interpretable visualisation.
+    Attempts to augment and prune these strings to find the simplest sufficient token patterns that activate the feature.
+    
+    Examples
+}
+
 
 \begin{frame}{Sparse Autoencoders} % 4 minutes
-    
+    \begin{align*}
+        \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+        \hat{\vec x}=&\mat W_d\vec y\\
+        \mathcal L(\vec x)=&\norm{\vec x-\hat{\vec x}}_2^2+\alpha\norm{\vec y}_1
+    \end{align*}
+    \centering
+    \includegraphics[height=0.5\textheight]{../images/cunningham_sae_illustration.png}
 \end{frame}
+\note{
+    Neurons seem to be uninterpretable.
+    Linear representation hypothesis -> We need to find the directions in MLP neuron space that are interpretable.
+    SAEs are a method of doing this.
+    Describe structure (and loss) of SAE with image and equations.
+    Describe how it fits into the model.
+}
+
 
 \section{Method} % 8 minutes
 \begin{frame}{Models and dataset} % 1 minute
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Neuron2Graph} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Analysis} % 4 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \section{Results} % 9 minutes
 \begin{frame}{Interpretability} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Density} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Geometry} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \section{Discussion} % 12 munutes
 \begin{frame}{Results} % 5 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Methods} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 \begin{frame}{Further Work} % 4 minutes
 
 \end{frame}
+\note{
+
+}
+
 
 \section{Conclusion} % 3 minutes
 \begin{frame}{Conclusion} % 3 minutes
     
 \end{frame}
+\note{
+
+}
+
 
 
 
