@@ -3,41 +3,22 @@ We also provide a more in depth overview of the literature on SAEs (section \ref
 
 \section{Preliminaries}
 \label{sec:preliminaries}
-\todo{Rework this section}
 Before we can dive into the specifics of the methods used in this thesis, 
 we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
 transformer language model \parencite{vaswani_attention_2023} 
 which we want to interpret.
-We will refer to this as the \emph{language model}.
-We will also assume that we have a set of text samples 
-which we use to train and test the methods\todo{what methods?}.
-We will refer to these as the \emph{dataset}.
+We will refer to this as the \emph{language model} or abbreviated as the \emph{LM}.
 
 Next we introduce the unit of interpretability, namely \emph{features}. 
-In the most general form, a feature is any function of the activations 
-of a model.
-Taking inspiration from \cite{foote_neuron_2023} 
-we can define a feature as a function
-\begin{align*}
-    a\in\mathcal{F}\times\mathcal{T}\times\N\to\R
-\end{align*} 
-where $\mathcal{F}$ is the set of possible features and
-$\mathcal{T}$ is the set of possible token strings.
-$a$ then takes a feature, a token string, and an index, and returns 
-the value of the feature on the token string at the given index.
-For example, if $f$ is the 423rd neuron in the second MLP layer of 
-the \texttt{gpt2-small} model, $s$ is the token string 
-\texttt{<|BOS|>","The"," quick"," brown"," fox"}
-then $a(f,s,3)$ would be the value of the 423rd neuron on the token 
-\texttt{"brown"} when \texttt{gpt2-small} processes 
-the string "\texttt{The quick brown fox}".
-
-
-but in the context of this thesis we will focus on two 
-specific types.
-The first type is the individual neurons of the model, i.e. the activations which can be read directly from the model, that are actually represented on the GPU during inference.
-The second type is the latent neurons of an SAE (see section \ref{sec:sae}).
+In the technical sense, a feature is any function of the activations 
+of a LM.
+E.g. a neuron in a MLP layer is a feature, where the function is simply the value of that neuron.
+The same holds for neurons in the residual stream or attention heads.
+Indeed, neurons are the basic form of feature and other features are built up from these.
+Especially interesting are features built from linear combinations of neurons.
+In this thesis we will focus on two types of features:
+MLP neurons and a speficic type of linear combination of neurons, namely the latents of SAEs (see section \ref{sec:sae}).
 We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{SAE latents} or just \emph{latents}.
 A core concept in the study of SAEs is \emph{sparsity}, which is a measure of how many of the activations of the SAE latents are zero.
 A set of features (e.g. the latents of an SAE) is sparse if only a small fraction of the activations are non-zero on any given input.
@@ -45,7 +26,7 @@ The transpose of this term is \emph{density}, which describes an individual feat
 A feature is dense if it only activates on a small fraction of the samples in the dataset.
 
 Note that there is some ambiguity in the literature, and in this report, around the term "feature".
-Sometimes it is meant as we describe here, a function of the model's activations, sometimes it is used specifically for what we call SAE latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the model.
+Sometimes it is meant as we describe here, a function of the LM's activations, sometimes it is used specifically for what we call SAE latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the LM.
 This is worth being aware of even though it is generally clear from context what is meant.
 In fact, we use the term in its abstract sense at the begining of section \ref{sec:sae} despite using it in the first sense otherwise.
 
@@ -81,7 +62,7 @@ Here we find the most important tokens in the pruned string $s'$.
 This is done by replacing each token in the pruned string 
 with a padding token and finding the change in activation.
 If the change is large, the token is important.
-How large the change needs to be is another parameter of the model.
+How large the change needs to be is another parameter of the LM.
 Once this step is done, we have a set $B$ of important tokens in $s'$.
 
 \subsection{Augmentation}
@@ -91,8 +72,8 @@ that activate $f$ similarly to $s'$.
 To do this, we replace each $b\in B$ with other "similar" tokens and 
 see whether the resulting string activates $f$ sufficiently.
 What counts as sufficient is yet another parameter, 
-while "similar" tokens are found using a helper model 
-(\texttt{distilbert-base-uncased} in the original paper) 
+while "similar" tokens are found using a helper LM 
+(\texttt{distilbert-base-uncased} in the original paper and in our experiments) 
 that is asked to predict replacements for $b$ 
 given the rest of $s'$ as context.
 All alternative strings that activates $f$ sufficiently are stored.

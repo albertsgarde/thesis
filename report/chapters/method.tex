@@ -13,7 +13,7 @@ Attempts were made to extend the experiments to SAEs on \texttt{gpt2-small}, spe
 \section{Dataset}
 \label{sec:dataset}
 Our experiments require data in the form of a number of samples for each feature.
-The text dataset we use is the same as was originally used to train both the model and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
+The text dataset we use is the same as was originally used to train both the LM and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
 The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
 We solve this by creating overlapping samples of fixed length within each dataset sample, padding with the padding token when necessary.
 The overlap is to ensure that all tokens are included with some preceding context.
@@ -76,5 +76,5 @@ To calculate density, we first define a threshold for what counts as an "activat
 In this work, we choose a threshold of $0.6$.
 This is somewhat arbitrary, but seems like a good balance between including high activations and excluding noise.
 Experiments with other thresholds such as $0.2$ showed that the results were not particularly sensitive to the choice of threshold.
-After defining a threshold, we run the language model on the dataset and count the number of tokens where each feature has an activation above the threshold.
+After defining a threshold, we run the LM on the dataset and count the number of tokens where each feature has an activation above the threshold.
 The density of a feature is then the number of such tokens divided by the total number of tokens in the dataset.

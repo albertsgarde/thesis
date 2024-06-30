@@ -15,7 +15,7 @@ They also find that the high density cluster is more interpretable than the ultr
 This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our extreme density cluster is on the other side.
 We also have a "mid density cluster" with many interpretable features, but our cluster with uninterpretable features is instead characterized by very high density.
 Where this difference comes from is unclear, especially since it is so large.
-The obvious explanation is that either the model, SAE or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
+The obvious explanation is that either the LM, SAE or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
 This only leaves the experiment and data analysis.
 One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
 This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find an ultra high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
@@ -43,18 +43,18 @@ This can be mitigated by improving the method of choosing samples, as we have at
 However, the compute cost of N2G scales linearly with the number of samples, so eventually, this removes the cost advantage of N2G.
 A second issue is that N2G is purely syntactical.
 While any semantic pattern can be represented by a sufficiently complex syntactical pattern, it is not clear how well N2G can capture these patterns.
-This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which shows that performance of N2G falls in the later layers of the model.
+This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which shows that performance of N2G falls in the later layers of the LM.
 This is consistent with later layers representing more abstract and semantic features which are difficult for N2G's purely syntactical approach to capture.
 Given this, it seems natural to think that N2G would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
 Testing this and how N2G relates to other measures of interpretability is an interesting avenue for further research.
 
 \section{Further work}
 The experiments in this work have focussed on the behaviour of features, i.e. what they activate on.
-It would be interesting to explore whether the results also extend to the effects of the features, i.e. how they affect the SAE and the model.
-Specifically whether the clusters found also have meaning in terms of the effect they have on the SAE and model, e.g. how much SAE or model performance drops when the high density cluster is removed or if we retain only the interpretable cluster.
+It would be interesting to explore whether the results also extend to the effects of the features, i.e. how they affect the SAE and the LM.
+Specifically whether the clusters found also have meaning in terms of the effect they have on the SAE and LM, e.g. how much SAE or LM performance drops when the high density cluster is removed or if we retain only the interpretable cluster.
 If performance remains roughly the same when only the interpretable cluster is retained, this implies that while N2G may not model all features well, it does model the important ones.
 More broadly for SAEs it would imply that though many features are uninterpretable, the important ones are interpretable, which would be a strong argument for their usefulness.
-Of course these results would have to be shown to scale to larger models and SAEs.
+Of course these results would have to be shown to scale to larger LMs and SAEs.
 
 The finding that the features of the high density cluster all point in the same direction also seems worth exploring.
 Though this was originally discovered right after the publication of the original SAE papers in \textcite{nanda_open_2023}, we have not found any sign of further exploration.
