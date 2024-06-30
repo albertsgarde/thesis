@@ -66,9 +66,9 @@ After N2G models have been trained and evaluated for all MLP and SAE features, w
 Our analysis is based on 4 main statistics for each feature: recall, precision, F1-score, and feature density.
 The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of tokens that activate the feature.
 To compare these statistics between the two populations, we implement two-sample bootstrap tests.
-For SAE latents, along with these statistical representations of the behaviour of features on a dataset, we also look at the directions in MLP activation space these features represent.
-These directions can be read directly from the encoding matrix of the SAE ($\mat W_e$ in \autoref{eq:sae_structure}).
-We define a number of ad-hoc clusters based and compare the directions in these clusters using intra-cluster cosine similarity and distance to mean direction.
+After defining a few ad-hoc clusters based on these statistics, we investigate the geometric properties of the features in these clusters.
+Specifically, we look at the encoding directions of the SAE latents and compare statistical properties of directions in the clusters.
+All these concepts are described in more detail in the following subsections.
 
 \subsection{Density}
 \label{sec:density}
@@ -78,3 +78,45 @@ This is somewhat arbitrary, but seems like a good balance between including high
 Experiments with other thresholds such as $0.2$ showed that the results were not particularly sensitive to the choice of threshold.
 After defining a threshold, we run the LM on the dataset and count the number of tokens where each feature has an activation above the threshold.
 The density of a feature is then the number of such tokens divided by the total number of tokens in the dataset.
+
+\subsection{Geometry}
+\label{sec:geometry}
+The "direction" of an SAE latent is the vector in MLP activation space that the latent represents.
+If we take the mathematical representation of an SAE \eqref{eq:sae_structure} 
+\begin{align*}
+    \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+    \widehat{\vec x}=&\mat W_d\vec y
+\end{align*}
+the direction of the $i$'th latent is $\mat W_e[i]$, i.e. the $i$'th row of the encoding matrix $\mat W_e$.
+There are arguments to be made\parencite{nanda_open_2023} that the respective row in the decoder matrix $\mat W_d$ is more representative of the latent, but we have chosen to use the encoding matrix for this work in keeping with our theme of looking at the behaviour of the features rather than their effect on the LM.
+
+Since these are directions in a high-dimensional space, we cannot simply visualize them or reason intuitively about them.
+Instead we use two statistics to boil down interesting properties to a few numbers we can understand: mean cosine similarity and variance.
+
+\subsubsection{Cosine similarity}
+Cosine similarity is a measure of how similar the directions of two vectors are and is defined for two non-zero vectors $\vec a,\vec b\in\R^{N}\setminus \{\vec 0\}$ in an $N\in\N$ dimensional space as
+\begin{align*}
+    \cos(\vec a,\vec b)=\frac{\vec a\cdot\vec b}{\norm{\vec a}\norm{\vec b}}=\widehat{\vec a}\cdot\widehat{\vec b}
+\end{align*}
+where $\widehat{\vec x}$ denotes the normalized vector $\vec x$.
+Since matrix multiplication is defined as the dot product of the rows of the first matrix with the columns of the second, finding the cosine similarity between all of latent directions can be written as
+\begin{align*}
+    \widehat{\mat W_e}\trans{\widehat{\mat W_e}}
+\end{align*}
+where $\widehat{\mat A}$ is the matrix where each row is normalized.
+The mean of these values gives a measure of how similar the directions are on average, and can be calculated as 
+\begin{align*}
+    \frac1{N(N-1)}\left(\mathrm{sum}\left(\widehat{\mat W_e}\trans{\widehat{\mat W_e}}\right)-N\right)
+\end{align*}
+where $N\in\N$ is the number of latents.
+The $N-1$ and the subtraction of $N$ is in order to ignore the similarity of a latent with itself, since that is always trivially $1$.
+Taking the mean naturally loses a lot of nuance, but the metric still has some interesting properties.
+A high mean cosine similarity implies that at least most directions are similar to most other directions.
+Especially interesting is that a high mean similarity implies a \emph{single} cluster of similar directions, since even if half the directions are similar to each other and the other half are similar to each other, if the two halfs are orthogonal to each other the mean similarity cannot exceed $0.5$.
+Unfortunately, this also means that a low mean similarity does not rule out relatively large clusters of similar directions.
+Indeed, a mean similarity of $0.1$ would still allow a cluster of equal directions to be $10\%$ of the total number of directions.
+
+\subsubsection{Variance}
+The variance is a measure of how spread out the directions are, and is calculated as the trace of the covariance matrix of either $\mat W_e$ or $\widehat{\mat W_e}$.
+The former we call the \emph{raw variance} and the latter the \emph{normalized variance}.
+The main difference between the two is that the raw variance is sensitive to the magnitude of the directions, while the normalized variance is not.
