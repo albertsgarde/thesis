@@ -14,8 +14,8 @@ Since features are spread over multiple neurons, this also means that each neuro
 Fortunately, even though features are not represented by individual neurons, there is some evidence for the \emph{linear representation hypothesis}.
 This states that features are represented as linear combinations of neurons, i.e. directions in activation space.
 \textcite{park_linear_2023} formalize the hypothesis and provide both theoretical and empirical evidence for it.
-Though \textcite{engels_not_2024} show that not all features are represented in this way, much work has been done to understand the linearly represented features.
-Given the linear representation hypothesis, an open problem becomes: what directions represent interpretable features?
+Though \textcite{engels_not_2024} show that not all features are represented in this way, there is empirical evidence to suggest that many are \parencite{neel_nanda_actually_2023}.
+Given the linear representation hypothesis, an open problem becomes finding the directions in activation space that represent interpretable features.
 This can be formalized as finding a transformation $\vec f\in\R^n\to\R^d$ which takes an activation vector $\vec x\in\R^n$ and gives an encoding $\vec f(\vec x)$ whose basis vectors are interpretable features.
 The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders} (SAEs).
 Later, in \ref{sec:alternatives_to_saes} we will also briefly cover alternative solutions to this problem.
@@ -27,9 +27,9 @@ This means that only very few features are present for each input.
 \subsection{Sparse autoencoders}
 Sparse coding has been an active area of research for at least 30 years, especially in relation to biological mammalian neurons responsible for vision \parencite{olshausen_sparse_1997}\parencite{lee_efficient_2006}.
 This long-standing research provides a foundation for the use of sparse autoencoders in the context of mechanistic interpretability.
-In this context, SAEs  encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
-Autoencoders are only interesting if the feature space is somehow restricted.
-In this case, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully polysemanticity.
+In general, autoencoders encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
+This is only interesting if the feature space is somehow restricted.
+In the case of SAEs in the context of mechanistic interpretability, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully monosemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \parencite{cunningham_sparse_2023}.
 The loss function is the sum of mean squared error between the input and the output and the $L^1$ regularization mentioned above.
 Illustration is available in figure \ref{fig:cunningham_sae_illustration} and formally this can be written as
