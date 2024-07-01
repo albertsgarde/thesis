@@ -1,14 +1,14 @@
-In this chapter we present the results of our experiments.
-We start by investigating the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
+In this chapter we present the results of our experiments, starting with
+an investigation of the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
 We then look at the relationship between feature \ac{N2G} performance and density.
-\todo{Introduce clusters}
-Finally, we investigate the relationship between geometry of the features and the clusters we have identified.
-In all cases, we focus on the direct results of our experiments and do not attempt to draw any broader conclusions.
+This gives rise to an intuitive clustering of features based on these two statistics, which are defined as the high density, low density cluster, and interpretable clusters.
+Finally, the relationship between geometry of the features and the clusters is investigated.
+In all cases, the focus is on the direct results of our experiments and not any broader conclusions.
 This we leave for the discussion in \autoref{sec:discussion}
 
 As described in section \ref{sec:preliminaries}, features are functions of the \ac{LM}'s activations.
-In the following, we look at two sets of features: \ac{MLP} neurons and \ac{SAE} latents.
-We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
+In the following, two sets of features are studied: \ac{MLP} neurons and \ac{SAE} latents.
+"Features" here refers to the union of the two sets while "neurons" and "latents" refer to the individual sets.
 
 
 
@@ -54,7 +54,7 @@ We use "features" to refer to the union of the two sets while "neurons" and "lat
 \end{figure}
 
 \section{N2G Performance}
-We start by looking at the performance of the \ac{N2G} models across the two populations: \ac{MLP} neurons and \ac{SAE} latents.
+The analysis begins with an examination of the performance of the \ac{N2G} models across the two populations: \ac{MLP} neurons and \ac{SAE} latents.
 For each feature, we calculate the recall, precision, and F1-score of the \ac{N2G} model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
 \autoref{tab:distributions} and \autoref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
 A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
@@ -86,7 +86,7 @@ This indicates that while most \ac{SAE} latents are as badly modelled by \ac{N2G
 \section{Density and performance}
 Density also has a bimodal distribution for \acp{SAE}, though here neither mode lines up well with the \ac{MLP} distribution.
 This begs the question of whether the modes of the performance metric distributions are related to the modes of the density distribution.
-To investigate this, we can look at \autoref{fig:density_f1_cluster_check}.
+\autoref{fig:density_f1_cluster_check} sheds light on this question.
 \autoref{fig:density_f1} shows that while some features with poorly performing \ac{N2G} models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
 Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the \ac{N2G} performance spectrum, the dense features are almost entirely located in the low performing cluster.
 Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by \ac{N2G}.
