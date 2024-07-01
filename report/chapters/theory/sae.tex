@@ -61,7 +61,7 @@ Though the performance of SAEs in the original papers \parencite{bricken_towards
 They show that this improves the $L^1$/MSE Pareto frontier.
 An issue that has received much attention is that of \emph{feature suppression}.
 Since the loss function is the sum of the mean squared error and the $L^1$ regularization, the model is encouraged not only to activate few features, but also to keep the activations smaller than what would cause the best reconstruction.
-Ideally, this would be fixed by using a $L^0$ regularization, which is what $L^1$ is a proxy for, but since $L^0$ doesn't have a gradient, this is not possible.
+Ideally, this would be fixed by using a $L^0$ regularization, which is what $L^1$ is a proxy for, but since $L^0$ has no gradient, this is not possible.
 Instead, various other approaches have been suggested \parencite{wright_addressing_2024}.
 \textcite{riggs_improving_2024} suggest taking the square root of the $L^1$ regularization term, which they show can improve the performance of the model.
 This is motivated by the square root penalizing small values more than large values.
@@ -83,7 +83,7 @@ This result is somewhat supported by \textcite{quaisley_research_2024} which use
 
 \subsection{Evaluation}
 \label{sec:evaluation}
-The last subsection touched on the issue of evaluating the performance of SAEs.
+The previous subsection touched on the issue of evaluating the performance of SAEs.
 This is a difficult problem, partly because we have yet to find a good definition for interpretability, however there are some metrics that are commonly used.
 The choice between them represents a tradeoff between expense and accuracy.
 
@@ -96,7 +96,7 @@ At the other end of the spectrum, we have the $L^1$ loss used in training.
 This is practically free since it is already calculated during training, but it is also a very indirect measure of interpretability.
 Since we are evaluating and so do not need gradients, we can also directly measure $L^0$ loss, which is a direct measure of sparsity.
 However, though there is evidence that the features we wish to find will be sparse, that does not mean that sparsity is sufficient for interpretability.
-While neither of these are reliable, \textcite{bricken_towards_2023} find that they correlate sufficiently with more powerful measures to be useful as proxies during iteration.
+While neither of these is reliable, \textcite{bricken_towards_2023} find that they correlate sufficiently with more powerful measures to be useful as proxies during iteration.
 
 Somewhere between these two extremes, we have automatic interpretability methods.
 The most commonly used of these is that presented by \textcite{bills_language_2023}.
@@ -162,7 +162,7 @@ However, they do not state how many features fit cleanly into each category.
 While most of the work on SAEs is done on either MLP neurons or the residual stream, \textcite{kissane_sparse_2024} and \textcite{kissane_attention_2024} show that they can also be used for understanding attention layers.
 In \textcite{krzyzanowski_we_2024} the same authors use the features of SAEs to study every attention head in GPT2-Small.
 To do this, they find the 10 features that each head most contributes to and interpret the head based on these.
-Through this methods they reproduce previous results on the roles of some heads.
+By this method they reproduce previous results on the roles of some heads.
 They also answer an open question about the role of some of the heads and confirm with more rigorous methods that do not involve SAEs.
 The reliance on the top 10 features for each head risks running into interpretability illusions \parencite{bolukbasi_interpretability_2021}, but the fact that the results line up with those from previous work and alternative methods provides evidence that this is not too severe here. 
 
@@ -179,7 +179,7 @@ While they do find other interpretable features, it highlights an important poin
 \textcite{casper_eis_2024} argues that while work on SAEs is useful, the results are often overblown.
 Especially, say the authors, the work from Anthropic \parencite{bricken_towards_2023}\parencite{templeton_scaling_2024} is often presented in a way so it seems more groundbreaking than it is.
 The arguments are partly based on the social media coverage surrounding the papers, but the way the Anthropic papers often focus on deep dives into a few interpretable features can make the work look more impressive.
-That does not mean that it is not a method that can provide valuable insight, only that once should be wary of updating too forcefully on such possible cherry-picked examples.
+That does not mean that the method cannot provide valuable insight, only that one should be wary of updating too forcefully on such possible cherry-picked examples.
 
 Another issue that is often mentioned is the reliance on unproven proxies.
 This is mentioned in many of the papers, especially those mentioned in subsection \ref{sec:evaluation}, that luckily are taking steps to resolve this issue.
@@ -217,7 +217,7 @@ Each added codebook consists of a set of "codes" (linear features).
 For each input, the cosine similarity between each code and the input is found, and the output is the sum of the $k$ most similar codes. 
 They function much like SAEs, but differ in two important ways.
 Firstly, instead of encouraging sparsity with regularization, they enforce sparsity by including only some set $k$ codes.
-Secondly, instead of being trained to autoencode activations after the model model has been trained, the codebook is inserted into the model from the beginning.
+Secondly, instead of being trained to autoencode activations after the model has been trained, the codebook is inserted into the model from the beginning.
 The first difference is interesting, since many of the issues that work presented in \ref{sec:improvements_to_saes} attempts to fix are related to precisely the $L^1$ loss, so this can be seen as a way of circumventing that entirely.
 The second one however can be a large disadvantage.
 There has been previous work \parencite{elhage_softmax_2022} to change the architecture of language modles to make them inherently more interpretable, but this has been largely abandoned mostly due to infeasibility \parencite{bricken_towards_2023}.

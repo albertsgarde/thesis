@@ -1,4 +1,4 @@
-In this chapter we define the terminology used the rest of the report (section \ref{sec:preliminaries}) and present the prior work that serves as a basis for the thesis (section \ref{sec:n2g}).
+In this chapter we define the terminology used in this thesis (section \ref{sec:preliminaries}) and present the prior work that serves as a basis for the thesis (section \ref{sec:n2g}).
 We also provide a more in depth overview of the literature on SAEs (section \ref{sec:sae}).
 
 \section{Preliminaries}
@@ -41,8 +41,8 @@ with the possibility of a special ignore token
 which signal that the token at that position does not matter.
 In the original paper, this is done on the basis of maximum activating samples, but we use a different method as described in section \ref{sec:sampling}.
 
-To run this method for a particular feature $f\in\mathcal{F}$, 
-we need a set of highly activating samples $\mathcal S\subseteq \mathcal T$.
+To run this method for a particular feature $f$, 
+we need a set of highly activating samples $\mathcal S$.
 For sample $s\in\mathcal S$, we identify a \emph{pivot token} $e$, 
 which is the most activating token in the sample, 
 and perform 3 steps: pruning, saliencey detection, and augmentation.
@@ -67,7 +67,7 @@ Once this step is done, we have a set $B$ of important tokens in $s'$.
 
 \subsection{Augmentation}
 Given a pruned string $s'$ and a set of important tokens $B$ in that string, 
-augmentation is the process of finding nearby nearby strings 
+augmentation is the process of finding nearby strings 
 that activate $f$ similarly to $s'$.
 To do this, we replace each $b\in B$ with other "similar" tokens and 
 see whether the resulting string activates $f$ sufficiently.
