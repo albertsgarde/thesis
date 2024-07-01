@@ -1,4 +1,10 @@
+Sparse coding has been an active area of research for at least 30 years, especially in relation to biological mammalian neurons responsible for vision \parencite{olshausen_sparse_1997}\parencite{lee_efficient_2006}.
+This long-standing research provides a foundation for the use of sparse autoencoders in the context of mechanistic interpretability.
+In this section we cover the literature on this use case of sparse autoencoders, including the theoretical background (\autoref{sec:sae_theoretical_background}), the basic structure of sparse autoencoders (\autoref{sec:sae_architecture}), suggested improvements (\autoref{sec:improvements_to_saes}), evaluation methods (\autoref{sec:evaluation}), and applications (\autoref{sec:applications}).
+Lastly, we cover a number of criticisms and considerations that have been raised in the literature (\autoref{sec:sae_considerations}) and some of the alternatives to sparse autoencoders (\autoref{sec:alternatives_to_saes}).
+
 \subsection{Theoretical background}
+\label{sec:sae_theoretical_background}
 When interpreting a language model, there is a question of what the unit of interpretability should be.
 What part of the model should we be looking at?
 Mechanistic interpretability aims to understand models as granularly as possible, which makes individual neurons in either the residual stream, MLP layers or attention heads the obvious choice.
@@ -24,11 +30,10 @@ Apart from linearity, one of the main assumptions SAEs make is that features are
 This means that only very few features are present for each input.
 \textcite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
-\subsection{Sparse autoencoders}
-Sparse coding has been an active area of research for at least 30 years, especially in relation to biological mammalian neurons responsible for vision \parencite{olshausen_sparse_1997}\parencite{lee_efficient_2006}.
-This long-standing research provides a foundation for the use of sparse autoencoders in the context of mechanistic interpretability.
+\subsection{Architecture}
+\label{sec:sae_architecture}
 In general, autoencoders encode an activation vector $\vec x\in\R^{n}$ into a feature vector $\vec y\in\R^d$, before reconstructing $\hat{\vec x}\in\R^n$.
-This is only interesting if the feature space is somehow restricted.
+This is only useful if the feature space is somehow restricted.
 In the case of SAEs in the context of mechanistic interpretability, that restriction comes from an $L^1$ regularization during training, which is intended to encourage sparsity and thereby hopefully monosemanticity.
 The core structure of the encoder is an affine transformation followed by a ReLU nonlinearity while the decoder is simply a linear transformation \parencite{cunningham_sparse_2023}.
 The loss function is the sum of mean squared error between the input and the output and the $L^1$ regularization mentioned above.
@@ -169,7 +174,8 @@ The reliance on the top 10 features for each head risks running into interpretab
 All these applications suggest that SAEs are indeed useful both for getting a handle on what is happening inside the models and for controlling behaviour.
 However, it remains to be seen whether this works in practice for models of interest.
 
-\subsection{Criticisms}
+\subsection{Considerations}
+\label{sec:sae_considerations}
 While SAEs are surely a large step forward for interpretability, there are still many issues that must be resolved before we achieve the goals the field is working towards.
 \textcite{huben_research_2024} train SAEs on OthelloGPT \parencite{li_emergent_2023} to see whether they recover the linear features found by \textcite{neel_nanda_actually_2023}.
 These linear features each represent whether a specific cell has the colour of the current player and so represent the board in a human interpretable way.
