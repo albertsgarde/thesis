@@ -12,8 +12,7 @@ We will refer to this as the \emph{language model} or abbreviated as the \emph{L
 
 Next we introduce the unit of interpretability, namely \emph{features}. 
 In the technical sense, a feature is any function of the activations 
-of a \ac{LM}.
-E.g. a neuron in a \ac{MLP} layer is a feature, where the function is simply the value of that neuron.
+of a \ac{LM}, e.g. a neuron in a \ac{MLP} layer is a feature, where the function is simply the value of that neuron.
 The same holds for neurons in the residual stream or attention heads.
 Indeed, neurons are the basic form of feature and other features are built up from these.
 Especially interesting are features built from linear combinations of neurons.
@@ -25,7 +24,7 @@ A set of features (e.g. the latents of an SAE) is sparse if only a small fractio
 The transpose of this term is \emph{density}, which describes an individual feature.
 A feature is dense if it only activates on a small fraction of the samples in the dataset.
 
-Note that there is some ambiguity in the literature, and in this thesis, around the term "feature".
+Note that there is some ambiguity in the literature around the term "feature".
 Sometimes it is meant as we describe here, a function of the \ac{LM}'s activations, sometimes it is used specifically for what we call \ac{SAE} latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the \ac{LM}.
 This last meaning we refer to as a \emph{concept}.
 This ambiguity in the literature is worth being aware of even if it is mostly clear from context what is meant.
