@@ -10,24 +10,24 @@ What part of the model should we be looking at?
 Mechanistic interpretability aims to understand models as granularly as possible, which makes individual neurons in either the residual stream, MLP layers or attention heads the obvious choice.
 Indeed, previous research has aimed to understand the behaviour and effect of individual neurons \parencite{foote_neuron_2023}\parencite{bills_language_2023}.
 However, there are reasons to believe that individual neurons are fundamentally difficult to interpret.
-According to the \emph{superposition hypothesis} \parencite{elhage_toy_2022}, individual neurons do not cleanly represent interpretable features.
-Instead, interpretable features are spread over several neurons in order to pack more features into the same set of neuron dimensions.
+According to the \emph{superposition hypothesis} \parencite{elhage_toy_2022}, individual neurons do not cleanly represent interpretable concepts.
+Instead, interpretable concepts are spread over several neurons in order to pack more concepts into the same set of neuron dimensions.
 This is possible due to the Johnson-Lindenstrauss lemma which implies that there are exponentially many nearly-orthogonal directions in an $n$-dimenstional space.
-Therefore, by spreading out features across neurons, the model can store many more features at the cost of only a little interference.
-\textcite{vaintrob_toward_2024} present a model for how the model performs computation on this representation of features.
-Since features are spread over multiple neurons, this also means that each neuron represents multiple features, that it is \emph{polysemantic}.
+Therefore, by spreading out concepts across neurons, the model can store many more concepts at the cost of only a little interference.
+\textcite{vaintrob_toward_2024} present a model for how the model performs computation on this representation of concepts.
+Since concepts are spread over multiple neurons, this also means that each neuron represents multiple concepts, that it is \emph{polysemantic}.
 
-Fortunately, even though features are not represented by individual neurons, there is some evidence for the \emph{linear representation hypothesis}.
-This states that features are represented as linear combinations of neurons, i.e. directions in activation space.
+Fortunately, even though concepts are not represented by individual neurons, there is some evidence for the \emph{linear representation hypothesis}.
+This states that concepts are represented as linear combinations of neurons, i.e. directions in activation space.
 \textcite{park_linear_2023} formalize the hypothesis and provide both theoretical and empirical evidence for it.
-Though \textcite{engels_not_2024} show that not all features are represented in this way, there is empirical evidence to suggest that many are \parencite{neel_nanda_actually_2023}.
-Given the linear representation hypothesis, an open problem becomes finding the directions in activation space that represent interpretable features.
+Though \textcite{engels_not_2024} show that not all concepts are represented in this way, there is empirical evidence to suggest that many are \parencite{neel_nanda_actually_2023}.
+Given the linear representation hypothesis, an open problem becomes finding the directions in activation space that represent interpretable concepts.
 This can be formalized as finding a transformation $\vec f\in\R^n\to\R^d$ which takes an activation vector $\vec x\in\R^n$ and gives an encoding $\vec f(\vec x)$ whose basis vectors are interpretable features.
 The most studied solution to this problem, and the one we shall focus on, is that of \emph{sparse autoencoders} (SAEs).
 Later, in \ref{sec:alternatives_to_saes} we will also briefly cover alternative solutions to this problem.
 
-Apart from linearity, one of the main assumptions SAEs make is that features are \emph{sparse}.
-This means that only very few features are present for each input.
+Apart from linearity, one of the main assumptions SAEs make is that concepts are \emph{sparse}.
+This means that only very few concepts are present for each input.
 \textcite{deng_measuring_2023} provide empirical evidence for both this assumption and the linear representation hypothesis.
 
 \subsection{Architecture}

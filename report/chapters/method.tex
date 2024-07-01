@@ -5,7 +5,7 @@ Afterwards we go into detail about the implementation of the \ac{N2G} method, in
 Finally we describe the statistical methods used to analyse the data gained from the features and from evaluating the \ac{N2G} models.
 Most code used in this work is available at \footnote{\url{https://github.com/albertsgarde/thesis}} while our modifications to the \ac{N2G} code can be found at \footnote{\url{https://github.com/albertsgarde/Neuron2Graph}}.
 
-\section{\acp{SAE}}
+\section{SAE}
 Since \acp{SAE} are finnicky to train, we will be using a pre-trained SAE, namely that provided by \textcite{nanda_neelnandasparse_autoencoder_nodate}.
 Though the past months have seen the development of several open source \ac{SAE} libraries \parencite{bloom_jbloomaussaelens_2024}\parencite{cooney_ai-safety-foundationsparse_autoencoder_2024}, we started this work before then and do not use any of them.
 Attempts were made to extend the experiments to \acp{SAE} on \texttt{gpt2-small}, specifically those provided by \textcite{wu_openaisparse_autoencoder_2024}, but they proved unsuccesful due to memory constraints making the process too time consuming.
