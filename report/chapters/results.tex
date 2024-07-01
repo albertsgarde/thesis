@@ -1,13 +1,13 @@
 In this chapter we present the results of our experiments.
-We start by investigating the performance of N2G on the two populations of features: MLP neurons and SAE latents.
-We then look at the relationship between feature N2G performance and density.
+We start by investigating the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
+We then look at the relationship between feature \ac{N2G} performance and density.
 \todo{Introduce clusters}
 Finally, we investigate the relationship between geometry of the features and the clusters we have identified.
 In all cases, we focus on the direct results of our experiments and do not attempt to draw any broader conclusions.
 This we leave for the discussion in \autoref{sec:discussion}
 
-As described in section \ref{sec:preliminaries}, features are functions of the LM's activations.
-In the following, we look at two sets of features: MLP neurons and SAE latents.
+As described in section \ref{sec:preliminaries}, features are functions of the \ac{LM}'s activations.
+In the following, we look at two sets of features: \ac{MLP} neurons and \ac{SAE} latents.
 We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
 
 
@@ -49,19 +49,19 @@ We use "features" to refer to the union of the two sets while "neurons" and "lat
     \end{subfigure}
     
     \caption{Distributions of our statistics across the two populations. 
-    Density is calculated with a activation threshold of $0.6$. Since for some of the features the N2G model never predicts an activation, the precision and F1 is sometimes undefined. A value of NaN is used to indicate this.}
+    Density is calculated with a activation threshold of $0.6$. Since for some of the features the \ac{N2G} model never predicts an activation, the precision and F1 is sometimes undefined. A value of NaN is used to indicate this.}
     \label{fig:distributions}
 \end{figure}
 
 \section{N2G Performance}
-We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
-For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
+We start by looking at the performance of the \ac{N2G} models across the two populations: \ac{MLP} neurons and \ac{SAE} latents.
+For each feature, we calculate the recall, precision, and F1-score of the \ac{N2G} model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
 \autoref{tab:distributions} and \autoref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
 A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
 More interesting is what the plots show about the nature of this distribution difference.
-Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the SAE population has a second mode at almost $1$.
-This indicates that while most SAE latents are as badly modelled by N2G as the MLP neurons, there is a cluster of SAE latents that are modelled almost perfectly.
-\autoref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
+Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the \ac{SAE} population has a second mode at almost $1$.
+This indicates that while most \ac{SAE} latents are as badly modelled by \ac{N2G} as the \ac{MLP} neurons, there is a cluster of \ac{SAE} latents that are modelled almost perfectly.
+\autoref{fig:recall_precision} confirms this by showing that there is a set of \ac{SAE} latents with both near perfect recall and near perfect precision.
 
 \begin{figure}[ht]
     \centering
@@ -69,7 +69,7 @@ This indicates that while most SAE latents are as badly modelled by N2G as the M
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/figures/recall_precision_mlp.pdf}
-        \caption{Recall vs Precision for MLP}
+        \caption{Recall vs Precision for \ac{MLP}}
         \label{fig:recall_precision_mlp}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
@@ -84,12 +84,12 @@ This indicates that while most SAE latents are as badly modelled by N2G as the M
 \end{figure}
 
 \section{Density and performance}
-Density also has a bimodal distribution for SAEs, though here neither mode lines up well with the MLP distribution.
+Density also has a bimodal distribution for \acp{SAE}, though here neither mode lines up well with the \ac{MLP} distribution.
 This begs the question of whether the modes of the performance metric distributions are related to the modes of the density distribution.
 To investigate this, we can look at \autoref{fig:density_f1_cluster_check}.
-\autoref{fig:density_f1} shows that while some features with poorly performing N2G models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
-Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the N2G performance spectrum, the dense features are almost entirely located in the low performing cluster.
-Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by N2G.
+\autoref{fig:density_f1} shows that while some features with poorly performing \ac{N2G} models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
+Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the \ac{N2G} performance spectrum, the dense features are almost entirely located in the low performing cluster.
+Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by \ac{N2G}.
 In other words, the high F1 cluster is a subset of the low density cluster.
 This is backed up by the \texttt{N} column of \autoref{tab:directions} which confirms that almost all high F1 features are low density.
 
@@ -109,14 +109,14 @@ This is backed up by the \texttt{N} column of \autoref{tab:directions} which con
         \label{fig:f1_density}
     \end{subfigure}
     
-    \caption{The relationship between density and F1-score for SAE features.
+    \caption{The relationship between density and F1-score for \ac{SAE} features.
     Each plot splits the features into clusters based on one metric and shows the distribution of the other within each cluster.
     The cluster boundaries are chosen based on figure \ref{fig:distributions_f1} and \ref{fig:distributions_log_density}.}
     \label{fig:density_f1_cluster_check}
 \end{figure}
 
 \section{Geometry}
-We have shown a strong relationship between density and N2G performance.
+We have shown a strong relationship between density and \ac{N2G} performance.
 Both of these are empirical measures of the behaviour of the feature on a dataset.
 This raises a question of whether these clusters are also meaningful directly in terms of the feature directions (see \autoref{sec:methods_geometry}) read directly from the $\mat W_e$ encoding matrix in the SAE.
 It turns out the answer is yes.
@@ -137,7 +137,7 @@ The high density cluster is characterized by all features pointing in the same d
     The clusters are the same as those used in previous figures (log density threshold is $-1.2$ and F1 threshold is $0.5$), except the random cluster which is a set of directions randomly generated according to the standard $2048$-dimensional normal distribution.
     \texttt N is the number of features in the cluster.
     \texttt{Cos sim.} is the mean pairwise cosine similarity of directions in the cluster.
-    \texttt{Variance} is the trace of the covariance matrix and is split into a raw and a normalized column, where the former is the value for the directions taken directly from the SAE while for the latter the directions have been normalized to norm $1$.
+    \texttt{Variance} is the trace of the covariance matrix and is split into a raw and a normalized column, where the former is the value for the directions taken directly from the \ac{SAE} while for the latter the directions have been normalized to norm $1$.
     }
     \label{tab:directions}
 \end{table}

@@ -1,29 +1,29 @@
 In this chapter we describe the methods used in this work.
-We first describe what SAEs we use.
-Then we describe which text dataset we use, and how we obtain the samples needed for N2G from that dataset.
-Afterwards we go into detail about the implementation of the N2G method, including the code changes needed from the original implementation as well as how we evaluate the resulting N2G models.
-Finally we describe the statistical methods used to analyse the data gained from the features and from evaluating the N2G models.
-Most code used in this work is available at \footnote{\url{https://github.com/albertsgarde/thesis}} while our modifications to the N2G code can be found at \footnote{\url{https://github.com/albertsgarde/Neuron2Graph}}.
+We first describe what \acp{SAE} we use.
+Then we describe which text dataset we use, and how we obtain the samples needed for \ac{N2G} from that dataset.
+Afterwards we go into detail about the implementation of the \ac{N2G} method, including the code changes needed from the original implementation as well as how we evaluate the resulting \ac{N2G} models.
+Finally we describe the statistical methods used to analyse the data gained from the features and from evaluating the \ac{N2G} models.
+Most code used in this work is available at \footnote{\url{https://github.com/albertsgarde/thesis}} while our modifications to the \ac{N2G} code can be found at \footnote{\url{https://github.com/albertsgarde/Neuron2Graph}}.
 
-\section{SAEs}
-Since SAEs are finnicky to train, we will be using a pre-trained SAE, namely that provided by \textcite{nanda_neelnandasparse_autoencoder_nodate}.
-Though the past months have seen the development of several open source SAE libraries \parencite{bloom_jbloomaussaelens_2024}\parencite{cooney_ai-safety-foundationsparse_autoencoder_2024}, we started this work before then and do not use any of them.
-Attempts were made to extend the experiments to SAEs on \texttt{gpt2-small}, specifically those provided by \textcite{wu_openaisparse_autoencoder_2024}, but they proved unsuccesful due to memory constraints making the process too time consuming.
+\section{\acp{SAE}}
+Since \acp{SAE} are finnicky to train, we will be using a pre-trained SAE, namely that provided by \textcite{nanda_neelnandasparse_autoencoder_nodate}.
+Though the past months have seen the development of several open source \ac{SAE} libraries \parencite{bloom_jbloomaussaelens_2024}\parencite{cooney_ai-safety-foundationsparse_autoencoder_2024}, we started this work before then and do not use any of them.
+Attempts were made to extend the experiments to \acp{SAE} on \texttt{gpt2-small}, specifically those provided by \textcite{wu_openaisparse_autoencoder_2024}, but they proved unsuccesful due to memory constraints making the process too time consuming.
 
 \section{Dataset}
 \label{sec:dataset}
 Our experiments require data in the form of a number of samples for each feature.
-The text dataset we use is the same as was originally used to train both the LM and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
+The text dataset we use is the same as was originally used to train both the \ac{LM} and the SAE, namely \textcite{nanda_neelnandac4-code-20k_nodate}.
 The dataset contains samples of varying lengths, but we need fixed lengths samples for both more convenient and more efficient processing.
 We solve this by creating overlapping samples of fixed length within each dataset sample, padding with the padding token when necessary.
 The overlap is to ensure that all tokens are included with some preceding context.
 
 \subsection{Sampling}
 \label{sec:sampling}
-For N2G to run on a feature, it needs a set of samples that activate the feature.
+For \ac{N2G} to run on a feature, it needs a set of samples that activate the feature.
 Since the running time scales linearly in the number of samples, we would like to keep this number as low as possible.
-At the same time, what samples N2G is run on has a large impact on the results.
-In the original N2G paper \parencite{foote_neuron_2023}, maximum activating samples were used.
+At the same time, what samples \ac{N2G} is run on has a large impact on the results.
+In the original \ac{N2G} paper \parencite{foote_neuron_2023}, maximum activating samples were used.
 However, we found that this leads to many of the samples being very similar which pollutes the test set.
 Because of this and arguments that maximum activating samples can be misleading \parencite{bolukbasi_interpretability_2021}, we instead use a weighted random sampling approach.
 Like with maximum activating samples we assume that the samples that activate the feature most highly are the most important for understanding the feature, but we do not assume that they are the \emph{only} important samples.
@@ -44,30 +44,30 @@ The implementation used for these experiments is available \footnote{\url{https:
 For the results below, we used $\alpha=1$, $c=0.5$, and $n=32$.
 
 \section{N2G}
-Our code for training and evaluating N2G models is heavily based on the original implementation \parencite{foote_apartresearchneuron2graph_2024}.
+Our code for training and evaluating \ac{N2G} models is heavily based on the original implementation \parencite{foote_apartresearchneuron2graph_2024}.
 However the original was a single script with no documentation and since we needed to work in depth with the code we have done considerable refactoring work to improve code quality.
 In our fork, the code has a more modular structure, all functions are typed, all constants are configurable from outside the code, and we follow the standards enforced by Ruff \parencite{marsh_astral-shruff_2024}.
 During this work we found many redundant calculations, the removal of which has likely sped up the code though we have not done any formal benchmarking.
-We also found that the original representation of the N2Gs took up so much memory that our computers often struggled to load all at once and they took up a lot of space on disk.
+We also found that the original representation of the \ac{N2G}s took up so much memory that our computers often struggled to load all at once and they took up a lot of space on disk.
 While the disk usage could be solved by compressing the files (N2G graphs compress very well), this would not solve the memory usage.
-Our solution was to create a Rust implementation of the N2Gs.
+Our solution was to create a Rust implementation of the \ac{N2G}s.
 While the memory impact is non-trivial to measure, the compressed disk size is not and it fell by a factor of $10$.
-This implementation does not support training, but can be used to evaluate N2Gs and produce the visual graph representations.
-The algorithm thus works by first training the N2Gs using the Python implementation, before converting them to the Rust implmentation for storage.
+This implementation does not support training, but can be used to evaluate \ac{N2G}s and produce the visual graph representations.
+The algorithm thus works by first training the \ac{N2G}s using the Python implementation, before converting them to the Rust implmentation for storage.
 
 \subsection{Evaluation}
-Given a feature and a N2G model trained on that feature's training set, we evaluate the model on the test set.
+Given a feature and a \ac{N2G} model trained on that feature's training set, we evaluate the model on the test set.
 This is done by getting it to predict for each token in each sample of the test set whether the feature will fire on that token, where firing is defined as the activation being above a threshold.
 These predictions can then be compared to the actual activations of the feature to calculate recall, precision, and F1-score.
 
 \section{Analysis}
 \todo{Explain cosine similarity and variance with formulas}
-After N2G models have been trained and evaluated for all MLP and SAE features, we can compare the two populations.
+After \ac{N2G} models have been trained and evaluated for all \ac{MLP} and \ac{SAE} features, we can compare the two populations.
 Our analysis is based on 4 main statistics for each feature: recall, precision, F1-score, and feature density.
-The first three refer to the performance of the N2G model of the feature when predicting the feature's activations on the test set while the last one is the fraction of tokens that activate the feature.
+The first three refer to the performance of the \ac{N2G} model of the feature when predicting the feature's activations on the test set while the last one is the fraction of tokens that activate the feature.
 To compare these statistics between the two populations, we implement two-sample bootstrap tests.
 After defining a few ad-hoc clusters based on these statistics, we investigate the geometric properties of the features in these clusters.
-Specifically, we look at the encoding directions of the SAE latents and compare statistical properties of directions in the clusters.
+Specifically, we look at the encoding directions of the \ac{SAE} latents and compare statistical properties of directions in the clusters.
 All these concepts are described in more detail in the following subsections.
 
 \subsection{Density}
@@ -76,19 +76,19 @@ To calculate density, we first define a threshold for what counts as an "activat
 In this work, we choose a threshold of $0.6$.
 This is somewhat arbitrary, but seems like a good balance between including high activations and excluding noise.
 Experiments with other thresholds such as $0.2$ showed that the results were not particularly sensitive to the choice of threshold.
-After defining a threshold, we run the LM on the dataset and count the number of tokens where each feature has an activation above the threshold.
+After defining a threshold, we run the \ac{LM} on the dataset and count the number of tokens where each feature has an activation above the threshold.
 The density of a feature is then the number of such tokens divided by the total number of tokens in the dataset.
 
 \subsection{Geometry}
 \label{sec:methods_geometry}
-The "direction" of an SAE latent is the vector in MLP activation space that the latent represents.
-If we take the mathematical representation of an SAE \eqref{eq:sae_structure} 
+The "direction" of an \ac{SAE} latent is the vector in \ac{MLP} activation space that the latent represents.
+If we take the mathematical representation of an \ac{SAE} \eqref{eq:sae_structure} 
 \begin{align*}
     \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
     \widehat{\vec x}=&\mat W_d\vec y
 \end{align*}
 the direction of the $i$'th latent is $\mat W_e[i]$, i.e. the $i$'th row of the encoding matrix $\mat W_e$.
-There are arguments to be made\parencite{nanda_open_2023} that the respective row in the decoder matrix $\mat W_d$ is more representative of the latent, but we have chosen to use the encoding matrix for this work in keeping with our theme of looking at the behaviour of the features rather than their effect on the LM.
+There are arguments to be made\parencite{nanda_open_2023} that the respective row in the decoder matrix $\mat W_d$ is more representative of the latent, but we have chosen to use the encoding matrix for this work in keeping with our theme of looking at the behaviour of the features rather than their effect on the \ac{LM}.
 
 Since these are directions in a high-dimensional space, we cannot simply visualize them or reason intuitively about them.
 Instead we use two statistics to boil down interesting properties to a few numbers we can understand: mean cosine similarity and variance.

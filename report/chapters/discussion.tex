@@ -1,25 +1,25 @@
-In the previous section, we showed three properties of features in an SAE trained on the MLP layer of \texttt{gelu-1l}: 
+In the previous section, we showed three properties of features in an \ac{SAE} trained on the \ac{MLP} layer of \texttt{gelu-1l}: 
 \begin{enumerate}[ref={observation~\arabic*}]
-    \item The performance of N2G on SAE latents is significantly better than on MLP neurons.\label{obs:n2g_performance}
-    \item The distribution of both N2G performance and feature density is bimodal with the high performance cluster being a subset of the low density cluster.\label{obs:bimodal}
-    \item The directions in MLP space represented by the high density features are very similar, while the the directions of the other clusters much closer to orthogonal.\label{obs:directions}
+    \item The performance of \ac{N2G} on \ac{SAE} latents is significantly better than on \ac{MLP} neurons.\label{obs:n2g_performance}
+    \item The distribution of both \ac{N2G} performance and feature density is bimodal with the high performance cluster being a subset of the low density cluster.\label{obs:bimodal}
+    \item The directions in \ac{MLP} space represented by the high density features are very similar, while the the directions of the other clusters much closer to orthogonal.\label{obs:directions}
 \end{enumerate}
-Viewing the performance of N2G as a measure of interpretability, \ref{obs:n2g_performance} suggests that SAE latents are more interpretable than MLP neurons.
-This replicates the findings of both original SAE papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
-We discuss the merits of N2G as an interpretability measurement in \autoref{sec:n2g_interpretability} and it is also used as such \textcite{gao_scaling_2024}.
+Viewing the performance of \ac{N2G} as a measure of interpretability, \ref{obs:n2g_performance} suggests that \ac{SAE} latents are more interpretable than \ac{MLP} neurons.
+This replicates the findings of both original \ac{SAE} papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
+We discuss the merits of \ac{N2G} as an interpretability measurement in \autoref{sec:n2g_interpretability} and it is also used as such \textcite{gao_scaling_2024}.
 \todo{The last half of this section is confusing}
 \todo{This continues in methodology section. That should be made clear}
 \todo{Is the whole thing methodology}
 \todo{Discuss comparison with gao}
 
 \todo{Restructure to reduce redundant citations}
-\textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of SAE latents based on their density.
+\textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of \ac{SAE} latents based on their density.
 Specifically they find a cluster of features with density around $-3$ (roughly matching our low density cluster) and an "ultra low density cluster" with density at or below $-6$.
 They also find that the high density cluster is more interpretable than the ultra low density cluster with the latter being almost entirely uninterpretable.
 This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our extreme density cluster is on the other side.
 We also have a "mid density cluster" with many interpretable features, but our cluster with uninterpretable features is instead characterized by very high density.
 Where this difference comes from is unclear, especially since it is so large.
-The obvious explanation is that either the LM, SAE or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
+The obvious explanation is that either the \ac{LM}, \ac{SAE} or dataset is different, but \textcite{nanda_open_2023} has published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
 This only leaves the experiment and data analysis.
 One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
 This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find an ultra high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
@@ -34,38 +34,38 @@ A more thorough investigation is needed to understand the implications of this.
 
 \section{Methodology}
 \label{sec:n2g_interpretability}
-Our conclusions are based on a measure of interpretability that is not widely used in the literature, namely N2G.
+Our conclusions are based on a measure of interpretability that is not widely used in the literature, namely \ac{N2G}.
 This potentially has a large effect on our results.
-The main reason for using N2G is that it is far cheaper than the more poweful interpretability measurements like automated interpretability with LLMs or human evaluation.
-This was crucial for us since we do not have the resources of e.g. Anthropic, but as SAEs are scaled to larger sizes, finding cheaper interpretability measures may become essential even for large AI labs.
-Indeed, while we were doing this work, \textcite{gao_scaling_2024} published a paper on scaling SAEs where they used N2G as a measure of interpretability for their 16 million latent SAE.
-This does not mean that N2G is without faults.
-First of all, the N2G interpretation of each feature is based on a set of text samples.
+The main reason for using \ac{N2G} is that it is far cheaper than the more poweful interpretability measurements like automated interpretability with \ac{LLM}s or human evaluation.
+This was crucial for us since we do not have the resources of e.g. Anthropic, but as \acp{SAE} are scaled to larger sizes, finding cheaper interpretability measures may become essential even for large AI labs.
+Indeed, while we were doing this work, \textcite{gao_scaling_2024} published a paper on scaling \acp{SAE} where they used \ac{N2G} as a measure of interpretability for their 16 million latent SAE.
+This does not mean that \ac{N2G} is without faults.
+First of all, the \ac{N2G} interpretation of each feature is based on a set of text samples.
 Though it performs some augmentation of these samples to explore the sample space more, the result is still heavily dependent on the samples chosen and can easily miss aspects of behaviour not present in them.
 This can be mitigated by improving the method of choosing samples, as we have attempted to do here, and by increasing the number of samples.
-However, the compute cost of N2G scales linearly with the number of samples, so eventually, this removes the cost advantage of N2G.
-A second issue is that N2G is purely syntactical.
-While any semantic pattern can be represented by a sufficiently complex syntactical pattern, it is not clear how well N2G can capture these patterns.
-This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which shows that performance of N2G falls in the later layers of the LM.
-This is consistent with later layers representing more abstract and semantic features which are difficult for N2G's purely syntactical approach to capture.
-Given this, it seems natural to think that N2G would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
-Testing this and how N2G relates to other measures of interpretability is an interesting avenue for further research.
+However, the compute cost of \ac{N2G} scales linearly with the number of samples, so eventually, this removes the cost advantage of \ac{N2G}.
+A second issue is that \ac{N2G} is purely syntactical.
+While any semantic pattern can be represented by a sufficiently complex syntactical pattern, it is not clear how well \ac{N2G} can capture these patterns.
+This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which shows that performance of \ac{N2G} falls in the later layers of the \ac{LM}.
+This is consistent with later layers representing more abstract and semantic features which are difficult for \ac{N2G}'s purely syntactical approach to capture.
+Given this, it seems natural to think that \ac{N2G} would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
+Testing this and how \ac{N2G} relates to other measures of interpretability is an interesting avenue for further research.
 
 \section{Further work}
 The experiments in this work have focussed on the behaviour of features, i.e. what they activate on.
-It would be interesting to explore whether the results also extend to the effects of the features, i.e. how they affect the SAE and the LM.
-Specifically whether the clusters found also have meaning in terms of the effect they have on the SAE and LM, e.g. how much SAE or LM performance drops when the high density cluster is removed or if we retain only the interpretable cluster.
-If performance remains roughly the same when only the interpretable cluster is retained, this implies that while N2G may not model all features well, it does model the important ones.
-More broadly for SAEs it would imply that though many features are uninterpretable, the important ones are interpretable, which would be a strong argument for their usefulness.
-Of course these results would have to be shown to scale to larger LMs and SAEs.
+It would be interesting to explore whether the results also extend to the effects of the features, i.e. how they affect the \ac{SAE} and the \ac{LM}.
+Specifically whether the clusters found also have meaning in terms of the effect they have on the \ac{SAE} and \ac{LM}, e.g. how much \ac{SAE} or \ac{LM} performance drops when the high density cluster is removed or if we retain only the interpretable cluster.
+If performance remains roughly the same when only the interpretable cluster is retained, this implies that while \ac{N2G} may not model all features well, it does model the important ones.
+More broadly for \acp{SAE} it would imply that though many features are uninterpretable, the important ones are interpretable, which would be a strong argument for their usefulness.
+Of course these results would have to be shown to scale to larger \acp{LM} and \acp{SAE}.
 
 The finding that the features of the high density cluster all point in the same direction also seems worth exploring.
-Though this was originally discovered right after the publication of the original SAE papers in \textcite{nanda_open_2023}, we have not found any sign of further exploration.
-Therefore, a first step would be to see whether it still holds for modern SAEs and SAEs trained on e.g. the residual stream, since though the overall structure has not changed much, as we saw in \autoref{sec:improvements_to_saes} many details have.
+Though this was originally discovered right after the publication of the original \ac{SAE} papers in \textcite{nanda_open_2023}, we have not found any sign of further exploration.
+Therefore, a first step would be to see whether it still holds for modern \acp{SAE} and \acp{SAE} trained on e.g. the residual stream, since though the overall structure has not changed much, as we saw in \autoref{sec:improvements_to_saes} many details have.
 If it does, potential hypotheses to explore includes those presented in the comments to \textcite{nanda_open_2023}.
-Gaining a greater understanding of this phenomenon could potentially aid in the training of SAEs, since the avoiding dead neurons could save many resources.
+Gaining a greater understanding of this phenomenon could potentially aid in the training of \acp{SAE}, since the avoiding dead neurons could save many resources.
 
-Lastly, exploring empirically the arguments made in \autoref{sec:n2g_interpretability} would be a useful avenue of research, since it could help establish N2G as a measure of interpretability.
-Further work in that direction could include investigating how the size of the N2G graph relates to the interpretability of the features.
+Lastly, exploring empirically the arguments made in \autoref{sec:n2g_interpretability} would be a useful avenue of research, since it could help establish \ac{N2G} as a measure of interpretability.
+Further work in that direction could include investigating how the size of the \ac{N2G} graph relates to the interpretability of the features.
 Intuitively, if a features requires a larger graph to model, it is less interpretable.
-This could be tested by devising some combined measure of N2G performance and graph size and seeing how it relates to more robust measures of interpretability.
+This could be tested by devising some combined measure of \ac{N2G} performance and graph size and seeing how it relates to more robust measures of interpretability.
