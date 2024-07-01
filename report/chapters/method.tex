@@ -88,7 +88,7 @@ If we take the mathematical representation of an \ac{SAE} \eqref{eq:sae_structur
     \widehat{\vec x}=&\mat W_d\vec y
 \end{align*}
 the direction of the $i$'th latent is $\mat W_e[i]$, i.e. the $i$'th row of the encoding matrix $\mat W_e$.
-There are arguments to be made\parencite{nanda_open_2023} that the respective row in the decoder matrix $\mat W_d$ is more representative of the latent, but we have chosen to use the encoding matrix for this work in keeping with our theme of looking at the behaviour of the features rather than their effect on the \ac{LM}.
+There are arguments to be made \parencite{nanda_open_2023} that the respective row in the decoder matrix $\mat W_d$ is more representative of the latent, but we have chosen to use the encoding matrix for this work in keeping with our theme of looking at the behaviour of the features rather than their effect on the \ac{LM}.
 
 Since these are directions in a high-dimensional space, we cannot simply visualize them or reason intuitively about them.
 Instead we use two statistics to boil down interesting properties to a few numbers we can understand: mean cosine similarity and variance.
