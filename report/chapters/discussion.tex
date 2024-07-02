@@ -5,26 +5,22 @@ In the previous section, we showed three properties of features in an \ac{SAE} t
     \item The directions in \ac{MLP} space represented by the high density features are very similar, while the the directions of the other clusters much closer to orthogonal.\label{obs:directions}
 \end{enumerate}
 Viewing the performance of \ac{N2G} as a measure of interpretability, \ref{obs:n2g_performance} suggests that \ac{SAE} latents are more interpretable than \ac{MLP} neurons.
-This corroborates the findings of both original \ac{SAE} papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
-We discuss the merits of \ac{N2G} as an interpretability measurement in \autoref{sec:n2g_interpretability} and it is also used as such \textcite{gao_scaling_2024}.
-\todo{The last half of this section is confusing}
-\todo{This continues in methodology section. That should be made clear}
-\todo{Is the whole thing methodology}
-\todo{Discuss comparison with gao}
+This corroborates the findings of both foundational \ac{SAE} papers \parencite{bricken_towards_2023}\parencite{cunningham_sparse_2023} despite using a totally different interpretability measure.
+We discuss the merits of \ac{N2G} as an interpretability measurement in \autoref{sec:n2g_interpretability}.
 
-\todo{Restructure to reduce redundant citations}
-\textcite{bricken_towards_2023} and \textcite{nanda_open_2023} both identity clusters of \ac{SAE} latents based on their density.
-Specifically they find a cluster of features with density around $-3$ (roughly matching our low density cluster) and an "ultra low density cluster" with density at or below $-6$.
-They also find that the high density cluster is more interpretable than the ultra low density cluster with the latter being almost entirely uninterpretable.
-This is in line with \ref{obs:bimodal} in the sense that we find two clusters of features based on density, except our extreme density cluster is on the other side.
-We also have a "mid density cluster" with many interpretable features, but our cluster with uninterpretable features is instead characterized by very high density.
-Where this difference comes from is unclear, especially since it is so large.
-The obvious explanation is that either the \ac{LM}, \ac{SAE} or dataset is different, but \textcite{nanda_open_2023} have published their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}} so we know that we fetch all three from the same URLs.
+
+Our research points to a strong clustering of SAE latents.
+We observe two distinct clusters of features based on density: a mid density cluster with log density around $-3.5$ and a high density cluster with log density around $-0.5$.
+The data also shows a cluster of interpretable features (measued as high \ac{N2G} performance) that is almost a subset of the mid density cluster.
+These results both align with and challenge the work by \textcite{bricken_towards_2023} and \textcite{nanda_open_2023}.
+The latter observe a mid density cluster with log density around $-2.5$ and a low density cluster with log density around $-4.5$.
+In agreement with our results, they also find that the interpretable features are a subset of the mid density cluster.
+There is a disagreement in the density of the mid density cluster, but the main difference is that we find a high density cluster while they find a low density cluster.
+Where this difference comes from is unclear, and it is especially puzzling since we ran our experiments on the same \ac{LM}, \ac{SAE} and dataset, with the URLs taken from their code at \footnote{\url{https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing}}.
 This only leaves the experiment and data analysis.
-One large difference here is that while both \textcite{bricken_towards_2023} and \textcite{nanda_open_2023} define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
+One large difference here is that while both  define a feature activating on a token as having an activation greater than $0$, we use a threshold of $0.6$.
 This could explain why we find a slightly lower density for the interpretable cluster, but it cannot explain why we find an ultra high density cluster instead of an ultra low density cluster, since a higher threshold can only decrease the density of a feature.
 Overall the discrepancy remains a mystery.
-\todo{Restructure to reduce redundant citations}
 
 Our \ref{obs:directions} matches the result in \textcite{nanda_open_2023} that the encoder directions of features in the uninterpretable cluster are very similar.
 The results of the other clusters are more difficult to interpret.
@@ -50,6 +46,7 @@ This is somewhat supported by table 1 in \textcite{foote_neuron_2023} which show
 This is consistent with later layers representing more abstract and semantic features which are difficult for \ac{N2G}'s purely syntactical approach to capture.
 Given this, it seems natural to think that \ac{N2G} would identify a subset of interpretable features, namely those that activate on mainly syntactical patterns.
 Testing this and how \ac{N2G} relates to other measures of interpretability is an interesting avenue for further research.
+\todo{Discuss comparison with gao}
 
 \section{Further work}
 The experiments in this work have focussed on the behaviour of features, i.e. what they activate on.
