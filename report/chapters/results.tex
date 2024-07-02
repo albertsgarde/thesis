@@ -1,8 +1,7 @@
-In this chapter we present the results of our experiments, starting with
-an investigation of the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
+In this chapter we present the results of our experiments, starting with an investigation of the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
 We then look at the relationship between feature \ac{N2G} performance and density.
 This gives rise to an intuitive clustering of features based on these two statistics, which are defined as the high density, low density cluster, and interpretable clusters.
-Finally, the relationship between geometry of the features and the clusters is investigated.
+This clustering is also related to both the geometry of the features and the sizes of the \ac{N2G} graphs, which we investigate in the last two sections of this chapter.
 In all cases, the focus is on the direct results of our experiments and not any broader conclusions.
 This we leave for the discussion in \autoref{sec:discussion}
 
@@ -140,4 +139,16 @@ The high density cluster is characterized by all features pointing in the same d
     \texttt{Variance} is the trace of the covariance matrix and is split into a raw and a normalized column, where the former is the value for the directions taken directly from the \ac{SAE} while for the latter the directions have been normalized to norm $1$.
     }
     \label{tab:directions}
+\end{table}
+
+\section{N2G size}
+The clusters found above also have a clear relationship to the size of the \ac{N2G} graphs.
+
+\begin{table}[ht]
+    \centering
+    \input{images/figures/n2g_size_table.tex}
+    \caption{Quartiles of \ac{N2G} graph sizes for the different feature clusters. The graph size is measured as the number of nodes in the trie, not the number of nodes in the vizualized graph.
+    All differences are significant in a two sample bootstrap test with $p<0.0001$.
+    }
+    \label{tab:n2g_sizes}
 \end{table}
