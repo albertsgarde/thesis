@@ -1,18 +1,15 @@
-In this thesis, we have explored several aspects of \acp{SAE} as used in the context of interpretability of language models.
-We investigate the use of a novel measure of interpretability, \ac{N2G}, and use it to corroborate several findings from previous work.
 
-First and foremost, find that \ac{N2G} performs better on \ac{SAE} latents than on \ac{MLP} neurons, corroborating the finding that \ac{SAE} latents are more interpretable than \ac{MLP} neurons.
+Our study of \acp{SAE} and the \ac{N2G} method has yielded insights into the structure of \ac{SAE} latents and the use of \ac{N2G} as a measure of interpretability.
+We corroborated previous findings that \ac{SAE} latents are more interpretable than MLP neurons, specifically observing higher \ac{N2G} performance on \ac{SAE} latents compared to MLP neurons.
+This aligns with the results of Bricken et al. (2023) and Cunningham et al. (2023), despite our use of a different interpretability measure, thus further strengthening the evidence for this foundational property of \acp{SAE}.
 
-This replication lends credence to the robustness of the original findings and suggests that \ac{N2G} can serve as a viable alternative for assessing the interpretability of \ac{SAE} latents.
+We also observed a clustering of \ac{SAE} latents based on density and interpretability, partially corroborating the findings of Bricken et al. (2023) and Nanda et al. (2023).
+Amongst these are the correlation between density and interpretability, and the presence of a cluster of uninterpretable \ac{SAE} latents that represent nearly the same linear combination of \ac{MLP} neurons.
+However, we also found some discrepancies in the specific characteristics of these clusters, highlighting the need for further investigation in this area.
 
-Secondly, our research identified clusters of \ac{SAE} latents based on their density and interpretability, aligning with previous studies.
-However, a notable divergence from existing literature emerged in our findings: we observed an ultra-high density cluster instead of the previously reported ultra-low density cluster. 
+Our investigation into \ac{N2G} revealed both potential benefits and limitations of this method.
+\ac{N2G} offers a computationally efficient approach to assessing interpretability, which is particularly valuable for large-scale models where more resource-intensive methods may be impractical.
+However, our results suggest that \ac{N2G} may be biased towards simple syntactical features.
+Despite this, it is still a useful proxy for interpretability, as long as this caveat is taken into account.
 
-Thirdly, we corroborated the unexplained phenomenon that the directions of the extreme density cluster exhibit remarkable similarity.
-Further work into the causes of this could potentially shed light on the issue of "dead neurons" in \acp{SAE}.
-
-Lastly, we observed that these directions were more distributed than those in the high-density cluster, they still demonstrated a degree of similarity that exceeded random chance.
-Unfortunately we did not have time to dive deeper into this, but a more thorough investigation of the direction distribution could provide more conclusive results on whether it is true that nearly orthogonal directions are exploited by language models.
-
-In conclusion, our work has provided further evidence that \ac{SAE} latents are more interpretable than \ac{MLP} neurons, has introduced a new method for measuring interpretability, and corroborated several other findings.
-Additionally, several new questions have been raised that could be the subject of future research.
+Overall this work has made clear a number of avenues of further research, especially into the geometry of the uninterpretable \ac{SAE} latents and the behaviour of the \ac{N2G} method as a measure of interpretability.
