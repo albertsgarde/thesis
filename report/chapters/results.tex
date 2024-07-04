@@ -55,7 +55,7 @@ In the following, two sets of features are studied: \ac{MLP} neurons and \ac{SAE
 \section{N2G Performance}
 The analysis begins with an examination of the performance of the \ac{N2G} models across the two populations: \ac{MLP} neurons and \ac{SAE} latents.
 For each feature, we calculate the recall, precision, and F1-score of the \ac{N2G} model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
-\autoref{tab:distributions} and \autoref{fig:distributions} shows the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
+\autoref{tab:distributions} and \autoref{fig:distributions} show the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
 A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
 More interesting is what the plots show about the nature of this distribution difference.
 Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the \ac{SAE} population has a second mode at almost $1$.
@@ -88,7 +88,7 @@ This begs the question of whether the modes of the performance metric distributi
 \autoref{fig:density_f1_cluster_check} sheds light on this question.
 \autoref{fig:density_f1} shows that while some features with poorly performing \ac{N2G} models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
 Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the \ac{N2G} performance spectrum, the dense features are almost entirely located in the low performing cluster.
-Alltogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by \ac{N2G}.
+Altogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by \ac{N2G}.
 In other words, the high F1 cluster is a subset of the low density cluster.
 This is backed up by the \texttt{N} column of \autoref{tab:directions} which confirms that almost all high F1 features are low density.
 
@@ -122,8 +122,6 @@ It turns out the answer is yes.
 Specifically, it turns out that features in the high density cluster all represent directions that are very similar, i.e. they all point in the same direction.
 This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and a variance of $0.04$.
 Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a variance of at least $0.98$.
-This is further confirmed when looking at the highly activating samples for the high density cluster, 10 of which can be seen at \footnote{\url{https://www.student.dtu.dk/~s183969/thesis/features/}}.
-E.g, of the first 10 dense features, 6 have the same top activating sample.
 The variance of the raw high density feature directions implies that though the vectors point in roughly the same direction, they still vary significantly in magnitude.
 
 Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
@@ -143,6 +141,10 @@ The high density cluster is characterized by all features pointing in the same d
 
 \section{N2G size}
 The clusters found above also have a clear relationship to the size of the \ac{N2G} graphs.
+\autoref{tab:n2g_sizes} shows the quartiles of the \ac{N2G} graph sizes for the different feature clusters.
+It shows a clear difference in graph sizes, with an ordering in all quartiles of high density $<$ MLP $<$ low density $<$ high F1.
+This is confirmed by a two sample bootstrap test, where within each quartile, all pairs are significantly different with $p<0.0001$.
+The only exception is the first quartile where both the low density cluster and the high F1 cluster have a Q1 of $1$ in all bootstrap samples.
 
 \begin{table}[ht]
     \centering
