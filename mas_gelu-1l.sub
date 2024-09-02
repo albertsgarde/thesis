@@ -4,7 +4,7 @@
 #BSUB -e logs/mas-gelu-1l_%J.err
 #BSUB -q gpua100
 #BSUB -n 12
-#BSUB -W 00:15
+#BSUB -W 00:45
 #BSUB -R "span[hosts=1]"
 #BSUB -R "rusage[mem=4096]"
 #BSUB -gpu "num=1:mode=exclusive_process"
