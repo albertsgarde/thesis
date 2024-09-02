@@ -1,32 +1,24 @@
-First a note on terminology, since it can be confusing.
-As described in section \ref{sec:preliminaries}, features are functions of the language models activations.
-In the following, we look at two sets of features: MLP neurons and SAE latents.
-We use "features" to refer to the union of the two sets while "neurons" and "latents" refer to the individual sets.
+In this chapter we present the results of our experiments, starting with an investigation of the performance of \ac{N2G} on the two populations of features: \ac{MLP} neurons and \ac{SAE} latents.
+We then look at the relationship between feature \ac{N2G} performance and density.
+This gives rise to an intuitive clustering of features based on these two statistics, which are defined as the high density, low density cluster, and interpretable clusters.
+This clustering is also related to both the geometry of the features and the sizes of the \ac{N2G} graphs, which we investigate in the last two sections of this chapter.
+In all cases, the focus is on the direct results of our experiments and not any broader conclusions.
+This we leave for the discussion in \autoref{sec:discussion}
 
-We start by looking at the performance of the N2G models across the two populations: MLP neurons and SAE latents.
-For each feature, we calculate the recall, precision, and F1-score of the N2G model trained on that feature along with the density of that feature, i.e. on what proportion of samples does its activation exceed some threshold.
-Table \ref{tab:distributions} and figure \ref{fig:distributions} shows the distributions of these statistics across the two populations.
-A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
-This is also indicated by the figures, but more interesting is that while the statistics for MLP neurons are roughly unimodal, the statistics for SAE latents are bimodal.
-There seems to be a cluster of high-scoring features in the SAE population that is not present in the MLP population.
-Figure \ref{fig:recall_precision} confirms this by showing that there is a set of SAE latents with both near perfect recall and near perfect precision.
+As described in section \ref{sec:preliminaries}, features are functions of the \ac{LM}'s activations.
+In the following, two sets of features are studied: \ac{MLP} neurons and \ac{SAE} latents.
+"Features" here refers to the union of the two sets while "neurons" and "latents" refer to the individual sets.
 
-An interesting question is whether the performance of the N2G model is related to the density of the feature.
-Figure \ref{fig:density} shows the distribution of feature densities across the two populations, first for all features and then for only features with an F1-score above 0.5.
-Interestingly, the high density features of the SAE almost disappear when only considering high-scoring features, which indicates that these are hard to interpret.
-Instead we get that the high-scoring SAE features are of lower density, around $10^{-2}$.
 
-Lastly, figure \ref{fig:density_f1} shows the relationship between density and F1-score for the two populations.
-This mainly confirms what we have already seen.
 
-\begin{table}[]
+\begin{table}[ht]
     \centering
     \input{images/figures/distribution_table.tex}
-    \caption{Means and standard deviations for the statistics of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means are different for all statistics with $p<0.0001$.}
+    \caption{Means and standard deviations for the statistics (N2G performance and feature density) of the two populations. Only includes features with a non-nan F1-score and a nonzero density. According to a two-sample bootstrap test, the distribution means for all statistics are different with $p<0.0001$.}
     \label{tab:distributions}
-    \end{table}
+\end{table}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
@@ -55,17 +47,28 @@ This mainly confirms what we have already seen.
         \label{fig:distributions_log_density}
     \end{subfigure}
     
-    \caption{Distributions of our statistics across the two populations. Only includes features with a non-nan F1-score and a nonzero density.}
+    \caption{Distributions of our statistics across the two populations. 
+    Density is calculated with a activation threshold of $0.6$. Since for some of the features the \ac{N2G} model never predicts an activation, the precision and F1 is sometimes undefined. A value of NaN is used to indicate this.}
     \label{fig:distributions}
 \end{figure}
 
-\begin{figure}[h]
+\section{N2G Performance}
+The analysis begins with an examination of the performance of the \ac{N2G} models across the two populations: \ac{MLP} neurons and \ac{SAE} latents.
+For each feature, we calculate the recall, precision, and F1-score of the \ac{N2G} model trained on that feature along with the density of that feature, i.e. on what proportion of tokens does its activation exceed some threshold.
+\autoref{tab:distributions} and \autoref{fig:distributions} show the distributions of these statistics across the two populations, with the activation threshold set to $0.6$.
+A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
+More interesting is what the plots show about the nature of this distribution difference.
+Looking at the plots of the performance metrics, it seems that the two populations share a mode at roughly $0.1$, but the \ac{SAE} population has a second mode at almost $1$.
+This indicates that while most \ac{SAE} latents are as badly modelled by \ac{N2G} as the \ac{MLP} neurons, there is a cluster of \ac{SAE} latents that are modelled almost perfectly.
+\autoref{fig:recall_precision} confirms this by showing that there is a set of \ac{SAE} latents with both near perfect recall and near perfect precision.
+
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/figures/recall_precision_mlp.pdf}
-        \caption{Recall vs Precision for MLP}
+        \caption{Recall vs Precision for \ac{MLP}}
         \label{fig:recall_precision_mlp}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
@@ -79,69 +82,75 @@ This mainly confirms what we have already seen.
     \label{fig:recall_precision}
 \end{figure}
 
-\begin{figure}[h]
+\section{Density and performance}
+Density also has a bimodal distribution for \acp{SAE}, though here neither mode lines up well with the \ac{MLP} distribution.
+This begs the question of whether the modes of the performance metric distributions are related to the modes of the density distribution.
+\autoref{fig:density_f1_cluster_check} sheds light on this question.
+\autoref{fig:density_f1} shows that while some features with poorly performing \ac{N2G} models ($F1<0.5$) are in the low density cluster, none of the well-performing features are in the high density cluster.
+Likewise, \autoref{fig:f1_density} shows that while low density features are spread over much of the \ac{N2G} performance spectrum, the dense features are almost entirely located in the low performing cluster.
+Altogether this means that low density is a necessary but not sufficient condition for a feature to be well modelled by \ac{N2G}.
+In other words, the high F1 cluster is a subset of the low density cluster.
+This is backed up by the \texttt{N} column of \autoref{tab:directions} which confirms that almost all high F1 features are low density.
+
+\begin{figure}[ht]
     \centering
     
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/figures/density_mlp.pdf}
-        \caption{MLP Feature Densities}
-        \label{fig:density_mlp}
+        \includegraphics[width=\textwidth]{images/figures/density_f1.pdf}
+        \caption{Density in each F1 cluster}
+        \label{fig:density_f1}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/figures/density_sae.pdf}
-        \caption{SAE Feature Densities}
-        \label{fig:density_sae}
+        \includegraphics[width=\textwidth]{images/figures/f1_density.pdf}
+        \caption{F1 in each density cluster}
+        \label{fig:f1_density}
     \end{subfigure}
     
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_mlp_good.pdf}
-        \caption{MLP Feature Densities (F1 >= 0.5)}
-        \label{fig:density_mlp_good}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_sae_good.pdf}
-        \caption{SAE Feature Densities (F1 >= 0.5)}
-        \label{fig:density_sae_good}
-    \end{subfigure}
-    
-    \caption{Histograms of feature densities. The lower two plots only include features with an F1-score about 0.5 Only includes features with a non-nan F1-score and a nonzero density.}
-    \label{fig:density}
+    \caption{The relationship between density and F1-score for \ac{SAE} features.
+    Each plot splits the features into clusters based on one metric and shows the distribution of the other within each cluster.
+    The cluster boundaries are chosen based on figure \ref{fig:distributions_f1} and \ref{fig:distributions_log_density}.}
+    \label{fig:density_f1_cluster_check}
 \end{figure}
 
-\begin{figure}[h]
+\section{Geometry}
+We have shown a strong relationship between density and \ac{N2G} performance.
+Both of these are empirical measures of the behaviour of the feature on a dataset.
+This raises a question of whether these clusters are also meaningful directly in terms of the feature directions (see \autoref{sec:methods_geometry}) read directly from the $\mat W_e$ encoding matrix in the SAE.
+It turns out the answer is yes.
+Specifically, it turns out that features in the high density cluster all represent directions that are very similar, i.e. they all point in the same direction.
+This can be seen in \autoref{tab:directions} where the high density cluster has a mean cosine similarity of $0.96$, and a variance of $0.04$.
+Meanwhile, the other clusters have a mean cosine similarity less than $0.02$ and a variance of at least $0.98$.
+The variance of the raw high density feature directions implies that though the vectors point in roughly the same direction, they still vary significantly in magnitude.
+
+Together with the results of the previous paragraph, this suggests that there are three meaningful clusters of features: a high density, low F1 cluster, a low density, high F1 cluster, and "the rest", a low density, low F1 cluster.
+The high density cluster is characterized by all features pointing in the same direction, while the low density, high F1 cluster is characterized by a spread of directions.
+
+\begin{table}[ht]
     \centering
-    
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp.pdf}
-        \caption{Density vs F1 for MLP}
-        \label{fig:density_f1_mlp}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_sae.pdf}
-        \caption{Density vs F1 for SAE}
-        \label{fig:density_f1_sae}
-    \end{subfigure}
-    
-    
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_mlp_good.pdf}
-        \caption{Density vs F1 for MLP (F1 >= 0.5)}
-        \label{fig:density_f1_mlp_good}
-    \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{images/figures/density_f1_sae_good.pdf}
-        \caption{Density vs F1 for SAE (F1 >= 0.5)}
-        \label{fig:density_f1_sae_good}
-    \end{subfigure}
-    
-    \caption{Heat maps of density vs F1-score for MLP and SAE features. The lower two plots show the same data but only for features with an F1-score above 0.5. This makes the high-scoring cluster of SAE latents more visible. Only includes features with a non-nan F1-score and a nonzero density.}
-    \label{fig:density_f1}
-\end{figure}
+    \input{images/figures/direction_table.tex}
+    \caption{Results of statistical analysis on the directions of various feature clusters.
+    The clusters are the same as those used in previous figures (log density threshold is $-1.2$ and F1 threshold is $0.5$), except the random cluster which is a set of directions randomly generated according to the standard $2048$-dimensional normal distribution.
+    \texttt N is the number of features in the cluster.
+    \texttt{Cos sim.} is the mean pairwise cosine similarity of directions in the cluster.
+    \texttt{Variance} is the trace of the covariance matrix and is split into a raw and a normalized column, where the former is the value for the directions taken directly from the \ac{SAE} while for the latter the directions have been normalized to norm $1$.
+    }
+    \label{tab:directions}
+\end{table}
+
+\section{N2G size}
+The clusters found above also have a clear relationship to the size of the \ac{N2G} graphs.
+\autoref{tab:n2g_sizes} shows the quartiles of the \ac{N2G} graph sizes for the different feature clusters.
+It shows a clear difference in graph sizes, with an ordering in all quartiles of high density $<$ MLP $<$ low density $<$ high F1.
+This is confirmed by a two sample bootstrap test, where within each quartile, all pairs are significantly different with $p<0.0001$.
+The only exception is the first quartile where both the low density cluster and the high F1 cluster have a Q1 of $1$ in all bootstrap samples.
+
+\begin{table}[ht]
+    \centering
+    \input{images/figures/n2g_size_table.tex}
+    \caption{Quartiles of \ac{N2G} graph sizes for the different feature clusters. The graph size is measured as the number of nodes in the trie, not the number of nodes in the vizualized graph.
+    All differences are significant in a two sample bootstrap test with $p<0.0001$.
+    }
+    \label{tab:n2g_sizes}
+\end{table}

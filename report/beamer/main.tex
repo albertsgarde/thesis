@@ -1,0 +1,402 @@
+\documentclass[aspectratio=169,hyperref={pdfpagelabels=false}]{beamer}
+%\setbeameroption{show notes}
+
+\input{preamble.tex}
+\input{../setup/statics.tex}
+\input{../setup/pre.sty}
+
+\title{\thesistitle}
+\subtitle{\thesissubtitle}
+
+\setdepartment{\thesisdepartment}
+\setcolor{dtured}
+
+
+
+\begin{document}
+\inserttitlepage
+
+
+\begin{frame}{Outline} % 2 minutes
+	\tableofcontents
+
+\end{frame}
+\note{
+
+}
+
+
+\section{Introduction} % 8 minutes
+\begin{frame}{Motivation} % 3 minutes
+    \includegraphics[height=0.8\textheight]{../images/ai_timeline.jpg}
+\end{frame}
+\note{
+    LLMs getting powerful.
+
+    Potential danger in several ways.
+
+    Interpretability could be key to controlling and gaining confidence in LLMs.
+
+    Neurons seem uninterpretable.
+
+    Need another unit of interpretation.
+}
+
+\begin{frame}{Goals} % 2 minutes
+    \begin{itemize}
+        \item Present existing work on Sparse Autoencoders (SAEs)
+        \item Confirm that SAE latents are more interpretable with novel interpretability metric
+        \item Investigate clusters in SAE latents based on Neuron2Graph (N2G) performance, density, and geometry
+        \item Assess the potential of N2G as a measure of interpretability
+    \end{itemize}
+\end{frame}
+\note{ 
+    To do this we use two methods: N2G and SAEs.
+}
+
+\section{Background} % 8 minutes
+\begin{frame}{Sparse Autoencoders} % 4 minutes
+    \begin{align*}
+        \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+        \hat{\vec x}=&\mat W_d\vec y\\
+        \mathcal L(\vec x)=&\norm{\vec x-\hat{\vec x}}_2^2+\alpha\norm{\vec y}_1
+    \end{align*}
+    \centering
+    \includegraphics[height=0.5\textheight]{../images/cunningham_sae_illustration.png}
+\end{frame}
+\note{
+    Neurons seem to be uninterpretable.
+    Linear representation hypothesis -> We need to find the directions in MLP neuron space that are interpretable.
+    SAEs are a method of doing this.
+    Describe structure (and loss) of SAE with image and equations.
+    Describe how it fits into the model.
+}
+
+% Possibly insert some kind of "preliminaries" slide
+\begin{frame}{Neuron2Graph} % 4 minutes
+    \only<1>{
+    \begin{itemize}
+        \item Automated interpretability method
+        \item Models a feature by building a syntactical graph
+    \end{itemize}
+    }
+    \only<2>{
+        \begin{itemize}
+            \item \texttt{"The"," big"," ten"}
+        \end{itemize}
+    }
+    \only<3>{
+        \begin{itemize}
+            \item \texttt{"The"," last"," ten"}
+        \end{itemize}
+    }
+    \includegraphics[height=0.7\textheight]{../images/gpt2-small_2_1817.pdf}
+\end{frame}
+\note{
+    Is an automated interpretability method published last year by Alex Foote.
+    Models a feature by building a syntactical graph based on a set of sample token strings.
+    The point being that this model has an easily interpretable visualisation.
+    Attempts to augment and prune these strings to find the simplest sufficient token patterns that activate the feature.
+    
+    Examples
+}
+
+
+\begin{frame}{Neuron2Graph} % 3 minutes
+    \begin{itemize}
+        \item Code based heavily on original implementation
+        \item Refactored for readability and maintainability
+        \item Original partial implementation in Rust to reduce memory and disk usage
+    \end{itemize}
+\end{frame}
+\note{
+    Original code is a rough translation of a Jupyter notebook.
+    It is therefore very difficult to work with.
+    We refactored it into a more maintainable form including a more modular structure and typing.
+    This made our modifications easier to implement and test.
+    Lastly, we also created a partial Rust implementation to reduce memory and disk usage.
+    After training the N2Gs in Python, we convert them to the Rust implementation for storage and analysis.
+}
+
+
+\begin{frame}{Models and dataset} % 1 minute
+    \begin{itemize}
+        \item Language model: \texttt{gelu-1l}
+        \item Dataset: \texttt{NeelNanda/c4-code-20k}
+        \item SAE: \texttt{NeelNanda/sparse\_autoencoder/25.pt}
+    \end{itemize}
+\end{frame}
+\note{
+    In our experiments we use the same language model, dataset and SAE as in Neel Nanda's replication of the original Anthropic article.
+    The language model is a single layer model.
+    The dataset is a combination of code and text.
+
+    Generalization from small LM and from early SAE.
+
+    Note that the same dataset is used to train the LM, the SAE, and the N2Gs.
+    This is commonly done.
+    I have not seen anyone argue for why.
+    One argument is that the SAE is meant to capture concepts in the LM and the N2G is meant to capture concepts in the SAE.
+    Therefore it is useful if the concepts are present in the dataset.
+}
+
+
+\section{Experiments} % 9 minutes
+\begin{frame}{Goals} % 2 minutes
+    \begin{itemize}
+        \item Confirm that SAE latents are more interpretable with novel interpretability metric (N2G)
+        \item Investigate clusters in SAE latents based on N2G, density, and geometry
+        \item Assess the potential of N2G as a measure of interpretability
+    \end{itemize}
+\end{frame}
+\note{ 
+}
+
+\begin{frame}{Interpretability} % 3 minutes
+    \only<1>{
+    \begin{table}[ht]
+        \centering
+        \input{../images/figures/distribution_table.tex}
+    \end{table}
+    }
+    \only<2>{
+    \begin{figure}[ht]
+        \centering
+        
+        \begin{subfigure}[b]{0.35\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_recall.pdf}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.35\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_precision.pdf}
+        \end{subfigure}
+        \begin{subfigure}[b]{0.35\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_f1.pdf}
+        \end{subfigure}
+    \end{figure}
+    }
+    \only<3>{
+        \begin{figure}[ht]
+            \centering
+            
+            \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/recall_precision_mlp.pdf}
+                \caption{Recall vs Precision for MLP}
+                \label{fig:recall_precision_mlp}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/recall_precision_sae.pdf}
+                \caption{Recall vs Precision for SAE}
+            \end{subfigure}
+        \end{figure}
+    }
+\end{frame}
+\note{
+    First slide:
+    Immediately we can confirm that SAE latents are more interpretable than MLP neurons.
+    Table shows performance of N2G models on the two populations along with the feature densities, which we will come back to later.
+    A two-sample bootstrap test shows that the means of the distributions are different for all statistics with $p<0.0001$.
+
+    This only shows summary statistics.
+    More interesting is the specific shape of the distributions.
+
+    Second slide:
+    Look at performance metrics.
+    Both populations seem to share a mode around 0, but SAE has second mode around 1.
+    Indicates most are badly modelled, but some are very well modelled.
+    Would be even more interesting if these modes were aligned across metrics.
+
+    Third slide:
+    They are.
+    Specifically [..]
+    }
+
+
+\begin{frame}{Density} % 3 minutes
+    \only<1>{
+    \begin{figure}[ht]
+        \centering
+        \begin{subfigure}[b]{0.7\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{../images/figures/distribution_log_density.pdf}
+        \end{subfigure}
+    \end{figure}
+    }
+    \only<2>{
+        \begin{figure}[ht]
+            \centering
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/distribution_log_density.pdf}
+            \end{subfigure}
+
+    
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/density_f1.pdf}
+            \end{subfigure}
+            \begin{subfigure}[b]{0.37\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{../images/figures/f1_density.pdf}
+            \end{subfigure}
+        \end{figure}
+    }
+\end{frame}
+\note{
+    Explain density.
+
+    First slide:
+    As we saw before, the density distribution of the SAE features is bimodal, just like for the performance metrics.
+    This raises the question of whether these modes are related.
+    To investigate this, we can look at...
+
+    Second slide:
+    We partition the SAE features first by N2G F1 and then by density.
+    While the low density cluster is not the same as the interpretable cluster, there is a clear relation.
+    Indeed, the interpretable cluster is almost a subset of the low density cluster.
+    In other words, all interpretable features have low density.
+}
+
+
+\begin{frame}{Geometry} % 3 minutes
+    \only<1>{
+        \begin{align*}
+            \vec y=&\mathrm{ReLU}\left(\mat W_e\vec x+\vec b\right)\\
+            \hat{\vec x}=&\mat W_d\vec y
+        \end{align*}
+    }
+    \only<2>{
+        \begin{table}[ht]
+            \centering
+            \input{../images/figures/direction_table.tex}
+        \end{table}
+    }
+\end{frame}
+\note{
+    By "geometry", we mean the directions in MLP activation space that the SAE latents represent.
+    Describe direction with reference to algebra.
+
+    Second slide:
+    To investigate these directions, we use cosine similarity and variance.
+    Explain cosine similarity and variance.
+    Explain table.
+    We see that the high density cluster has over half of latents and very high cosine similarity.
+
+    The rest have far lower cosine similarity (less than 1.9\%) but still far more than randomly chosen directions.
+}
+
+
+\begin{frame}{N2G sizes} % 3 minutes
+    \begin{table}[ht]
+        \centering
+        \input{../images/figures/n2g_size_table.tex}
+    \end{table}
+\end{frame}
+\note{
+    Lastly, there is also a relationship between the clusters we've defined and the sizes of the N2Gs.
+
+    Explain table
+
+    All differences are significant with $p<0.0001$.
+
+    The interpretable cluster has the smallest N2Gs, with the low density cluster not far behind.
+    Remember that interpretable cluster is almost subset of low density cluster.
+
+    Not only smallest, but small in absolute terms.
+    Most N2Gs of interpretable features are less than 2 nodes.
+    Very few are more than 10.
+}
+
+
+\section{Discussion} % 12 minutes
+\begin{frame}{Results} % 5 minutes
+    \begin{table}
+        \begin{tabular}{@{}llllll@{}}
+            \toprule
+                    & N & F1   & Log density & Similarity & N2G size \\
+                    &   & Mean & Mean        & Mean & Median \\
+                    \midrule 
+            High density (> -1.2) & 9944 & 0.1 & -0.6 & 0.96 & 349    \\ 
+            Low density (< -1.2)  & 6440 & 0.6 & -3.7 & 0.01 & 5    \\ 
+            High F1 (> 0.5)       & 3795 & 0.9 & -3.5 & 0.02 & 2    \\ \bottomrule
+        \end{tabular}
+        \caption{Summary of cluster statistics.}
+    \end{table}
+\end{frame}
+\note{
+    There are a number of things we can say.
+
+    First, we have confirmed that SAE latents are more interpretable than MLP neurons.
+    We expected this, but it is a sign that our method is working to some degree.
+
+    Second, we have these clusters.
+    They aren't a new finding either, since both the original Anthropic article and Neel Nanda's replication found similar clusters.
+    But there are some interesting differences.
+    Slight difference in density.
+    Their uninterpretable cluster is below.
+    Our uninterpretable cluster is above.
+
+    The high similarity in the uninterpretable cluster is also found by Nanda.
+}
+\note{
+    Our original finding is the relationship between density and N2G size.
+    As we'll come to in a bit, this mostly says something about the N2G method, but it is still interesting to note that at least 1.5 thousand latents in the SAE are well-moddelled as activating on a single token regardless of context.
+
+    Caveats: This may turn out not to be true if tested on more data.
+    Though given the amount, it seems unlikely to be totally a fluke.
+
+    Also likely caused by the size of the model.
+    A model of this size will have difficulty capturing more complex features.
+}
+
+\begin{frame}{N2G} % 5 minutes
+    \begin{itemize}
+        \item Cheaper than human evaluation or automated interpretability with LLMs
+        \item Purely syntactical: identifies features that are activated by a single token
+        \item I would expect high precision and low recall
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Further Work} % 4 minutes
+    \begin{itemize}
+        \item Direct comparison between N2G and more expensive interpretability measures on larger models.
+        \item Extend clustering to other attributes of the features, especially their effect on the model output.
+        \item Repeat these experiments on other SAEs, especially those trained with newer methods and on larger models.
+    \end{itemize}
+\end{frame}
+\note{
+    First point:
+    Would help us understand the limitations of N2G.
+    Though it is likely useful, a better understanding of exactly what interpretable features it can and cannot identify would make it more so.
+
+    Second point:
+    The point of interepretaiblity is to understand the behaviour of the model, so in order for these clusters to be useful, we need to understand how they affect the model output.
+
+    Thirds point:
+    Many new SAE techiques are specifically designed to avoid the low density cluster of "dead" features.
+    It would therefore be interesting to see whether this only increases the size of the interpretable cluster or creates new uninterpretable clusters.
+    Also, larger models seem to be able to represent qualitatively different concepts, so what we look at here would likely be different.
+}
+
+
+\section{Conclusion} % 3 minutes
+\begin{frame}{Conclusion} % 3 minutes
+    \begin{itemize}
+        \item SAE latents are more interpretable than MLP neurons
+        \item SAE latents have a natural clustering based on N2G performance, density, geometry, and N2G size.
+        \item N2G as a measure of interpretability is promising, with some caveats
+    \end{itemize}
+\end{frame}
+\note{
+
+}
+
+
+
+
+
+\end{document}

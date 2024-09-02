@@ -21,15 +21,19 @@
 \input{frontmatter/approval.tex}
 \clearpage 
 \input{frontmatter/abstract.tex}
-\clearpage 
-\input{frontmatter/acknowledgements.tex}
+%\clearpage 
+%\input{frontmatter/acknowledgements.tex}
 \cleardoublepage 
 \tableofcontents
 \cleardoublepage 
 
+\section*{List of Acronyms}
+\input{frontmatter/glossary.tex}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagenumbering{arabic}
 \cleardoublepage
+\acresetall
 \chapter{Introduction}
 \input{chapters/introduction.tex}
 \cleardoublepage
@@ -37,15 +41,19 @@
 \input{chapters/theory.tex}
 \cleardoublepage
 \chapter{Method}
+\label{sec:method}
 \input{chapters/method.tex}
 \cleardoublepage
 \chapter{Results}
+\label{sec:results}
 \input{chapters/results.tex}
 \cleardoublepage
 \chapter{Discussion}
+\label{sec:discussion}
 \input{chapters/discussion.tex}
 \cleardoublepage
 \chapter{Conclusion}
+\label{sec:conclusion}
 \input{chapters/conclusion.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

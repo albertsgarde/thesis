@@ -1,7 +1,9 @@
 % Todos
-\usepackage{todonotes}
+\usepackage[disable]{todonotes}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{acronym}
 
 %% Standard symbols
 \newcommand{\e}{\mathrm{e}}
@@ -29,60 +31,16 @@
 \newcommand{\mat}[1]{\mathbf{#1}}
 \newcommand{\set}[1]{\mathcal{#1}}
 
-% Vector span
-\newcommand{\vspan}{\mathrm{span}}
-
-% Column vectors
-\makeatletter
-\newcommand{\cvec}[1]{
-    \left[\begin{array}{c}#1\cvecchecknextarg}
-\newcommand{\cvecchecknextarg}{\@ifnextchar\bgroup{\cvecgobblenextarg}{\end{array}\right]}}
-\newcommand{\cvecgobblenextarg}[1]{\\#1\@ifnextchar\bgroup{\cvecgobblenextarg}{\end{array}\right]}}
-\makeatother
-
-% Row vectors
-\makeatletter
-\newcommand{\rvec}[2]{
-    \left[\begin{array}{*{#1}{c}}#2\rvecchecknextarg}
-\newcommand{\rvecchecknextarg}{\@ifnextchar\bgroup{\rvecgobblenextarg}{\end{array}\right]}}
-\newcommand{\rvecgobblenextarg}[1]{&#1\@ifnextchar\bgroup{\rvecgobblenextarg}{\end{array}\right]}}
-\makeatother
-
-% Vertical iff
-\newcommand{\viff}{\Updownarrow}
-
 % Absolute
 \newcommand{\abs}[1]{\left\lvert#1\right\lvert}
 
 % Norm
 \newcommand{\norm}[1]{\left\lvert\left\lvert#1\right\lvert\right\lvert}
-
-% Inner product
-\newcommand{\iprod}[2]{\left\langle#1,#2\right\rangle}
-
-% Complex conjugate
-\newcommand{\conj}[1]{\overline{#1}}
-
 % Transpose
 \newcommand{\trans}[1]{#1^\top}
 
-% Conjugate transpose (adjunct)
-\newcommand{\adj}[1]{#1^*}
-
-% Infinite sum
-\newcommand{\infsum}[2][1]{\sum_{#2=#1}^\infty}
-
 % Label specific row in align
 \newcommand\numberthis[1]{\stepcounter{equation}\label{#1}\tag{\theequation}}
-
-% Conditional probability
-\newcommand\given[1][]{\:#1\vert\:}
-
-% Contradiction
-\newcommand{\contradiction}{\ensuremath{\lightning}}
-
-% Closure
-\newcommand{\closure}[1]{\overline{#1}}
 
 % Matrix trace
 \newcommand{\trace}{\mathrm{tr}}
@@ -98,49 +56,6 @@
 
 % Element-wise product
 \newcommand{\elemprod}{\circ}
- 
-% Matrix representation of linear operator in basis
-\newcommand{\linopbasis}[3]{\tensor[_{#1}]{\left[#2\right]}{_{#3}}}
-
-\newcommand{\powerset}[1]{\mathcal{P}\left(#1\right)}
 
 \DeclareMathOperator*{\argmax}{arg\,max}
 \DeclareMathOperator*{\argmin}{arg\,min}
-
-
-% Image
-\newcommand{\image}[3]{
-    \begin{figure}[H]
-        \centering
-        \includegraphics[scale=#3]{#1} 
-        \caption{#2}
-    \end{figure}
-} 
-
-% Itemize characters
-\renewcommand\labelitemii{\textbullet}
-\renewcommand\labelitemiii{\textbullet}
-
-\newcommand\matlist[2]{#1_1,#1_2,\dots,#1_{#2}}
-
-% References a Theorem/Lemma/Corollary depending on the label (thr/lemma/cor).
-% For example, if a label thr:hairy_ball exists, then \thref{hairy_ball} will evaluate to "Theorem \label{thr:hairy_ball}".
-% If the theorem is later changed to a lemma, so thr:hairy_ball is renamed lemma:hairy_ball, \thref{hairy_ball} will instead evaluate to "\Lemma \label{lemma:hairy_ball}".
-% What happens if two labels with the same name (both thr:hairy_ball and lemma:hairy_ball) is undefined.
-\makeatletter
-\newcommand\thref[1]{%
-	\@ifundefined{r@theorem:#1}{%
-		\@ifundefined{r@lemma:#1}{%
-			\@ifundefined{r@corollary:#1}{%
-				Definition \ref {definition:#1}%
-			}{%
-				Corollary \ref{corollary:#1}%
-			}%
-		}{%
-			Lemma \ref{lemma:#1}%
-		}%
-	}{%
-		Theorem \ref{theorem:#1}%
-	}%
-}
-\makeatother

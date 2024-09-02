@@ -1,0 +1,34 @@
+\mode<presentation>
+\setbeamertemplate{title page}{
+    {
+        \usebeamerfont{title}
+        \usebeamercolor[fg]{title}
+        
+        % title
+        \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=south west, 
+              text width = \paperwidth,
+              xshift=0mm, 
+              yshift=10mm] 
+             at (current page.south west) 
+             {{\usebeamerfont{subtitle}%
+                \usebeamercolor[fg]{subtitle}%
+                \insertsubtitle} \\
+                {\textbf{\inserttitle}}}; 
+        \end{tikzpicture}
+        
+    }
+    
+        % logo
+        \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=north west, 
+              xshift=1mm, 
+              yshift=-2mm] 
+             at (current page.north west) 
+             {\includegraphics[width=7.5mm,keepaspectratio]{logos/\targetcolourmodel/white.pdf}}; 
+        \end{tikzpicture}
+}
+
+\setbeamertemplate{frametitle}{}
+\mode
+<all>

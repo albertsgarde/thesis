@@ -20,9 +20,9 @@
     \begin{itemize}
         \item Looked into the literature.
         \item Investigated tasks for the models to solve.
-        \item Attempted to get N2G working on \verb|gpt2-small| SAEs.
+        \item Attempted to get N2G working on \texttt{gpt2-small} SAEs.
         \begin{itemize}
-            \item Existing \verb|gpt2-small| SAEs have many features, which means that MAS data takes up a lot of space.
+            \item Existing \texttt{gpt2-small} SAEs have many features, which means that MAS data takes up a lot of space.
             \item I have ideas for solutions, but none are great.
         \end{itemize}
     \end{itemize}
@@ -70,11 +70,11 @@
 \begin{frame}[fragile=singleslide]
     \frametitle{Tasks}
     \begin{itemize}
-        \item \verb|gelu-11| is far too underpowered for any task.
-        \item The largest model we can comfortably work with is \verb|gpt2-small|, the largest we can practically work with is \verb|gpt2-xl|, and thats something of a stretch.
+        \item \texttt{gelu-11} is far too underpowered for any task.
+        \item The largest model we can comfortably work with is \texttt{gpt2-small|, the largest we can practically work with is \verb|gpt2-xl}, and thats something of a stretch.
         These models are still underpowered for many interesting tasks.
-        \item A possible task is correctly continuing the string \verb|The cat is sm| by completing a word.
-        \item Basically all models can do this task, and I expected removing neurons activting on \verb|sm| to make the task harder, but this is not the case.
+        \item A possible task is correctly continuing the string \texttt{The cat is sm} by completing a word.
+        \item Basically all models can do this task, and I expected removing neurons activting on \texttt{sm} to make the task harder, but this is not the case.
     \end{itemize}
     \begin{center}
         \includegraphics[scale=0.6]{images/fruit_colors.png}

@@ -1,38 +1,37 @@
-In this chapter we define the terminology used the rest of the report (section \ref{sec:preliminaries}) and present the prior work that serves as a basis for the thesis (section \ref{sec:n2g}).
-We also provide a more in depth overview of the literature on SAEs (section \ref{sec:sae}).
+In this chapter we define the terminology used in this thesis (section \ref{sec:preliminaries}) and present the prior work that serves as a basis for the thesis (section \ref{sec:n2g}).
+We also provide a more in depth overview of the literature on \acp{SAE} (section \ref{sec:sae}).
 
-\section{Preliminaries}
+\section{Terminology}
 \label{sec:preliminaries}
 Before we can dive into the specifics of the methods used in this thesis, 
 we need to establish some basic concepts and terminology.
 Firstly, throughout this section, we assume there is some fixed 
 transformer language model \parencite{vaswani_attention_2023} 
 which we want to interpret.
-We will refer to this as the \emph{language model}.
-We will also assume that we have a set of text samples 
-which we use to train and test the methods.
-We will refer to these as the \emph{dataset}.
+We will refer to this as the \emph{language model} or abbreviated as the \emph{LM}.
 
 Next we introduce the unit of interpretability, namely \emph{features}. 
-In the most general form, a feature is any function of the activations 
-of a model, but in the context of this thesis we will focus on two 
-specific types.
-The first type is the individual neurons of the model, i.e. the activations which can be read directly from the model, that are actually represented on the GPU during inference.
-The second type is the latent neurons of an SAE (see section \ref{sec:sae}).
+In the technical sense, a feature is any function of the activations 
+of a \ac{LM}, e.g. a neuron in a \ac{MLP} layer is a feature, where the function is simply the value of that neuron.
+The same holds for neurons in the residual stream or attention heads.
+Indeed, neurons are the basic form of feature and other features are built up from these.
+Especially interesting are features built from linear combinations of neurons.
+In this thesis we will focus on two types of features:
+\Ac{MLP} neurons and a specific type of linear combination of neurons, namely the latents of \acp{SAE} (see section \ref{sec:sae}).
 We will generally refer to features of the first type as \emph{neurons} and features of the second type as \emph{SAE latents} or just \emph{latents}.
-A core concept in the study of SAEs is \emph{sparsity}, which is a measure of how many of the activations of the SAE latents are zero.
+A core concept in the study of \acp{SAE} is \emph{sparsity}, which is a measure of how many of the activations of the \ac{SAE} latents are zero.
 A set of features (e.g. the latents of an SAE) is sparse if only a small fraction of the activations are non-zero on any given input.
 The transpose of this term is \emph{density}, which describes an individual feature.
 A feature is dense if it only activates on a small fraction of the samples in the dataset.
 
-Note that there is some ambiguity in the literature, and in this report, about the term "feature".
-Sometimes it is meant as we describe here, a function of the model's activations, sometimes it is used specifically for what we call SAE latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the model.
-This is worth being aware of even though it is generally clear from context what is meant.
-In fact, we use the term in its abstract sense at the begining of section \ref{sec:sae} despite using it in the first sense otherwise.
+Note that there is some ambiguity in the literature around the term "feature".
+Sometimes it is meant as we describe here, a function of the \ac{LM}'s activations, sometimes it is used specifically for what we call \ac{SAE} latents \parencite{templeton_scaling_2024}, and sometimes it is used in a more abstract way to refer to human-understandable concepts represented in the \ac{LM}.
+This last meaning we refer to as a \emph{concept}.
+This ambiguity in the literature is worth being aware of even if it is mostly clear from context what is meant.
 
 \section{Neuron2Graph}
 \label{sec:n2g}
-The main interpretability method we use to investigate SAEs is N2G (Neuron2Graph)
+The main interpretability method we use to investigate \acp{SAE} is \ac{N2G} (Neuron2Graph)
 as described in \cite{foote_neuron_2023}.
 It attempts to build a graph model of the behaviours of a feature 
 by finding a set of patterns which activate the feature.
@@ -41,13 +40,16 @@ with the possibility of a special ignore token
 which signal that the token at that position does not matter.
 In the original paper, this is done on the basis of maximum activating samples, but we use a different method as described in section \ref{sec:sampling}.
 
-To run this method for a particular feature $f\in\mathcal{F}$, 
-we need a set of highly activating samples $\mathcal S\subseteq \mathcal T$.
+To run this method for a particular feature $f$, 
+we need a set of highly activating samples $\mathcal S$.
 For sample $s\in\mathcal S$, we identify a \emph{pivot token} $e$, 
 which is the most activating token in the sample, 
-and perform 3 steps: pruning, saliencey detection, and augmentation.
+and perform 3 steps: pruning, saliency detection, and augmentation.
+This results in a set of string patterns that all activate $f$ highly.
+These are then used to build a graph model of the feature (\autoref{sec:n2g_graph_building}), which can be used to predict the activation of the feature on any given input (\autoref{sec:n2g_prediction}).
 
 \subsection{Pruning}
+\label{sec:n2g_pruning}
 For a token string $s\in\mathcal S$, and pivot token $e$, 
 pruning consists of finding the smallest substring of $s$ that ends in $e$ 
 and still sufficiently activates $f$.
@@ -58,29 +60,32 @@ This removes context that is irrelevant to the activation of $f$.
 We call the pruned string $s'$
 
 \subsection{Saliency detection}
+\label{sec:n2g_saliency}
 Here we find the most important tokens in the pruned string $s'$.
 This is done by replacing each token in the pruned string 
 with a padding token and finding the change in activation.
 If the change is large, the token is important.
-How large the change needs to be is another parameter of the model.
+How large the change needs to be is another parameter of the \ac{LM}.
 Once this step is done, we have a set $B$ of important tokens in $s'$.
 
 \subsection{Augmentation}
+\label{sec:n2g_augmentation}
 Given a pruned string $s'$ and a set of important tokens $B$ in that string, 
-augmentation is the process of finding nearby nearby strings 
+augmentation is the process of finding nearby strings 
 that activate $f$ similarly to $s'$.
 To do this, we replace each $b\in B$ with other "similar" tokens and 
 see whether the resulting string activates $f$ sufficiently.
 What counts as sufficient is yet another parameter, 
-while "similar" tokens are found using a helper model 
-(\verb|distilbert-base-uncased| in the original paper) 
+while "similar" tokens are found using a helper \ac{LM} 
+(\texttt{distilbert-base-uncased} in the original paper and in our experiments) 
 that is asked to predict replacements for $b$ 
 given the rest of $s'$ as context.
 All alternative strings that activates $f$ sufficiently are stored.
 
 \subsection{Graph building}
+\label{sec:n2g_graph_building}
 After performing the 3 previous steps on all strings in $\mathcal S$, 
-We have a set $\mathcal S'\subseteq\mathcal T$ 
+we have a set $\mathcal S'\subseteq\mathcal T$ 
 of pruned and augmented strings that all activate $f$ highly.
 In order to make predictions we must build a model from these strings.
 This is done by creating a trie $T$ 
@@ -91,6 +96,20 @@ The rest of the nodes are the tokens in the strings of $S'$,
 so that each path from the root to a leaf represents a string in $S'$.
 At the end of each of these paths through $T$, 
 we add an end node storing the activation of $f$ on the represented string.
+An example of this can be seen in figure \ref{fig:n2g_graph_gpt2-small_2_1817}.
+The activating tokens are represented by red nodes while the rest are blue.
+Note that in this representation, ignore tokens are not shown, and nodes at the same depth representing the same token are collapsed.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{images/gpt2-small_2_1817.pdf}
+    \caption{N2G Graph of neuron 1817 in the second \ac{MLP} layer of \texttt{gpt2-small}. 
+    Note that in this representation, ignore tokens are not shown, and nodes at the same depth representing the same token are collapsed.}
+    \label{fig:n2g_graph_gpt2-small_2_1817}
+\end{figure}
+
+\subsection{Prediction}
+\label{sec:n2g_prediction}
 To predict the activation of $f$ on the last token of a new string $s$, 
 we start from the root of $T$ and the last token of $s$.
 We then traverse the trie, going backwards through $s$ 
@@ -99,6 +118,12 @@ with the special ignore tokens matching any token.
 If we reach an end node, we return the activation stored there.
 If at some point no node matches the current token of $s$, 
 we return $0$.
+
+For an example, consider figure \ref{fig:n2g_graph_gpt2-small_2_1817}.
+If we let $s$ be the string \texttt{"The big ten"}, tokenized as \texttt{"The"," big"," ten"}, then we start from the end and see that the last token is \texttt{" ten"}.
+This is indeed an activating token, so we move to the next token in $s$, \texttt{" big"}.
+There is a preceding node for this token, and since it is an end node, we return the activation stored there.
+If we instead consider the string \texttt{"The last ten"}, tokenized as \texttt{"The"," last"," ten"}, we again have that the last token is an activating token, but since no preceding node matches the token \texttt{" last"}, we return $0$.
 
 This gives us a quantative measure of how good a model of the feature 
 the graph is.
@@ -109,6 +134,7 @@ where all ignore nodes are removed,
 and nodes representing the same token on the same layer are collapsed.
 We refer to both this representation and the original trie $T$ 
 as the \emph{feature graph}.
+
 
 \section{Sparse autoencoders}
 \label{sec:sae}

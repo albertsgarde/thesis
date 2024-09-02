@@ -17,4 +17,5 @@
 *.xdv
 *.tdo
 
+!images/**.pdf
 images/figures/*
